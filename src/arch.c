@@ -96,13 +96,15 @@ void arch_loop() {
 int main(int argc, char **argv) {
 
 	/* Validate arguments */
-	if (argc != 5) {
+	if (argc != 7) {
 		
 		printf("Usage: %s <Root Directory> <Db user> <Db pass> <Db name>.\n"
 			   "Root Directory - Path to indexroot. All subdirectories will be indexed.\n"
+			   "Db host - Database host\n"
 			   "Db user - Database user\n"
 		       "Db pass - Database password\n"
-		       "Db name - Database to use for indexing\n", argv[0]);
+		       "Db name - Database to use for indexing\n"
+			   "Db tbl  - Database tablename", argv[0]);
 		
 		return EXIT_FAILURE;
 	}
@@ -117,7 +119,7 @@ int main(int argc, char **argv) {
 	signal(SIGUSR2, sighandl);
 
 	/* connect to database */
-	if (!arch_db_init("localhost", argv[2], argv[3], argv[4], "fs"))
+	if (!arch_db_init(argv[2], argv[3], argv[4], argv[5], argv[6]))
 		return EXIT_FAILURE;
 	
 	/* clean database */

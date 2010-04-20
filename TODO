@@ -1,0 +1,18 @@
+
+##################
+    TODO LIST
+##################
+
+* ref list always first ;)
+* config parser
+* support for networked broadcasting?
+
+
+##################
+  Reference list
+##################
+
+References are tagged in source files by the string 'REF:<number>'
+
+1: refactor to string api 
+2: group path handling into one interface (also consider move:ing related stuff from REF:1)

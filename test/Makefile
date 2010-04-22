@@ -14,6 +14,9 @@ raw_inotify :
 path :
 	$(CC) -D__DEBUG__ $(CFLAGS) ../src/common/path.c t_path.c -o test_path
 
+path2 :
+	$(CC) -D__DEBUG__ $(CFLAGS) ../src/common/path.c t_path2.c -o test_path2
+
 rbtree : 
 	$(CC) -D RB_DEBUG $(CFLAGS) ../src/common/rbtree.c t_rbtree.c -o test_rbtree
 

@@ -167,3 +167,26 @@ const char* basename(const char *path) {
 	
 	return last;
 }
+
+
+char* dirname(char *fullpath) {
+
+	char *dirname, *sep;
+	int pos;
+
+	if (fullpath[strlen(fullpath)-1] == '/')
+		fullpath[strlen(fullpath)-1] = '\0';
+
+	sep = strrchr(fullpath,'/');
+	pos = sep-fullpath+1;
+
+	if(sep == NULL)
+		return NULL;
+
+	dirname = malloc ( pos );
+
+	memset(dirname,0,pos);
+	memcpy (dirname, fullpath, pos-1 );
+
+	return dirname;
+}

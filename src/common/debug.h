@@ -1,25 +1,19 @@
-/*
- * Common Debugging macros and definitions
- * 
- * Copyright (C) 2010  Archived
+/* common/debug.h - debugging macros and definitions
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *   Copyright (C) 2010  Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
  */
 
-#ifndef _COMMON_DEBUG_H
+#ifndef __COMMON_DEBUG_H
 
-#define _COMMON_DEBUG_H
+#define __COMMON_DEBUG_H
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #define __perror(...) fprintf(stderr, __VA_ARGS__)
 
@@ -29,8 +23,7 @@
 
 #ifdef __DEBUG__
 
-#include <stdio.h>
-#include <stdlib.h>
+#define __str(x) #x
 
 #define dassert(expr) \
 	((expr) ? \
@@ -38,11 +31,14 @@
 		__perror("ASSERT: \"" #expr "\" at %s:%i\n", __FILE__, __LINE__))
 
 #define dprint(...) \
-	__perror("DEBUG: " __VA_ARGS__)
+	__dprint(__FILE__, __LINE__, __VA_ARGS__)
+
+#define __dprint(file, line, ...) \
+    __perror("# " file ":" __str(line) " -> " __VA_ARGS__)
 
 #else
 #define dassert(expr)
 #define dprint(...)
 #endif
 
-#endif /* _COMMON_DEBUG_H */
+#endif /* __COMMON_DEBUG_H */

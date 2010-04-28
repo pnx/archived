@@ -1,10 +1,8 @@
-/**
- * Archived - Inotify based filesystem mirror daemon
+/*
+ * arch/mysql.c - Handles database operations
  * 
- * @authors: pnx, tritomI
- * 
- *  
- *  Copyright (C) 2010  Archived
+ *  (C) Copyright 2010 Henrik Hautakoski <henrik@unknown.org>
+ *  (C) Copyright 2010 Fredric Nilsson <fredric@unknown.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,8 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 #include <mysql/mysql.h>

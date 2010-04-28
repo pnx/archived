@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010  Archived
  *
@@ -33,7 +32,9 @@ static struct tree *current = NULL;
 static void index_entry(struct entry *ent) {
 
     static char buf[1024];
-
+#if __DEBUG__
+		printf("DEBUG: index_entry adding to db: %s %s %d\n", ent->base, ent->name, ent->dir);
+#endif
     arch_db_insert(ent->base, ent->name, ent->dir);
     
     if (ent->dir) {
@@ -50,7 +51,7 @@ static void index_entry(struct entry *ent) {
 static void add(const char *path) {
 	
 	char *newstr;
-	
+
 	if (st_size >= 255)
 		return;
 	
@@ -131,6 +132,9 @@ void indexer_run(unsigned int num) {
 		}
 		
         index_entry(ent);
+#if __DEBUG__
+		printf("DEBUG: indexer_run(): ");
+#endif
 	}
 }
 

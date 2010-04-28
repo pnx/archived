@@ -1,16 +1,51 @@
 
 #include "unit.h"
+#include <malloc.h>
+#include <time.h>
 
-int utest_string(const char *a, const char *b) {
+static inline char ranchr() {
+
+    char ch;
+
+    do {
+        ch = rand() % 0x7A;
+    } while(ch < 0x20);
+
+    return ch;
+}
+
+void utest_init_RNG() {
+
+    static unsigned char init = 0;
     
-    while(*a == *b) {
+    if (init)
+        return;
         
-        if (*a == 0)
-            return 1;
-   
-        a++;
-        b++;
-    }
+    srand(time(NULL));
+    init = 1;
+}
+
+/*
+ * Helper function for generating random strings
+ */
+char* utest_ran_string(size_t size) {
+
+    int i, r;
+    char *str;
+
+    if (size < 1)
+        return NULL;
+
+    str = malloc(size+1);
+
+    if (str == NULL)
+        return NULL;
+
+    utest_init_RNG();
     
-    return 0;
+    for(i=0; i < size; i++)
+        str[i] = ranchr();
+    str[i] = 0;
+
+    return str;
 }

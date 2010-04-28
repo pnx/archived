@@ -1,24 +1,16 @@
-/*
- * Modified version of Julienne Walker's implementation
- * http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
+/* common/rbtree.c - red black tree implementation
  * 
- * Copyright (C) 2010  Archived
+ *   Copyright (C) 2010  Hernrik Hautakoski <henrik.hautakoski@gmail.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * Do not touch anything in this file. it's perfect ;)
+ *   Based on the work of Julienne Walker's rbtree implementation
+ *   http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
  */
+
 #include <malloc.h>
 
 #include "debug.h"
@@ -27,50 +19,6 @@
 #define is_red(n) (n != NULL && n->color == RB_RED)
 #define swap(n,d,q) n->child[n->child[d] == q]
 
-#ifdef __DEBUG__
-int rb_assert(rbnode *node) {
-	
-	int rh, lh;
-	rbnode *ln;
-	rbnode *rn;
-	
-	if (node == NULL) {
-		return 1;
-	}
-	
-	ln = node->child[0];
-	rn = node->child[1];
-		
-	if (is_red(node)) {
-		if (is_red(ln) || is_red(rn)) {
-			die("Double red");
-			return 0;
-		}
-	}
-		
-	lh = rb_assert(ln);
-	rh = rb_assert(rn);
-	
-	if ( (ln != NULL && ln->key >= node->key) &&
-		 (rn != NULL && rn->key <= node->key) ) {
-		die("BST violation");
-		return 0;
-	}
-	
-	if (rh != 0 && lh != 0) {
-		
-		if (rh != lh) {
-			die("Black height violation");
-			return 0;
-		}
-		
-		return (is_red(node)) ? lh : lh+1;
-	}
-	
-	return 0;
-}
-#endif
-
 static rbnode* node_alloc(uint key, void *ptr) {
 	
 	rbnode *n = malloc(sizeof(rbnode));
@@ -78,61 +26,83 @@ static rbnode* node_alloc(uint key, void *ptr) {
 	if (n == NULL)
 		return NULL;
 	
-	n->key   = key;
-	n->data  = ptr;
-	n->color = RB_RED;
+	n->key      = key;
+	n->data     = ptr;
+	n->color    = RB_RED;
 	n->child[0] = NULL;
 	n->child[1] = NULL;
 	
 	return n;
 }
 
-static void node_dealloc(rbnode *n, void (*a)(rbnode *)) {
+/*
+ * Recursivly deallocate a tree.
+ */
+static void node_dealloc(rbnode *n, void (*action)(rbnode *)) {
 	
 	if (n == NULL)
 		return;
-	
-	if (a != NULL)
-		a(n);
-	else
+
+	if (action != NULL) {
+		action(n);
+	} else if (n->data != NULL) {
 		free(n->data);
+        n->data = NULL;
+    }
 	
-	node_dealloc(n->child[0], a);
-	node_dealloc(n->child[1], a);
+	node_dealloc(n->child[0], action);
+	node_dealloc(n->child[1], action);
 	
 	free(n);
 }
 
-static void _rbwalk(rbnode *n, void (*a)(rbnode *)) {
+/*
+ * Recursivly walks a tree, applying action function on every node
+ */
+static void rbwalk(rbnode *n, void (*action)(rbnode *)) {
 	
 	if (n == NULL)
 		return;
 	
-	a(n);
+	action(n);
 	
-	_rbwalk(n->child[0], a);
-	_rbwalk(n->child[1], a);
+	rbwalk(n->child[0], action);
+	rbwalk(n->child[1], action);
 }
 
-static rbnode* _rbcmp(rbnode *n, void *d, size_t l) {
+static inline int datacmp(void *d1, void *d2, size_t l) {
+
+    if (d1 == NULL || d2 == NULL)
+        return d1 == d2;
+        
+    return !memcmp(d1, d2, l);
+}
+
+/*
+ * Compares every node's data member with cmpdata along the
+ * path. comparison is done at memory level and returns the first node that match.
+ */
+static rbnode* rbcmp(rbnode *n, void *cmpdata, size_t len) {
 	
-	rbnode* r;
+	rbnode *r;
 	
 	if (n == NULL)
 		return NULL;
-	
-	if (memcmp(n->data, d, l) == 0)
+
+    dprint("CMP %s - %s\n", (char*)n->data, (char*)cmpdata);
+
+	if (datacmp(n->data, cmpdata, len))
 		return n;
 	
-	r = _rbcmp(n->child[0], d, l);
+	r = rbcmp(n->child[0], cmpdata, len);
 	
 	if (r == NULL)
-		r = _rbcmp(n->child[1], d, l);
+		r = rbcmp(n->child[1], cmpdata, len);
 	
 	return r;
 }
 
-static rbnode* rotate_single(rbnode *root, unsigned char dir) {
+static inline rbnode* rotate_single(rbnode *root, unsigned char dir) {
 	
 	rbnode *save = root->child[!dir];
 	
@@ -145,11 +115,76 @@ static rbnode* rotate_single(rbnode *root, unsigned char dir) {
 	return save;
 }
 
-static rbnode* rotate_double(rbnode *root, unsigned char dir) {
+static inline rbnode* rotate_double(rbnode *root, unsigned char dir) {
 	root->child[!dir] = rotate_single(root->child[!dir], !dir);
 	return rotate_single(root, dir);
 }
 
+inline int rbtree_is_empty(rbtree *tree) {
+
+	return tree == NULL || tree->root == NULL;
+}
+
+/*
+ * Searches a tree by key.
+ */
+rbnode* rbtree_search(rbtree *tree, uint key) {
+	
+	rbnode *n;
+	
+	if (tree == NULL || tree->root == NULL)
+		return NULL;
+	
+	n = tree->root;
+	
+	while(n != NULL) {
+		
+		dprint("SEARCH: check %u\n", n->key);
+		
+		if (n->key == key)
+			break;
+		
+		n = n->child[n->key < key];
+	}
+	
+	return n;
+}
+
+rbnode* rbtree_cmp_search(rbtree *tree, void *cmpdata, size_t len) {
+	
+	if (tree == NULL)
+		return NULL;
+				
+	return rbcmp(tree->root, cmpdata, len);
+}
+
+void rbtree_walk(rbtree *tree, void (*action)(rbnode *)) {
+	
+	if (tree == NULL)
+		return;
+			
+	rbwalk(tree->root, action);
+}
+
+void rbtree_free(rbtree *tree, void (*action)(rbnode *)) {
+		
+	if (tree == NULL)
+		return;
+	
+	node_dealloc(tree->root, action);
+	tree->root = NULL;
+}
+
+/*
+ * duplicate keys result in the tree remains unchanged
+ * this can cause memory leaks as data fields can (should) 
+ * be heap allocated, and the client expects us to keep track of it.
+ *
+ * for general purposes, we should notify client about it so 
+ * then they can chose what to do
+ *
+ * the function now returns -1 in that situation // H Hautakoski
+ */
 int rbtree_insert(rbtree *tree, uint key, void *data) {
 	
 	rbnode head = {0};
@@ -160,7 +195,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data) {
 	/* iterator and parent */
 	rbnode *p, *q;
 	
-	unsigned char dir = 0, dir2, last;
+	unsigned char dir = 0, dir2, last, inserted = 0;
 	
 	/* somewhere in here, there should be dragons */
 	
@@ -168,51 +203,56 @@ int rbtree_insert(rbtree *tree, uint key, void *data) {
 		tree->root = node_alloc(key, data);
 		if (tree->root == NULL)
 			return 0;
-	} else {
-		
-		t = &head;
-		g = p = NULL;
-		q = t->child[1] = tree->root;
-		
-		for(;;) {
-			if (q == NULL) {
-				p->child[dir] = q = node_alloc(key, data);
-				if (q == NULL)
-					return 0;
-			} else if (is_red(q->child[0]) && is_red(q->child[1])) {
-				/* color flip case */
-				q->color = RB_RED;
-				q->child[0]->color = RB_BLACK;
-				q->child[1]->color = RB_BLACK;
-			}
-			
-			/* fix red validation */
-			if (is_red(q) && is_red(p)) {
-				dir2 = (t->child[1] == g);
-				if (q == p->child[last])
-					t->child[dir2] = rotate_single(g, !last);
-				else
-					t->child[dir2] = rotate_double(g, !last);
-			}
-			
-			if (q->key == key) 
-				break;
-			
-			last = dir;
-			dir = q->key < key;
-			
-			if (g != NULL)
-				t = g;
-			g = p, p = q;
-			q = q->child[dir];
-		}
-		
-		tree->root = head.child[1];
+        goto done;
 	}
-	
+		
+	t = &head;
+	g = p = NULL;
+	q = t->child[1] = tree->root;
+		
+	for(;;) {
+		if (q == NULL) {
+			p->child[dir] = q = node_alloc(key, data);
+			if (q == NULL)
+				return 0;
+            inserted = 1;
+		} else if (is_red(q->child[0]) && is_red(q->child[1])) {
+			/* color flip case */
+			q->color = RB_RED;
+			q->child[0]->color = RB_BLACK;
+			q->child[1]->color = RB_BLACK;
+		}
+			
+		/* fix red validation */
+		if (is_red(q) && is_red(p)) {
+			dir2 = (t->child[1] == g);
+			if (q == p->child[last])
+				t->child[dir2] = rotate_single(g, !last);
+			else
+				t->child[dir2] = rotate_double(g, !last);
+		}
+			
+		if (q->key == key)
+			break;
+			
+		last = dir;
+		dir = q->key < key;
+			
+		if (g != NULL)
+			t = g;
+		g = p, p = q;
+		q = q->child[dir];
+	}
+		
+	tree->root = head.child[1];
+    
+done:
 	/* root should be black */
 	tree->root->color = RB_BLACK;
 	
+    if (!inserted)
+        return -1;
+    
 	return 1;
 }
 
@@ -226,7 +266,8 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	/* found item */
 	rbnode *f = NULL;
 	
-	/* pointer to the data member of the node we delete */
+	/* pointer to the data member of the node we delete,
+       returned so it can be free'd */
 	void *ret = NULL;
 	
 	unsigned char dir = 1, dir2, last;
@@ -238,7 +279,7 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	g = p = NULL;
 	q->child[1] = tree->root;
 	
-	/* more dragons */
+	/* more dragons, TODO: reduce indentation */
 	
 	while(q->child[dir] != NULL) {
 		last = dir;
@@ -292,64 +333,10 @@ void* rbtree_delete(rbtree *tree, uint key) {
 				f->key  = q->key;
 				f->data = q->data;
 			}
-			swap(p,1,q) = swap(q, 0, NULL);
+			swap(p, 1, q) = swap(q, 0, NULL);
 		}
 		free(q);
 	}
 	
 	return ret;
-}
-
-rbnode* rbtree_search(rbtree *tree, uint key) {
-	
-	rbnode *n;
-	
-	if (tree == NULL || tree->root == NULL)
-		return NULL;
-	
-	n = tree->root;
-	
-	while(n != NULL) {
-		
-#ifdef __DEBUG__
-		printf("SEARCH: check %u\n", n->key);
-#endif
-		
-		if (n->key == key)
-			break;
-		
-		n = n->child[n->key < key];
-	}
-	
-	return n;
-}
-
-rbnode* rbtree_cmp_search(rbtree *tree, void *cmpdata, size_t len) {
-	
-	if (tree == NULL)
-		return NULL;
-				
-	return _rbcmp(tree->root, cmpdata, len);
-}
-
-void rbtree_walk(rbtree *tree, void (*action)(rbnode *)) {
-	
-	if (tree == NULL)
-		return;
-			
-	_rbwalk(tree->root, action);
-}
-
-void rbtree_free(rbtree *tree, void (*action)(rbnode *)) {
-		
-	if (tree == NULL)
-		return;
-	
-	node_dealloc(tree->root, action);
-	tree->root = NULL;
-}
-
-inline int rbtree_is_empty(rbtree *tree) {
-
-	return tree == NULL || tree->root == NULL;
 }

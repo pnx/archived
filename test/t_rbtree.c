@@ -1,91 +1,169 @@
-#ifndef RB_DEBUG
-    #define RB_DEBUG 1
-#endif
+
+/*
+ * rb_assert should be called after every rbtree_* operation (not just only the one's
+ * that actualy performs changes to the tree) to ensure the tree is valid after the
+ * function is done.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <assert.h>
+#include "unit.h"
 #include "../src/common/rbtree.h"
+#include "../src/common/debug.h"
 
-#define MAX_VAL 12500
-#define NODES 5000
+#define MAX_VAL 500
+#define NODES   20
 
-uint get_random_key(uint m) {
-	return (uint) (rand() % m);
+#define is_red(n) (n != NULL && n->color == RB_RED)
+
+static int rb_assert(rbnode *node) {
+	
+	int rh, lh;
+	rbnode *ln, *rn;
+	
+	if (node == NULL) {
+		return 1;
+	}
+	
+	ln = node->child[0];
+	rn = node->child[1];
+		
+	if (is_red(node)) {
+        /* double red violation */
+		if (is_red(ln) || is_red(rn)) {
+			die("Double red");
+			return 0;
+		}
+	}
+		
+	lh = rb_assert(ln);
+	rh = rb_assert(rn);
+    
+	if ( (ln != NULL && ln->key >= node->key) &&
+		 (rn != NULL && rn->key <= node->key) ) {
+		die("BST violation");
+		return 0;
+	}
+	
+	if (rh != 0 && lh != 0) {
+		
+		if (rh != lh) {
+			die("Black height violation");
+			return 0;
+		}
+		
+		return (is_red(node)) ? lh : lh+1;
+	}
+	
+	return 0;
 }
 
-void printer(rbnode *node) {
-	
-	printf("node: %u (%p)\n", node->key, node);
+/* data */
+static rbtree tree;
+static uint keyref[NODES];
+static uint search_key = -1;
+static char search_data[32];
+
+void test_insert() {
+
+    int i = 0, ret;
+    uint ckey;
+    char *data;
+
+    utest_init_RNG();
+
+    /* insert values */
+	while(i < NODES) {
+		
+		ckey = (uint) (rand() % MAX_VAL);
+        data = utest_ran_string(32);
+		
+        /* insert into rbtree and assert it */
+		ret = rbtree_insert(&tree, ckey, data);
+        rb_assert(tree.root);
+        
+        dprint("INSERT: %i %s\n", ckey, data);
+        
+        /* ignore duplicate key */
+        if (ret == -1)
+            continue;
+        
+		keyref[i] = ckey;
+        
+		if (i == ((NODES/2))) {
+			search_key = ckey;
+            memcpy(&search_data, data, 32);
+        }
+
+        i++;
+	}
+    
+    /* insert duplicate key */
+    assert(rbtree_insert(&tree, search_key, "duplicate") == -1);
+    rb_assert(tree.root);
+}
+
+void test_delete() {
+
+    int i;
+    uint key;
+
+    /* remove some values */	
+	for(i=0; i < 10; i++) {
+
+        key = keyref[(NODES/2)+i];
+
+	    rbtree_delete(&tree, key);
+        rb_assert(tree.root);
+	}
+}
+
+void test_search() {
+
+    rbnode *n;
+
+    /* search for a key we know exists */
+    n = rbtree_search(&tree, search_key);
+    
+    assert(n != NULL);
+	assert(n->key == search_key);
+
+    /* search for a key we now don't exist */
+    n = rbtree_search(&tree, MAX_VAL+512);
+
+    assert(n == NULL);
+}
+
+void test_cmp_search() {
+
+    rbnode *n;
+
+    n = rbtree_cmp_search(&tree, &search_data, 32);
+
+    assert(n != NULL);
+    assert_string(n->data, search_data);
 }
 
 int main(int argc, char **argv) {
 	
-	uint keyref[NODES];
-	uint i, spos, search_key, ckey;
-	rbtree tree;
-	rbnode *snode;
-	
 	tree.root = NULL;
 	
-	srand(time(NULL));
-	
-	/* rbtree should be empty */
+    /* a new tree is empty */
 	assert(rbtree_is_empty(&tree) == 1);
-	
-	/* get a random node position */
-	spos = get_random_key(NODES);
-	
-	/* insert values */
-	for(i=0; i < NODES; i++) {
-		
-		ckey = get_random_key(MAX_VAL);
-		
-		if(i == spos)
-			search_key = ckey;
-		
-		//printf("insert: %u\n", ckey);
-		rbtree_insert(&tree, ckey, NULL);
-		keyref[i] = ckey;
-	}
-	
-	/* validate tree */
-	rb_assert(tree.root);
-	
-	/* search the random key */
-	snode = rbtree_search(&tree, search_key);
-	
-	assert(snode->key == search_key);
 
-    /* remove some values */	
-	for(i=0; i < NODES; i++) {
-	
-		//printf("removing: %u\n", ckey);
-		
-	    rbtree_delete(&tree, ckey);
-	    
-	    ckey = get_random_key(MAX_VAL);
-	}
-	
-    /* assert again */
-    rb_assert(tree.root);
+    test_insert();
+    test_search();
+    test_cmp_search();
+    test_delete();
 
-    if(argc == 1) {
-    	/* free the tree */
-    	rbtree_free(&tree, NULL);
-    } else {
-    	printf("---\n");
-    	for(i=0; i < NODES; i++) {
-    		//printf("removing: %u\n", keyref[i]);
-    		rbtree_delete(&tree, keyref[i]);
-    	}
-    }
-	
-    rbtree_walk(&tree, printer);
+    /* free the tree */
+    rbtree_free(&tree, NULL);
     
-	/* tree should now be empty */
+	/* tree is now empty again */
 	assert(rbtree_is_empty(&tree) == 1);
-	
+
+    printf("-- TEST PASS --\n");
+    
 	return 0;
 }

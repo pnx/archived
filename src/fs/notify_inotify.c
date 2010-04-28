@@ -109,24 +109,19 @@ static int proc_event(inoev *iev) {
 	if (iev == NULL)
 		return 0;
 	
-	//notify_event_clear(&event);
+	/* notify_event_clear(&event); */
 	
-#ifdef __DEBUG__
 	fprintf(stderr, "RAW EVENT: %i, %x", iev->wd, iev->mask);
 	if (iev->len)
 		fprintf(stderr, ", %s\n", iev->name);
 	else
 		fprintf(stderr, "\n");
-#endif
 	
 	/* lookup the watch descriptor in rbtree */
 	node = rbtree_search(&tree, iev->wd);
 	
 	if (node == NULL) {
-#ifdef __DEBUG__
-		fprintf(stderr, "-- IGNORING EVENT -- invalid watchdescriptor %i\n", iev->wd);
-		rb_assert(tree.root);
-#endif
+		dprint("-- IGNORING EVENT -- invalid watchdescriptor %i\n", iev->wd);
 		return 0;
 	}
 
@@ -152,10 +147,10 @@ static int proc_event(inoev *iev) {
 		case IN_MOVED_TO :
 			
 			if (event.dir) {
-				dprint("IN_CREATE on directory, adding\n");
+				dprint("IN_MOVED_TO on directory, adding\n");
 				addwatch(event.path, event.filename);
 			}
-					
+            
 			type = NOTIFY_MOVE_TO;
 			break;
 		case IN_MOVED_FROM :

@@ -18,7 +18,7 @@ path2 :
 	$(CC) -D__DEBUG__ $(CFLAGS) ../src/common/path.c t_path2.c -o test_path2
 
 rbtree : 
-	$(CC) -D RB_DEBUG $(CFLAGS) ../src/common/rbtree.c t_rbtree.c -o test_rbtree
+	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/rbtree.c t_rbtree.c -o test_rbtree
 
 inotify :
 	$(CC) -lpthread -D INOTIFY_DEBUG -D RB_DEBUG $(CFLAGS) \

@@ -8,14 +8,11 @@
 #include <string.h>
 #include <assert.h>
 
-#define utest_exit(fmt, ...) \
-    fprintf(stderr, fmt, __VA_ARGS__); \
-    exit(1)
+#define assert_string(a, b) \
+	assert(strcmp((char*)a, (char*)b) == 0)
 
-#define utest_string(a, b) \
-	(strcmp(a, b) == 0 ? \
-		(void) 0 : \
-		utest_exit("ASSERT: \"" #expr "\" at %s:%i\n", __FILE__, __LINE__))
-        
-        
+void utest_init_RNG();
+
+char* utest_ran_string(size_t size);
+
 #endif /* _UNIT_H */

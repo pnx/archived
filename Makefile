@@ -24,7 +24,7 @@ all :
 
 me :
 	mkdir -p $(BUILD)
-	$(CC) $(CFLAGS) $(DEFS) $(SOURCES) -o $(BUILD)/arch
+	$(CC) $(CFLAGS) $(SOURCES) -o $(BUILD)/arch
 
 clean :
 	rm -fr $(BUILD)

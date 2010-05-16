@@ -14,6 +14,16 @@ static inline char ranchr() {
     return ch;
 }
 
+void __assert_str(char *file, int line, char *func, char *a, char *b) {
+    
+    if (a == NULL || b == NULL)
+        __uexit(file, line, func, "a or b is null\n", NULL);
+
+    if (strcmp(a, b) != 0)
+        __uexit(file, line, func, "\"%s\" != \"%s\"\n", a, b);
+    
+}
+
 void utest_init_RNG() {
 
     static unsigned char init = 0;

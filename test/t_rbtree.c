@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include "unit.h"
 #include "../src/common/rbtree.h"
 #include "../src/common/debug.h"

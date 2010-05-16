@@ -12,7 +12,7 @@ raw_inotify :
 	$(CC) -linotifytools raw_inotify.c -o raw_inotify
 	
 path :
-	$(CC) -D__DEBUG__ $(CFLAGS) ../src/common/path.c t_path.c -o test_path
+	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/path.c t_path.c -o test_path
 
 rbtree : 
 	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/rbtree.c t_rbtree.c -o test_rbtree

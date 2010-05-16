@@ -1,7 +1,7 @@
 
 #ifndef _UNIT_H
 
-#define _UNIT_H
+#define _UNIT_H 1
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,15 +15,7 @@
     } while(0)
 
 /* internal function. assert_* macros below expands to this */
-inline void __assert_str(char *file, int line, char *func, char *a, char *b) {
-
-    if (a == NULL || b == NULL)
-        __uexit(file, line, func, "a or b is null\n", NULL);
-
-    if (strcmp(a, b) != 0)
-        __uexit(file, line, func, "\"%s\" != \"%s\"\n", a, b);
-    
-}
+void __assert_str(char *file, int line, char *func, char *a, char *b);
 
 #define assert_string(a, b) __assert_str(__FILE__, __LINE__, __FUNCTION__, a, b)
 

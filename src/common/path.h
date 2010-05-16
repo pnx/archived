@@ -1,40 +1,18 @@
-/*
- * -- path.h
- * 
- * common path handling routines
- * 
- * Copyright (C) 2010  Archived
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 
-#ifndef _COMMON_PATH_H
+#ifndef __COMMON_PATH_H
 
-#define _COMMON_PATH_H
+#define __COMMON_PATH_H
 
-#include <stdarg.h>
-#include <string.h>
-#include <limits.h>
+#include <stddef.h>
 
-#ifndef PATH_MAX
-#define PATH_MAX 4096
-#endif
+int is_abspath(const char *path);
 
 size_t pathlen(const char *path);
 
 char* fmt_path(const char *base, const char *name, unsigned char dir);
 
-const char* basename(const char *path);
+char* basename(char *path);
 
-#endif /* _COMMON_PATH_H */
+char* dirname(char *path);
+
+#endif /* __COMMON_PATH_H */

@@ -1,6 +1,6 @@
 /* common/rbtree.c - red black tree implementation
  * 
- *   Copyright (C) 2010  Hernrik Hautakoski <henrik.hautakoski@gmail.com>
+ *   Copyright (C) 2010  Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 #include "debug.h"
 #include "rbtree.h"
 
-#define is_red(n) (n != NULL && n->color == RB_RED)
-#define swap(n,d,q) n->child[n->child[d] == q]
+#define is_red(n) ((n) != NULL && (n)->color == RB_RED)
+#define swap(n,d,q) ((n)->child[(n)->child[d] == (q)])
 
 static rbnode* node_alloc(uint key, void *ptr) {
 	
@@ -181,7 +181,7 @@ void rbtree_free(rbtree *tree, void (*action)(rbnode *)) {
  * be heap allocated, and the client expects us to keep track of it.
  *
  * for general purposes, we should notify client about it so 
- * then they can chose what to do
+ * then they can choose what to do
  *
  * the function now returns -1 in that situation // H Hautakoski
  */

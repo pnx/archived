@@ -39,6 +39,6 @@
 #else
 #define dassert(expr)
 #define dprint(...)
-#endif
+#endif /* __DEBUG__ */
 
 #endif /* __COMMON_DEBUG_H */

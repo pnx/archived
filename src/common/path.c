@@ -1,6 +1,6 @@
-/* common/path.c - path string handling routines
+/* common/path.c - path handling routines
  * 
- *   Copyright (C) 2010  Hernrik Hautakoski <henrik.hautakoski@gmail.com>
+ *   Copyright (C) 2010  Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by

@@ -1,0 +1,94 @@
+
+Coding-style
+--------------
+
+Statements
+----------
+If only one statement exist in a statement body. Braces should be skipped,
+but not if the structure is nested or followed by multiple if/else, ex:
+
+for(i=0; i < 10; i++)
+    for(j=0; i < 10; j++)
+        if (i == j)
+            foo();
+
+if (a)
+    foo();
+else if (b) {
+    if (c)
+        bar();
+} else
+    baz();
+
+instead you should write the above code as:
+
+for(i=0; i < 10; i++) {
+    for(j=0; i < 10; j++) {
+        if (i == j)
+            foo();
+    }
+}
+
+if (a) {
+    foo();
+} else if (b) {
+    if (c)
+        bar();
+} else {
+    baz();
+}
+
+Avoid using assignment in if()
+
+Functions
+---------
+We use an extended K&R style, the extension is for functions that can have both there opening bracer on the same line and
+directly under it but please don't mix em. We allow both but you should chose one and stick with it.
+You should mimic the syntax used around your code, don't mix both formats in one c file.
+If you encounter a file with mixed syntax, change it to whatever style you like (you can't break anything ;)
+
+void foo() {
+    /* body */
+}
+
+void bar()
+{
+    /* body */
+}
+
+
+Pointer declaration
+-------------------
+this should be done in 2 different ways depending on where it's declared:
+
+    1: variables are declared like `char *str`, not `char * str` or `char* str`.
+    2: function return types are declared like `char* function(...);`
+
+this syntax forces the most readable code. ex:
+
+    struct list* new_list(char *name);
+
+this format cleary states that name is a pointer of type char and the function returns
+a pointer to a struct list
+
+Naming
+------
+
+ * Never use CamelCase. UPPERCASE for constants and lowercase for variables,functions,macros. words is separated by underscore.
+
+ * API functions (that have a prototype in a header file) should be prefixed with the header filename.
+   One exception exist and that is when the functionality is realy lowlevel and/or generic enough that it
+   would be redundant to include a prefix. an example of this is a fatal() or die() function that may be prototyped in misc.h.
+
+ * Headerguard defines is written like __PATH_TO_THIS_HEADER_H
+
+Documentation
+-------------
+
+All API's should be externaly documented in the doc/ directory.
+
+Things to keep in mind when modify or write code
+------------------------------------------------
+
+include and change the comment found in TEMPLATE file, at the top of the .c/.h file 
+

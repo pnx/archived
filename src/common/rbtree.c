@@ -197,8 +197,6 @@ int rbtree_insert(rbtree *tree, uint key, void *data) {
 	
 	unsigned char dir = 0, dir2, last, inserted = 0;
 	
-	/* somewhere in here, there should be dragons */
-	
 	if (tree->root == NULL) {
 		tree->root = node_alloc(key, data);
 		if (tree->root == NULL)
@@ -209,6 +207,8 @@ int rbtree_insert(rbtree *tree, uint key, void *data) {
 	t = &head;
 	g = p = NULL;
 	q = t->child[1] = tree->root;
+
+    /* somewhere in here, there should be dragons */
 		
 	for(;;) {
 		if (q == NULL) {
@@ -279,7 +279,7 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	g = p = NULL;
 	q->child[1] = tree->root;
 	
-	/* more dragons, TODO: reduce indentation */
+	/* more dragons (killed some of them though) */
 	
 	while(q->child[dir] != NULL) {
 		last = dir;
@@ -291,31 +291,32 @@ void* rbtree_delete(rbtree *tree, uint key) {
 		if (q->key == key)
 			f = q;
 		
-		if (!is_red(q) && !is_red(q->child[dir])) {
-			if (is_red(q->child[!dir]))
-				p = p->child[last] = rotate_single(q, dir);
-			else if (!is_red(q->child[!dir])) {
-				s = p->child[!last];
+		if (is_red(q) || is_red(q->child[dir]))
+            continue;
+            
+        if (is_red(q->child[!dir])) {
+            p = p->child[last] = rotate_single(q, dir);
+        } else {
+            s = p->child[!last];
 				
-				if (s != NULL) {
-				    /* swap color if both child's are black */
-					if (!is_red(s->child[!last]) && !is_red(s->child[last])) {
-						p->color = RB_BLACK;
-						s->color = q->color = RB_RED;
-					} else {
-						dir2 = (g->child[1] == p);
+            if (s == NULL)
+                continue;
+
+            if (!is_red(s->child[!last]) && !is_red(s->child[last])) {
+                p->color = RB_BLACK;
+                s->color = q->color = RB_RED;
+            } else {
+                dir2 = (g->child[1] == p);
 						
-						if (is_red(s->child[last]))
-							g->child[dir2] = rotate_double(p, last);
-						else if (is_red(s->child[!last]))
-							g->child[dir2] = rotate_single(p, last);
+                if (is_red(s->child[last]))
+                    g->child[dir2] = rotate_double(p, last);
+                else if (is_red(s->child[!last]))
+                    g->child[dir2] = rotate_single(p, last);
 						
-						q->color = g->child[dir2]->color = RB_RED;
-						g->child[dir2]->child[0]->color  = RB_BLACK;
-						g->child[dir2]->child[1]->color  = RB_BLACK;
-					}
-				}
-			}
+                q->color = g->child[dir2]->color = RB_RED;
+                g->child[dir2]->child[0]->color  = RB_BLACK;
+                g->child[dir2]->child[1]->color  = RB_BLACK;
+            }
 		}
 	}
 	

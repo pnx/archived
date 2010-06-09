@@ -4,8 +4,9 @@
 ##################
 
 * ref list always first ;)
-* config parser
-* support for networked broadcasting?
+* get rid of static context switch (indexer/notify).
+  this should be implementation specific under notify API (and we may try without threads first)
+* ini-like config support
 
 
 ##################

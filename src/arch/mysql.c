@@ -209,10 +209,10 @@ int arch_db_delete(const char *path, const char *filename) {
 	
 	/* 
 	 * Allocate memory big enough for query 
-	 * dbtable + path + filename + date + 100 (for base query)
+	 * dbtable + path + filename + date + 100 (for base query) + \0
 	 */
 	stmt_size = STRSZ(dbtable) + 
-			STRSZ(path) + STRSZ(filename) + 100;
+			STRSZ(path) + STRSZ(filename) + 101;
 	
 	char *stmt = malloc(stmt_size);
 	

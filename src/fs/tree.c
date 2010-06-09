@@ -14,7 +14,6 @@
 #include <errno.h>
 #include <dirent.h>
 
-#include "../common/mem.h"
 #include "../common/path.h"
 #include "tree.h"
 

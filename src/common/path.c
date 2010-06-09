@@ -58,7 +58,7 @@ static inline int has_delim(const char *str) {
 
 /*
  * copy a clean path to buf
- * NOTE: buffer should be atleast of size pathlen(path)
+ * NOTE: buffer should be atleast of size pathlen(path)+1
  */
 static char* cpy_path(char *buf, const char *path) {
 	
@@ -120,7 +120,7 @@ size_t pathlen(const char *path) {
 	
 	size_t size = 0;
 	
-	while(*path != 0) {
+	while(*path) {
 		
 		size++;
 		
@@ -129,7 +129,7 @@ size_t pathlen(const char *path) {
         else
             path++;
 	}
-	
+
 	return size;
 }
 
@@ -149,6 +149,9 @@ char* fmt_path(const char *base, const char *name, unsigned char dir) {
             size++;
 	}
 
+    if (*(base+size) != '/')
+        size++;
+
     ptr = alloc_path(size);
     
 	if (ptr == NULL)
@@ -157,9 +160,7 @@ char* fmt_path(const char *base, const char *name, unsigned char dir) {
 	ret = ptr;
 	
 	ptr = cpy_path(ptr, base);
-	
-	dassert((ptr-ret) == pathlen(base));
-	
+
 	if (name != NULL) {
 		memcpy(ptr, name, strlen(name));
 		if (dir)
@@ -180,22 +181,16 @@ char* basename(char *path) {
     }
 
     while(*path != '\0') {
-
         if (*path == '/') {
-            
             if (*(path+1) == '\0') {
-
                 if (pos >= path)
                     break;
-                
                 *(path--) = '\0';
                 continue;
             }
-
             if (*(path+1) != '/')
                 pos = path+1;
         }
-        
         path++;
     }
 
@@ -216,10 +211,8 @@ char* dirname(char *path) {
 	len = split_path(path) - path;
 
     if (len <= 1) {
-
         if (*path != '/') 
             path[0] = '.';
-            
         path[1] = '\0';
     } else {
         path[len] = '\0';

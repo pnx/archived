@@ -14,17 +14,14 @@ void test_fmt_path() {
     ptr = fmt_path("/usr/src/", "linux", 0);
     assert_string(ptr, "/usr/src/linux");
     free(ptr);
-/*
-    ptr = fmt_path("/segment1/segment2/", "segment3/", 1);
+
+    ptr = fmt_path("/segment1/segment2/", "segment3", 1);
     assert_string(ptr, "/segment1/segment2/segment3/");
     free(ptr);
-    */
 
-/*
-    ptr = fmt_path("/stuff/with/ahell/lot/of/slashes/at/the/", "end/////////", 1);
-    assert_string(ptr, "/stuff/with/ahell/lot/of/slashes/at/the/end/////////");
+    ptr = fmt_path("/stuff/with/ahell/lot/of/slashes/at/the/", "end", 1);
+    assert_string(ptr, "/stuff/with/ahell/lot/of/slashes/at/the/end/");
     free(ptr);
-    */
 
     ptr = fmt_path("/mnt/cdrom", "keff", 0);
     assert_string(ptr, "/mnt/cdrom/keff");

@@ -9,6 +9,12 @@
  *  (at your option) any later version.
  */
 
+#include "notify.h"
+/* red black tree for watch descriptors */
+#include "../common/rbtree.h"
+#include "../common/debug.h"
+#include "../common/path.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,12 +23,6 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/inotify.h>
-
-/* red black tree for watch descriptors */
-#include "../common/rbtree.h"
-#include "../common/debug.h"
-#include "../common/path.h"
-#include "notify.h"
 
 typedef struct inotify_event inoev;
 
@@ -46,18 +46,6 @@ static char *inobuf = NULL;
 
 /* current event */
 static notify_event event;
-
-static int rmwatch(unsigned int wd) {
-	
-	void *data = rbtree_delete(&tree, wd);
-	
-	if (data == NULL)
-		return 0;
-	
-	dprint("remove watch: %i %s\n", wd, (char*) data);
-	free(data);
-	return 1;
-}
 
 static int addwatch(const char *path, const char *name) {
 	
@@ -93,23 +81,35 @@ static int addwatch(const char *path, const char *name) {
 	return wd;
 }
 
-/* REF:1 */
+static int rmwatch(unsigned int wd) {
+	
+	void *data = rbtree_delete(&tree, wd);
+	
+	if (data == NULL)
+		return 0;
+	
+	dprint("remove watch: %i %s\n", wd, (char*) data);
+    inotify_rm_watch(fd, wd);
+	free(data);
+	return 1;
+}
+
 static int proc_event(inoev *iev) {
 
 	rbnode *node;
-	char    buf[4096];
+    char buf[4096];
 	uint8_t type = NOTIFY_UNKNOWN;
 
 	if (iev == NULL)
 		return 0;
 	
-	/* notify_event_clear(&event); */
-	
+#ifdef __DEBUG__
 	fprintf(stderr, "RAW EVENT: %i, %x", iev->wd, iev->mask);
 	if (iev->len)
 		fprintf(stderr, ", %s\n", iev->name);
 	else
 		fprintf(stderr, "\n");
+#endif
 	
 	/* lookup the watch descriptor in rbtree */
 	node = rbtree_search(&tree, iev->wd);
@@ -148,9 +148,9 @@ static int proc_event(inoev *iev) {
 			type = NOTIFY_MOVE_TO;
 			break;
 		case IN_MOVED_FROM :
-			/* TODO: clean this */
-			sprintf(buf, "%s%s/", event.path, event.filename);
-			notify_rm_watch_path(buf);
+            /* TODO: clean this */
+            sprintf(buf, "%s%s/", event.path, event.filename);
+            notify_rm_watch_path(buf);
 		case IN_DELETE :
 			type = NOTIFY_DELETE;
 			break;
@@ -195,8 +195,10 @@ void notify_cleanup() {
 	/* free rbtree */
 	rbtree_free(&tree, NULL);
 	
-	if (inobuf != NULL)
+	if (inobuf != NULL) {
 		free(inobuf);
+        inobuf = NULL;
+    }
 	
 	fd = 0;
 }
@@ -209,21 +211,18 @@ int notify_add_watch(const char *path) {
 	return addwatch(path, NULL);
 }
 
-void notify_rm_watch(unsigned int wd) {
-	inotify_rm_watch(fd, wd);
-}
-
-void notify_rm_watch_path(const char *path) {
+int notify_rm_watch(const char *path) {
 	
 	rbnode *node = rbtree_cmp_search(&tree, (void*)path, strlen(path));
 	
 	if (node == NULL) {
-		dprint("remove watch by path: can't find %s\n", path);
-		return;
+		dprint("remove watch: can't find %s\n", path);
+		return -1;
 	}
 	
-	dprint("remove watch by path: %i %s\n", node->key, (char*) node->data);
-	notify_rm_watch(node->key);
+	dprint("remove watch: %i %s\n", node->key, (char*) node->data);
+	rmwatch(node->key);
+    return 0;
 }
 
 /*

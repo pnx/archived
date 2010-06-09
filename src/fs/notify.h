@@ -10,7 +10,6 @@
  */
 
 #ifndef _FS_NOTIFY_H
-
 #define _FS_NOTIFY_H
 
 /* notify event def's and operations */
@@ -22,9 +21,7 @@ void notify_cleanup();
 
 int notify_add_watch(const char *path);
 
-void notify_rm_watch(unsigned int wd);
-
-void notify_rm_watch_path(const char *path);
+int notify_rm_watch(const char *path);
 
 void notify_print_stat();
 
@@ -32,6 +29,7 @@ notify_event* notify_read();
 
 void notify_stat();
 
+/* TODO: context-switch/threading should be implementation specific. */
 int notify_is_ready();
 
 #endif /* _FS_NOTIFY_H */

@@ -150,7 +150,7 @@ static int proc_event(inoev *iev) {
 		case IN_MOVED_FROM :
             /* TODO: clean this */
             sprintf(buf, "%s%s/", event.path, event.filename);
-            notify_rm_watch_path(buf);
+            notify_rm_watch(buf);
 		case IN_DELETE :
 			type = NOTIFY_DELETE;
 			break;

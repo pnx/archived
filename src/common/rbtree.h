@@ -6,6 +6,8 @@
 #define RB_RED   0
 #define RB_BLACK 1
 
+#include <stddef.h>
+
 typedef unsigned char color_t;
 typedef unsigned int uint;
 

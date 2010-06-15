@@ -7,7 +7,7 @@
 * get rid of static context switch (indexer/notify).
   this should be implementation specific under notify API (and we may try without threads first)
 * ini-like config support
-
+* fix mysql module
 
 ##################
   Reference list

@@ -20,8 +20,8 @@ CC       := gcc
 
 SOURCES  := \
 	src/arch.c \
-    src/arch/mysql.c \
-    src/indexer.c \
+    	src/arch/mysql.c \
+	src/indexer.c \
 	src/common/path.c \
 	src/common/rbtree.c \
 	src/fs/notify_inotify.c \

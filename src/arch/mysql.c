@@ -23,6 +23,8 @@ static MYSQL* dbconn;
 static unsigned long dbthread_id;
 static char *dbtable = NULL;
 
+int db_setup();
+
 /*
  * Initialize database connection and connect to database
  */
@@ -56,7 +58,10 @@ int arch_db_init(char *host, char *username, char *password, char *database, cha
 #ifdef DB_DEBUG
 	fprintf(stderr, "Mysql init: %li\n", dbthread_id);
 #endif
-	
+
+    /* setup database */
+    db_setup();
+
 	return 1;
 }
 
@@ -80,17 +85,38 @@ void arch_db_close() {
 /*
  * Truncate database table
  */
-int arch_db_truncate() {
+int db_setup() {
 	
 	int ret;
+        char stmt_create[] = "CREATE TABLE IF NOT EXISTS `%s` ("
+                        "`Path` varchar(512) default NULL, "
+                        "`Base` varchar(512) default NULL, "
+                        "`Type` tinyint(1) default NULL, "
+                        "`Status` tinyint(1) default NULL, "
+                        "`Date` datetime default NULL) "
+                        "ENGINE=MyISAM DEFAULT CHARSET=utf8";
+        char stmt_trunc[] = "TRUNCATE TABLE `%s`";
 	
-	/* Allocate memory big enough for query */
-	char *stmt = (char *) malloc((sizeof(char) * strlen(dbtable)) + 20);
-	
-	/* Create mysql query */
-	if(sprintf(stmt, "TRUNCATE TABLE `%s`", dbtable) < 0) {
-		fprintf(stderr, "Could not create sql statement in notify_db_truncate()\n");
+	/* Allocate memory big enough for querys */
+	char *stmt = (char *) malloc((sizeof(char) * strlen(dbtable)) + strlen(stmt_create) - 1);
+
+        /* Create mysql query */
+	if(sprintf(stmt, stmt_create, dbtable) < 0) {
+		fprintf(stderr, "Error, create database sql\n");
+	}
+
+	/* Run mysql query */
+	ret = mysql_query(dbconn, stmt);
+        
+	/* Make sure query was successfull */
+	if(ret != 0) {
+		fprintf(stderr, "%s\n", mysql_error(dbconn));
 		return -1;
+        }
+
+	/* Create mysql query */
+	if(sprintf(stmt, stmt_trunc, dbtable) < 0) {
+		fprintf(stderr, "Error, trunc sql\n");
 	}
 	
 	/* Run mysql query */

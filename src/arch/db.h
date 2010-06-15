@@ -18,8 +18,6 @@ int arch_db_insert(const char *path, const char *filename, const int isdir);
 
 int arch_db_delete(const char *path, const char *filename);
 
-int arch_db_truncate();
-
 void arch_db_close();
 
-#endif /* __ARCH_DB_H */
+#endif

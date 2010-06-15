@@ -122,10 +122,6 @@ int main(int argc, char **argv) {
 	if (!arch_db_init(argv[2], argv[3], argv[4], argv[5], argv[6]))
 		return EXIT_FAILURE;
 	
-	/* clean database */
-	if (arch_db_truncate() == -1)
-		return EXIT_FAILURE;
-	
 	notify_init();
 	
 	if(notify_add_watch(argv[1]) == -1) {

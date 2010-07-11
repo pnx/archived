@@ -10,6 +10,12 @@ all :
 
 raw_inotify :
 	$(CC) -linotifytools raw_inotify.c -o raw_inotify
+
+strbuf :
+	$(CC) $(CFLAGS) ../src/common/strbuf.c t_strbuf.c -o test_strbuf
+
+config :
+	$(CC) ../src/common/config.c t_config.c -o test_config
 	
 path :
 	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/path.c t_path.c -o test_path

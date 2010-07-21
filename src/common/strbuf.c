@@ -28,13 +28,6 @@ static void buf_expand(strbuf_t *s, size_t l) {
 	assert(s->buf != NULL);
 }
 
-static inline void swap(char *a, char *b) {
-
-	char tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
 void strbuf_init(strbuf_t *s) {
 
 	s->buf = NULL;
@@ -82,10 +75,13 @@ void strbuf_ltrim(strbuf_t *s) {
 
 void strbuf_rev(strbuf_t *s) {
 
-	int i;
-	
-	for(i=0; i < s->len / 2; i++)
-		swap(s->buf + i, s->buf + (s->len-1)-i);
+    char tmp, *st = s->buf, *en = s->buf + s->len - 1;
+
+    while(st < en) {
+        tmp = *st;
+        *st++ = *en;
+        *en-- = tmp;
+    }
 }
 
 char* strbuf_release(strbuf_t *s) {
@@ -110,3 +106,5 @@ void strbuf_free(strbuf_t *s) {
         free(s->buf);
     s->buf = NULL;
 }
+
+

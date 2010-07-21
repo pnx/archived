@@ -1,9 +1,12 @@
 
+#include <assert.h>
 #include <stdio.h>
 #include <malloc.h>
 #include "../src/common/strbuf.h"
 
 void print_strbuf(strbuf_t *s) {
+
+    assert(s->len = strlen(s->buf));
 
     printf("block: %i, len: %i |%s|\n", s->alloc_size, s->len, s->buf);
 }

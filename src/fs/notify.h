@@ -1,7 +1,7 @@
 /* fs/notify.h - filesystem notification API
  * 
- *  (C) Copyright 2010 Henrik Hautakoski <henrik.hautakoski@gmail.com>
- *  (C) Copyright 2010 Fredric Nilsson <fredric@unknown.org>
+ *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
+ *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

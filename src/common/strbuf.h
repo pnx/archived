@@ -25,6 +25,8 @@ void strbuf_init(strbuf_t *s);
 
 void strbuf_append(strbuf_t *s, char *str, size_t len);
 
+void strbuf_reduce(strbuf_t *s, size_t len);
+
 void strbuf_trim(strbuf_t *s);
 
 void strbuf_rtrim(strbuf_t *s);

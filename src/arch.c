@@ -102,8 +102,8 @@ int main(int argc, char **argv) {
 			   "Root Directory - Path to indexroot. All subdirectories will be indexed.\n"
 			   "Db host - Database host\n"
 			   "Db user - Database user\n"
-		       "Db pass - Database password\n"
-		       "Db name - Database to use for indexing\n"
+                           "Db pass - Database password\n"
+                           "Db name - Database to use for indexing\n"
 			   "Db tbl  - Database tablename", argv[0]);
 		
 		return EXIT_FAILURE;

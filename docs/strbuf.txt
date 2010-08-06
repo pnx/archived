@@ -1,0 +1,54 @@
+---------------------
+  String buffer API
+---------------------
+
+First off, the major design choices. the most important thing to keep in mind
+when using the API is that it is designed for low-level usage, The basic error checking
+is removed (like checking if the input strbuf pointer is null). This is not done to
+gain speed, but because this is a buffer API, you should in almost every case allocate
+the structure on the stack or have it passed from a function that has it allocated on the stack.
+Other types of skipped error checking is for example if the ->len member is in range of
+the allocated block. (obviously this is checked in functions that may need to expand the memory)
+
+-- Data structures
+
+strbuf_t:
+
+The ->buf member is yours to mess with if you want, but you should never go beyond ->len.
+A NULL terminating character is located at ->len+1 at all times so it is safe to use the ->buf member
+on any function that relies on the input being a valid C string. The API will never rely on this
+and it's possible to have embedded null's because of that.
+
+->alloc_len and ->len should not be messed with, only strbuf_* functions will know how to handle those properly.
+
+-- Functions
+
+strbuf_append():
+
+Like strncat() this function will append the buffer with the contents of 'str'
+and will always copy exactly 'len' bytes.
+
+strbuf_reduce():
+
+Will reduce ->buf by 'len' bytes from the end, Note that this don't shrink the memory block
+just changes the size and properly NULL terminates the now reduced space.
+
+strbuf_trim():
+strbuf_rtrim():
+strbuf_ltrim():
+
+Removes space characters from the beginning (ltrim) of the ->buf string, the end (rtrim) or both (trim).
+
+strbuf_rev():
+
+Reverses the ->buf string.
+
+strbuf_release():
+
+This function should be used to detach the ->buf member from the strbuf_t structure.
+A malloc():ed C string of size strlen()+1 is returned that you are now responsible for.
+
+strbuf_free():
+
+Free's all the memory associted with the strbuf_t structure.
+

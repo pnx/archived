@@ -47,6 +47,15 @@ void strbuf_append(strbuf_t *s, char *str, size_t len) {
     s->buf[s->len] = '\0';
 }
 
+void strbuf_reduce(strbuf_t *s, size_t len) {
+
+    if (len > s->len)
+        len = s->len;
+
+    s->len -= len;
+    s->buf[s->len] = '\0';
+}
+
 void strbuf_trim(strbuf_t *s) {
 
 	strbuf_rtrim(s);

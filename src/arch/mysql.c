@@ -59,8 +59,8 @@ int arch_db_init(char *host, char *username, char *password, char *database, cha
 	fprintf(stderr, "Mysql init: %li\n", dbthread_id);
 #endif
 
-    /* setup database */
-    db_setup();
+        /* setup database */
+        db_setup();
 
 	return 1;
 }
@@ -83,7 +83,7 @@ void arch_db_close() {
 }
 
 /*
- * Truncate database table
+ * Database setup
  */
 int db_setup() {
 	

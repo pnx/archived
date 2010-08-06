@@ -6,7 +6,7 @@
 
 void print_strbuf(strbuf_t *s) {
 
-    assert(s->len = strlen(s->buf));
+    assert(s->len == strlen(s->buf));
 
     printf("block: %i, len: %i |%s|\n", s->alloc_size, s->len, s->buf);
 }
@@ -41,6 +41,14 @@ int main() {
 	strbuf_rev(&b);
 	
 	print_strbuf(&b);
+
+    strbuf_reduce(&b, 6);
+
+    print_strbuf(&b);
+
+    strbuf_reduce(&b, 95);
+
+    print_strbuf(&b);
 	
     str = strbuf_release(&b);
 	

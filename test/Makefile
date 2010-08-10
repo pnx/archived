@@ -31,7 +31,7 @@ inotify :
 	    ../src/fs/notify_event.c \
 	    ../src/fs/inotify.c \
 	t_inotify.c -o test_inotify
-	
+
 tree :
 	$(CC) $(CFLAGS) $(DEFS) ../src/common/path.c ../src/fs/tree.c t_tree.c -o test_tree
 	
@@ -41,3 +41,6 @@ indexer :
 mysql :
 	$(CC) -D DB_DEBUG $(CFLAGS) ../src/mysql_db.c -L/usr/lib64/mysql \ 
 		-lmysqlclient -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl -lcrypto t_mysql.c -o test_mysql
+
+queue :
+	$(CC) $(CFLAGS) ../src/fs/queue.c t_queue.c -o test_queue

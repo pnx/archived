@@ -17,8 +17,6 @@
 #include "debug.h"
 #include "path.h"
 
-static char defpath[2];
-
 /*
  * allocates and initilizes a path
  */
@@ -83,30 +81,6 @@ static char* cpy_path(char *buf, const char *path) {
 	return buf;
 }
 
-static char* split_path(char *path) {
-
-    char *last = path+strlen(path)-1, *slash = NULL;
-
-    while(*last == '/' && (last--) > path);
-
-    while(last > path) {
-
-        if (*last == '/') {
-            slash = last;
-        } else if (slash != NULL) {
-            break;
-        }
-
-        last--;
-    }
-
-    if (slash == NULL)
-        return path;
-
-    return slash;
-}
-
-
 int is_abspath(const char *path) {
 	
 	if (*path != '/')
@@ -168,55 +142,4 @@ char* fmt_path(const char *base, const char *name, unsigned char dir) {
 	}
 	
 	return ret;
-}
-
-char* basename(char *path) {
-
-    char *pos = path;
-
-    if (path == NULL || *path == '\0') {
-        defpath[0] = '.';
-        defpath[1] = '\0';
-        return defpath;
-    }
-
-    while(*path != '\0') {
-        if (*path == '/') {
-            if (*(path+1) == '\0') {
-                if (pos >= path)
-                    break;
-                *(path--) = '\0';
-                continue;
-            }
-            if (*(path+1) != '/')
-                pos = path+1;
-        }
-        path++;
-    }
-
-    return pos;
-}
-
-char* dirname(char *path) {
-
-    char *last, *slash = NULL;
-	size_t len;
-
-    if (path == NULL || *path == '\0') {
-        defpath[0] = '.';
-        defpath[1] = '\0';
-        return defpath;
-    }
-
-	len = split_path(path) - path;
-
-    if (len <= 1) {
-        if (*path != '/') 
-            path[0] = '.';
-        path[1] = '\0';
-    } else {
-        path[len] = '\0';
-    }
-
-	return path;
 }

@@ -37,6 +37,20 @@ void test_pathlen() {
     assert(pathlen("dir") == 3);
 }
 
+void test_isabspath() {
+
+    assert(is_abspath("file") == 0);
+    assert(is_abspath("./file") == 0);
+    assert(is_abspath(".file") == 0);
+    assert(is_abspath("..file") == 0);
+    assert(is_abspath("/../relpath") == 0);
+    assert(is_abspath("/path/to/file") == 1);
+    assert(is_abspath("/ab/xy/.file") == 1);
+    assert(is_abspath("/ab/xy/..file") == 1);
+    assert(is_abspath("/ab/.xy/file") == 1);
+    assert(is_abspath("/ab/..xy/file") ==1);
+}
+
 void test_basename() {
 
     int i;
@@ -83,6 +97,7 @@ void test_dirname() {
 
 int main(int argc, char *argv[]) {
 
+    test_isabspath();
     test_fmt_path();
     test_pathlen();
     test_basename();

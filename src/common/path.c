@@ -82,12 +82,22 @@ static char* cpy_path(char *buf, const char *path) {
 }
 
 int is_abspath(const char *path) {
-	
-	if (*path != '/')
+
+	if (path == NULL || *path != '/')
 		return 0;
-	
-	return strstr(path, "/./")  == NULL && 
-		   strstr(path, "/../") == NULL;
+
+    for(; *path; path++) {
+
+        if (*path == '/' && *(path+1) == '.') {
+            path += 2;
+            if (*path == '.')
+                path++;
+            if (*path == '/' || *path == '\0')
+                return 0;
+        }
+    }
+
+	return 1;
 }
 
 size_t pathlen(const char *path) {

@@ -19,14 +19,14 @@ A NULL terminating character is located at ->len+1 at all times so it is safe to
 on any function that relies on the input being a valid C string. The API will never rely on this
 and it's possible to have embedded null's because of that.
 
-->alloc_len and ->len should not be messed with, only strbuf_* functions will know how to handle those properly.
+->alloc_size and ->len should not be messed with, only strbuf_* functions will know how to handle those properly.
 
 -- Functions
 
 strbuf_append():
 
 Like strncat() this function will append the buffer with the contents of 'str'
-and will always copy exactly 'len' bytes.
+and will always copy exactly 'len' bytes. (if memory can be obtained ofcourse)
 
 strbuf_reduce():
 
@@ -50,5 +50,5 @@ A malloc():ed C string of size strlen()+1 is returned that you are now responsib
 
 strbuf_free():
 
-Free's all the memory associted with the strbuf_t structure.
+Free's all the memory (allocated on the heap) associted with the strbuf_t structure.
 

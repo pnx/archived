@@ -39,7 +39,7 @@ indexer :
 	$(CC) $(CFLAGS) -D__DEBUG__ ../src/common/path.c ../src/fs/tree.c ../src/indexer.c t_indexer.c -o test_indexer
 
 mysql :
-	$(CC) -D DB_DEBUG $(CFLAGS) ../src/mysql_db.c -L/usr/lib64/mysql \ 
+	$(CC) -D DB_DEBUG $(CFLAGS) ../src/arch/mysql.c -L/usr/lib64/mysql \
 		-lmysqlclient -lz -lcrypt -lnsl -lm -L/usr/lib64 -lssl -lcrypto t_mysql.c -o test_mysql
 
 queue :

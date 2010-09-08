@@ -3,17 +3,11 @@
     TODO LIST
 ##################
 
-* ref list always first ;)
-* get rid of static context switch (indexer/notify).
-  this should be implementation specific under notify API (and we may try without threads first)
-* ini-like config support
-* fix mysql module
-
-##################
-  Reference list
-##################
-
-References are tagged in source files by the string 'REF:<number>'
-
-1: refactor to string api 
-2: group path handling into one interface (also consider move:ing related stuff from REF:1)
+ * Use queue in inotify_read(), tree and remove indexer
+ * path:
+    * normalize
+ * strbuf:
+    * "\0" default string.
+    * strbuf_squeeze: squeeze repeated characters into one.
+ * ini-like config support
+ * fix mysql module

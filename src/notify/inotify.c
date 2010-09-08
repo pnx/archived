@@ -1,4 +1,4 @@
-/* fs/notify_inotify.c - inotify implementation
+/* notify/inotify.c - inotify implementation
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@unknown.org>

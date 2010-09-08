@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include "../src/fs/tree.h"
+#include "../src/notify/tree.h"
 
 int main(int argc, char *argv[]) {
 	

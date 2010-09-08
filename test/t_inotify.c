@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include "../src/fs/notify.h"
+#include "../src/notify/notify.h"
 
 PROT_SCAN_CALLBACK(my_callback) {
 	//printf("FROM THREAD -- path: %s; is_dir = %i\n", path, dir);
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 			   "Filename: %s\n"
 			   "Directory: %u\n"
 			   "====================\n"
-				, notify_event_masktostr(event), event->path, event->filename, event->dir);
+				, notify_event_typetostr(event), event->path, event->filename, event->dir);
 	}
 	
 	return 0;

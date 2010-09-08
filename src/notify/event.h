@@ -1,4 +1,4 @@
-/* fs/notify_event.h - event data structure and operation's for notify API
+/* notify/event.h - event data structure and operation's for notify API
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>
@@ -9,9 +9,8 @@
  *  (at your option) any later version.
  */
 
-#ifndef _NOTIFY_EVENT_H
-
-#define _NOTIFY_EVENT_H
+#ifndef __NOTIFY_EVENT_H
+#define __NOTIFY_EVENT_H
 
 #include <stdint.h>
 
@@ -45,4 +44,4 @@ void notify_event_set_type(notify_event *event, uint8_t type);
 
 const char* notify_event_typetostr(notify_event *event);
 
-#endif /* _NOTIFY_EVENT_H */
+#endif /* __NOTIFY_EVENT_H */

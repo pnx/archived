@@ -12,8 +12,8 @@
 #include "common/debug.h"
 #include "common/path.h"
 #include "arch/db.h"
-#include "fs/notify.h"
-#include "fs/tree.h"
+#include "notify/notify.h"
+#include "notify/tree.h"
 #include "indexer.h"
 
 static char *stack[256];

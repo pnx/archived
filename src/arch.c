@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "arch/db.h"
-#include "fs/notify.h"
+#include "notify/notify.h"
 
 /* only way to exit the application properly
    when in main loop is by signal */

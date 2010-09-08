@@ -1,4 +1,4 @@
-/* fs/tree.h - Filesystem traversal
+/* notify/tree.h - Filesystem traversal
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *
@@ -8,9 +8,8 @@
  *  (at your option) any later version.
  */
 
-#ifndef _FS_TREE_H
-
-#define _FS_TREE_H
+#ifndef __NOTIFY_TREE_H
+#define __NOTIFY_TREE_H
 
 #define MAX_DEPTH 0x20
 
@@ -40,4 +39,4 @@ struct entry* tree_cpy_ent(struct entry *ent);
 
 struct entry* tree_next_ent(struct tree *tree);
 
-#endif /* _FS_TREE_H */
+#endif /* __NOTIFY_TREE_H */

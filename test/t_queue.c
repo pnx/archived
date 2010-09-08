@@ -1,7 +1,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "../src/fs/queue.h"
+#include "../src/notify/queue.h"
 
 int main() {
 

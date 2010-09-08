@@ -1,4 +1,4 @@
-/* src/fs/notify_queue.c
+/* notify/queue.h
  *
  *   Copyright (C) 2010       Henrik Hautakoski <henrik@fiktivkod.org>
  *
@@ -11,8 +11,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __FS_QUEUE_H
-#define __FS_QUEUE_H
+#ifndef __NOTIFY_QUEUE_H
+#define __NOTIFY_QUEUE_H
 
 #include <stddef.h>
 
@@ -32,4 +32,4 @@ void queue_clear(queue_t *q);
 
 void queue_destroy(queue_t *q);
 
-#endif /* __FS_QUEUE_H */
+#endif /* __NOTIFY_QUEUE_H */

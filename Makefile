@@ -9,24 +9,23 @@
 #DB_NAME := dbname
 #DB_TBL	 := dbtable
 
-ifdef DEBUG
-CFLAGS	 := -g
-DEFS	 := -D__DEBUG__
-endif
-
-LIBS     := `mysql_config --libs`
-CFLAGS   := -Werror $(LIBS) $(DEFS)
 CC       := gcc
+CFLAGS   := -Werror `mysql_config --cflags`
+LDFLAGS  := -L/usr/lib/mysql -lmysqlclient
+
+ifdef DEBUG
+CFLAGS	 += -g -D__DEBUG__
+endif
 
 SOURCES  := \
 	src/arch.c \
-    	src/arch/mysql.c \
+    src/arch/mysql.c \
 	src/indexer.c \
 	src/common/path.c \
 	src/common/rbtree.c \
-	src/fs/notify_inotify.c \
-	src/fs/notify_event.c \
-	src/fs/tree.c
+	src/notify/inotify.c \
+	src/notify/event.c \
+	src/notify/tree.c
 
 BUILD    := ./build
 
@@ -37,7 +36,7 @@ ifdef DB_HOST
 else
 	@echo "Tip: edit this Makefile DB_* macros to enable generation of a wrapper shellscript"
 endif
-	$(CC) $(CFLAGS) $(SOURCES) -o $(BUILD)/arch
+	$(CC) $(CFLAGS) $(LDFLAGS) $(SOURCES) -o $(BUILD)/arch
 	
 wrapper :
 	@echo "#!/bin/sh" > $(BUILD)/wrapper

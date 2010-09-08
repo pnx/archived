@@ -1,4 +1,4 @@
-/* fs/notify_event.c - notify event implementation
+/* notify/event.c - notify event implementation
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>
@@ -12,7 +12,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "notify_event.h"
+#include "event.h"
 #include "../common/path.h"
 
 #define dealloc_data(ev) \

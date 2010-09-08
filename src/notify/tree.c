@@ -1,4 +1,4 @@
-/* fs/tree.c - Filesystem traversal
+/* notify/tree.c - Filesystem traversal
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *

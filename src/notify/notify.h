@@ -1,4 +1,4 @@
-/* fs/notify.h - filesystem notification API
+/* notify/notify.h - filesystem notification API
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>
@@ -9,11 +9,11 @@
  *  (at your option) any later version.
  */
 
-#ifndef _FS_NOTIFY_H
-#define _FS_NOTIFY_H
+#ifndef __NOTIFY_NOTIFY_H
+#define __NOTIFY_NOTIFY_H
 
 /* notify event def's and operations */
-#include "notify_event.h"
+#include "event.h"
 
 int notify_init();
 
@@ -32,4 +32,4 @@ void notify_stat();
 /* TODO: context-switch/threading should be implementation specific. */
 int notify_is_ready();
 
-#endif /* _FS_NOTIFY_H */
+#endif /* __NOTIFY_NOTIFY_H */

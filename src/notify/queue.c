@@ -61,16 +61,16 @@ static void dealloc_node(struct ref *tail) {
 	tail->i = 0;
 }
 
-queue_t* init_queue() {
+queue_t init_queue() {
 
-    queue_t *q = malloc(sizeof(queue_t));
+    queue_t q = malloc(sizeof(struct __queue));
 
     init(q);
 
     return q;
 }
 
-void queue_clear(queue_t *q) {
+void queue_clear(queue_t q) {
 
     struct node *t, *n;
 
@@ -88,13 +88,13 @@ void queue_clear(queue_t *q) {
     init(q);
 }
 
-void queue_destroy(queue_t *q) {
+void queue_destroy(queue_t q) {
 
     queue_clear(q);
     free(q);
 }
 
-void queue_enqueue(queue_t *q, void *obj) {
+void queue_enqueue(queue_t q, void *obj) {
 
 	if (q->head.n == NULL) {
 		q->tail.n = q->head.n = malloc(sizeof(struct node));
@@ -108,7 +108,7 @@ void queue_enqueue(queue_t *q, void *obj) {
 	q->head.n->block[q->head.i] = obj;
 }
 
-void* queue_dequeue(queue_t *q) {
+void* queue_dequeue(queue_t q) {
 
     void *obj;
 
@@ -127,15 +127,15 @@ void* queue_dequeue(queue_t *q) {
     return obj;
 }
 
-int queue_isempty(queue_t *q) {
+int queue_isempty(queue_t q) {
 
     if (q == NULL)
         return -1;
-        
+
     return q->head.n == NULL && q->head.n == q->tail.n;
 }
 
-size_t queue_num_items(queue_t *q) {
+size_t queue_num_items(queue_t q) {
 
     if (queue_isempty(q))
         return 0;

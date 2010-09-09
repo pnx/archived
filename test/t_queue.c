@@ -6,7 +6,7 @@
 int main() {
 
     int i, map[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	queue_t *q = init_queue();
+	queue_t q = init_queue();
 
     for(i=0; i < 10; i++)
         queue_enqueue(q, &map[i]);

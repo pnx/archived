@@ -16,20 +16,20 @@
 
 #include <stddef.h>
 
-typedef struct __queue queue_t;
+typedef struct __queue* queue_t;
 
-queue_t* init_queue(void);
+queue_t init_queue(void);
 
-void queue_enqueue(queue_t *q, void *obj);
+void queue_enqueue(queue_t q, void *obj);
 
-void* queue_dequeue(queue_t *q);
+void* queue_dequeue(queue_t q);
 
-int queue_isempty(queue_t *q);
+int queue_isempty(queue_t q);
 
-size_t queue_num_items(queue_t *q);
+size_t queue_num_items(queue_t q);
 
-void queue_clear(queue_t *q);
+void queue_clear(queue_t q);
 
-void queue_destroy(queue_t *q);
+void queue_destroy(queue_t q);
 
 #endif /* __NOTIFY_QUEUE_H */

@@ -25,6 +25,12 @@ int main() {
     for(i=4; i < 10; i++)
         queue_enqueue(q, &map[i]);
 
+    assert(queue_isempty(q) == 0);
+
+    queue_clear(q);
+
+    assert(queue_isempty(q));
+
     queue_destroy(q);
 
 	return 0;

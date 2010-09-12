@@ -1,20 +1,50 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <malloc.h>
 #include "../src/common/strbuf.h"
+
+typedef unsigned int uint;
 
 void print_strbuf(strbuf_t *s) {
 
     assert(s->len == strlen(s->buf));
 
-    printf("block: %i, len: %i |%s|\n", s->alloc_size, s->len, s->buf);
+    printf("block: %u, len: %u |%s|\n", (uint)s->alloc_size, (uint)s->len, s->buf);
 }
 
-int main() {
+void test_release_empty() {
 
     strbuf_t b = STRBUF_INIT;
-	char *str;
+
+    char *ptr = strbuf_release(&b);
+
+    assert(*ptr == '\0');
+
+    free(ptr);
+}
+
+void test_squeeze() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_append_str(&b, "aaabXXXcdefXXXXghijklXXmmmnopXXXXXqrstuXXvwxyXXz");
+    strbuf_squeeze(&b, 'X');
+    print_strbuf(&b);
+    strbuf_free(&b);
+
+    strbuf_append_str(&b, "XXXX");
+    strbuf_squeeze(&b, 'X');
+    print_strbuf(&b);
+    strbuf_free(&b);
+}
+
+void test() {
+
+    strbuf_t b = STRBUF_INIT;
+	
+    print_strbuf(&b);
 
     strbuf_append(&b, "    ", 4);
     strbuf_append(&b, "abcdef", 6);
@@ -22,7 +52,8 @@ int main() {
 	print_strbuf(&b);
 	
     strbuf_append(&b, "012345678901234567890123456789", 30);
-    strbuf_append(&b, "      ", 6);
+    strbuf_append_ch(&b, 'a'); 
+    strbuf_append_str(&b, "      ");
 
     print_strbuf(&b);
 
@@ -46,15 +77,21 @@ int main() {
 
     print_strbuf(&b);
 
-    strbuf_reduce(&b, 95);
-
-    print_strbuf(&b);
-	
-    str = strbuf_release(&b);
+    /* testing release */
+    char *str = strbuf_release(&b);
 	
 	printf("released |%s|\n", str);
 	
 	free(str);
+}
 
+int main() {
+
+    test();
+    
+    test_release_empty();
+
+    test_squeeze();
+    
     return 0;
 }

@@ -9,42 +9,50 @@
  */
 
 #include <ctype.h>
+#include <string.h>
 #include <malloc.h>
 #include <assert.h>
 #include "strbuf.h"
 
 #define CHNK_SIZE 128
 
-static void buf_expand(strbuf_t *s, size_t l) {
+char strbuf_null = '\0';
 
-	if (l <= s->alloc_size)
-		return;
+static void* xrealloc(void *ptr, size_t size) {
 
-	do 
-		s->alloc_size += CHNK_SIZE;
-	while(l > s->alloc_size);
-	
-    s->buf = realloc(s->buf, s->alloc_size);
-	assert(s->buf != NULL);
+    assert(size);
+    ptr = realloc(ptr, size);
+    assert(ptr != NULL);
+    return ptr;
+}
+
+static void* xcalloc(size_t nmemb, size_t size) {
+
+    assert(nmemb);
+    assert(size);
+    void *ptr = calloc(nmemb, size);
+    assert(ptr != NULL);
+    return ptr;
 }
 
 void strbuf_init(strbuf_t *s) {
 
-	s->buf = NULL;
-	s->len = 0;
-	s->alloc_size = 0;
+	s->buf = &strbuf_null;
+	s->alloc_size = s->len = 0;
 }
 
-void strbuf_append(strbuf_t *s, char *str, size_t len) {
+void strbuf_expand(strbuf_t *s, size_t len) {
 
-	if (str == NULL)
+    if (s->len + len + 1 < s->alloc_size)
 		return;
+    if (!s->alloc_size)
+        s->buf = NULL;
 
-    buf_expand(s, s->len + len + 1);
+	do 
+		s->alloc_size += CHNK_SIZE;
+	while(s->len + len + 1 > s->alloc_size);
 	
-    memcpy(s->buf + s->len, str, len);
-    s->len += len;
-    s->buf[s->len] = '\0';
+    s->buf = xrealloc(s->buf, s->alloc_size);
 }
 
 void strbuf_reduce(strbuf_t *s, size_t len) {
@@ -56,6 +64,51 @@ void strbuf_reduce(strbuf_t *s, size_t len) {
     s->buf[s->len] = '\0';
 }
 
+char* strbuf_release(strbuf_t *s) {
+
+	char *ret;
+	
+	if (!s->alloc_size)
+        ret = xcalloc(1, 1);
+    else if (s->len + 1 != s->alloc_size)
+		ret = xrealloc(s->buf, s->len + 1);
+	else
+		ret = s->buf;
+	
+	strbuf_init(s);
+	
+	return ret;
+}
+
+void strbuf_free(strbuf_t *s) {
+
+    if (!s->alloc_size)
+        return;
+        
+    free(s->buf);
+    strbuf_init(s);
+}
+
+void strbuf_append(strbuf_t *s, void *ptr, size_t len) {
+
+    strbuf_expand(s, len);
+    memcpy(s->buf + s->len, ptr, len);
+    s->len += len;
+    s->buf[s->len] = '\0';
+}
+
+void strbuf_append_str(strbuf_t *s, char *str) {
+
+    strbuf_append(s, str, strlen(str));
+}
+
+void strbuf_append_ch(strbuf_t *s, char ch) {
+
+    strbuf_expand(s, 1);
+    s->buf[s->len++] = ch;
+    s->buf[s->len] = '\0';
+}
+
 void strbuf_trim(strbuf_t *s) {
 
 	strbuf_rtrim(s);
@@ -64,7 +117,7 @@ void strbuf_trim(strbuf_t *s) {
 
 void strbuf_rtrim(strbuf_t *s) {
 
-    for(; s->len > 0 && isspace(s->buf[s->len-1]); s->len--);
+    for(; s->len && isspace(s->buf[s->len-1]); s->len--);
     s->buf[s->len] = '\0';
 }
 
@@ -93,27 +146,20 @@ void strbuf_rev(strbuf_t *s) {
     }
 }
 
-char* strbuf_release(strbuf_t *s) {
+void strbuf_squeeze(strbuf_t *s, char ch) {
 
-	char *ret;
-	
-	if (s->len + 1 != s->alloc_size) {
-		ret = realloc(s->buf, s->len + 1);
-		assert(ret != NULL);
-	} else {
-		ret = s->buf;
-	}
-	
-	strbuf_init(s);
-	
-	return ret;
+    size_t p;
+
+    for(p=s->len; p; p--) {
+
+        if (s->buf[p] != ch)
+            continue;
+
+        size_t np = p, of = 0;
+        
+        for(; np >= 1 && s->buf[np-1] == ch; np--)
+            of++;
+        for(s->len -= of; np <= s->len; np++)
+            s->buf[np] = s->buf[np + of];
+    }
 }
-
-void strbuf_free(strbuf_t *s) {
-
-    if (s->alloc_size > 0)
-        free(s->buf);
-    s->buf = NULL;
-}
-
-

@@ -11,9 +11,7 @@
 #ifndef __COMMON_STRBUF_H
 #define __COMMON_STRBUF_H
 
-#include <string.h>
-
-#define STRBUF_INIT { 0, 0, NULL }
+#include <stddef.h>
 
 typedef struct {
     size_t alloc_size;
@@ -21,11 +19,25 @@ typedef struct {
     char  *buf;
 } strbuf_t;
 
+extern char strbuf_null;
+
+#define STRBUF_INIT { 0, 0, &strbuf_null }
+
 void strbuf_init(strbuf_t *s);
 
-void strbuf_append(strbuf_t *s, char *str, size_t len);
+void strbuf_expand(strbuf_t *s, size_t len);
 
 void strbuf_reduce(strbuf_t *s, size_t len);
+
+char* strbuf_release(strbuf_t *s);
+
+void strbuf_free(strbuf_t *s);
+
+void strbuf_append(strbuf_t *s, void *ptr, size_t len);
+
+void strbuf_append_str(strbuf_t *s, char *str);
+
+void strbuf_append_ch(strbuf_t *s, char ch);
 
 void strbuf_trim(strbuf_t *s);
 
@@ -35,8 +47,6 @@ void strbuf_ltrim(strbuf_t *s);
 
 void strbuf_rev(strbuf_t *s);
 
-char* strbuf_release(strbuf_t *s);
-
-void strbuf_free(strbuf_t *s);
+void strbuf_squeeze(strbuf_t *s, char ch);
 
 #endif /* __COMMON_STRBUF_H */

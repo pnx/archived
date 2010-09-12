@@ -6,8 +6,5 @@
  * Use queue in inotify_read(), tree and remove indexer
  * path:
     * normalize
- * strbuf:
-    * "\0" default string.
-    * strbuf_squeeze: squeeze repeated characters into one.
  * ini-like config support
  * fix mysql module

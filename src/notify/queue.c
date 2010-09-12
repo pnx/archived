@@ -65,8 +65,8 @@ queue_t init_queue() {
 
     queue_t q = malloc(sizeof(struct __queue));
 
-    init(q);
-
+    if (q)
+        init(q);
     return q;
 }
 

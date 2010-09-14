@@ -28,6 +28,14 @@ strbuf_append():
 Like strncat() this function will append the buffer with the contents of 'str'
 and will always copy exactly 'len' bytes. (if memory can be obtained ofcourse)
 
+strbuf_append_str():
+
+Will add the C-string to the end of ->buf
+
+strbuf_append_ch():
+
+Adds one character 'ch' to the end of ->buf
+
 strbuf_reduce():
 
 Will reduce ->buf by 'len' bytes from the end, Note that this don't shrink the memory block
@@ -42,6 +50,10 @@ Removes space characters from the beginning (ltrim) of the ->buf string, the end
 strbuf_rev():
 
 Reverses the ->buf string.
+
+strbuf_squeeze():
+
+Squeezes "together" sequences of 'ch' into one character.
 
 strbuf_release():
 

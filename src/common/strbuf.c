@@ -89,7 +89,7 @@ void strbuf_free(strbuf_t *s) {
     strbuf_init(s);
 }
 
-void strbuf_append(strbuf_t *s, void *ptr, size_t len) {
+void strbuf_append(strbuf_t *s, const void *ptr, size_t len) {
 
     strbuf_expand(s, len);
     memcpy(s->buf + s->len, ptr, len);
@@ -97,7 +97,7 @@ void strbuf_append(strbuf_t *s, void *ptr, size_t len) {
     s->buf[s->len] = '\0';
 }
 
-void strbuf_append_str(strbuf_t *s, char *str) {
+void strbuf_append_str(strbuf_t *s, const char *str) {
 
     strbuf_append(s, str, strlen(str));
 }
@@ -157,7 +157,7 @@ void strbuf_squeeze(strbuf_t *s, char ch) {
 
         size_t np = p, of = 0;
         
-        for(; np >= 1 && s->buf[np-1] == ch; np--)
+        for(; np && s->buf[np-1] == ch; np--)
             of++;
         for(s->len -= of; np <= s->len; np++)
             s->buf[np] = s->buf[np + of];

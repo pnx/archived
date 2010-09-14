@@ -33,9 +33,9 @@ char* strbuf_release(strbuf_t *s);
 
 void strbuf_free(strbuf_t *s);
 
-void strbuf_append(strbuf_t *s, void *ptr, size_t len);
+void strbuf_append(strbuf_t *s, const void *ptr, size_t len);
 
-void strbuf_append_str(strbuf_t *s, char *str);
+void strbuf_append_str(strbuf_t *s, const char *str);
 
 void strbuf_append_ch(strbuf_t *s, char ch);
 

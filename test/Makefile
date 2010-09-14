@@ -12,7 +12,7 @@ strbuf :
 	$(CC) $(CFLAGS) ../src/common/strbuf.c t_strbuf.c -o test_strbuf
 	
 path :
-	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/path.c t_path.c -o test_path
+	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/strbuf.c ../src/common/path.c t_path.c -o test_path
 
 rbtree : 
 	$(CC) $(DEFS) $(CFLAGS) unit.c ../src/common/rbtree.c t_rbtree.c -o test_rbtree

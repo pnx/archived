@@ -21,6 +21,7 @@ SOURCES  := \
 	src/arch.c \
     src/arch/mysql.c \
 	src/indexer.c \
+	src/common/strbuf.c \
 	src/common/path.c \
 	src/common/rbtree.c \
 	src/notify/inotify.c \

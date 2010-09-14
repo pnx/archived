@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "debug.h"
+#include "strbuf.h"
 #include "path.h"
 
 /*
@@ -117,39 +118,26 @@ size_t pathlen(const char *path) {
 	return size;
 }
 
-char* fmt_path(const char *base, const char *name, unsigned char dir) {
+char* path_normalize(const char *base, const char *name, unsigned char dir) {
 
-	char *ptr, *ret;
-	size_t size;
-	
-	if (base == NULL || !is_abspath(base) || has_delim(name))
+    strbuf_t sb = STRBUF_INIT;
+
+    if (base == NULL || !is_abspath(base) || has_delim(name))
 		return NULL;
-	
-	size = pathlen(base);
-	
-	if (name != NULL) {
-		size += strlen(name);
-		if (dir)
-            size++;
-	}
 
-    if (*(base+size) != '/')
-        size++;
+    strbuf_append_str(&sb, base);
 
-    ptr = alloc_path(size);
+    if (sb.buf[sb.len] != '/')
+        strbuf_append_ch(&sb, '/');
+
+    if (name) {
+        strbuf_append_str(&sb, name);
     
-	if (ptr == NULL)
-		return NULL;
-	
-	ret = ptr;
-	
-	ptr = cpy_path(ptr, base);
+        if (dir)
+            strbuf_append_ch(&sb, '/');
+    }
 
-	if (name != NULL) {
-		memcpy(ptr, name, strlen(name));
-		if (dir)
-            *(ptr+strlen(name)) = '/';
-	}
-	
-	return ret;
+    strbuf_squeeze(&sb, '/');
+
+    return strbuf_release(&sb);
 }

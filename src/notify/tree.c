@@ -43,7 +43,7 @@ struct tree* tree_new(const char *path) {
 	if (t == NULL)
 		return NULL;
 	
-	t->path = fmt_path(path, NULL, 0);
+	t->path = path_normalize(path, NULL, 0);
 	
 	if (t->path == NULL) {
 		free(t);

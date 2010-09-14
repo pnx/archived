@@ -87,7 +87,7 @@ static int rm() {
 
 void indexer_register(const char *base, const char *name) {
 	
-    char *fullpath = fmt_path(base, name, 1);
+    char *fullpath = path_normalize(base, name, 1);
     
 	if (!indexer_pending()) {
 #if __DEBUG__

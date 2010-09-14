@@ -53,7 +53,7 @@ static int addwatch(const char *path, const char *name) {
 	char   *cpath;
 	int     wd;
 	
-	cpath = fmt_path(path, name, 1);
+	cpath = path_normalize(path, name, 1);
 	
 	if (cpath == NULL)
 		return -1;

@@ -4,26 +4,26 @@
 #include "unit.h"
 #include "../src/common/path.h"
 
-void test_fmt_path() {
+void test_normalize() {
 
     char *ptr;
 
-    ptr = fmt_path("usr/", "include/", 0);
+    ptr = path_normalize("usr/", "include/", 0);
     assert(ptr == NULL);
 
-    ptr = fmt_path("/usr/src/", "linux", 0);
+    ptr = path_normalize("/usr/src/", "linux", 0);
     assert_string(ptr, "/usr/src/linux");
     free(ptr);
 
-    ptr = fmt_path("/segment1/segment2/", "segment3", 1);
+    ptr = path_normalize("/segment1///segment2//", "segment3", 1);
     assert_string(ptr, "/segment1/segment2/segment3/");
     free(ptr);
 
-    ptr = fmt_path("/stuff/with/ahell/lot/of/slashes/at/the/", "end", 1);
+    ptr = path_normalize("/stuff/with/ahell/lot/of/slashes/at/the///", "end", 1);
     assert_string(ptr, "/stuff/with/ahell/lot/of/slashes/at/the/end/");
     free(ptr);
 
-    ptr = fmt_path("/mnt/cdrom", "keff", 0);
+    ptr = path_normalize("/mnt/cdrom", "keff", 0);
     assert_string(ptr, "/mnt/cdrom/keff");
     free(ptr);
 }
@@ -98,7 +98,7 @@ void test_dirname() {
 int main(int argc, char *argv[]) {
 
     test_isabspath();
-    test_fmt_path();
+    test_normalize();
     test_pathlen();
     test_basename();
     test_dirname();

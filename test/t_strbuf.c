@@ -29,7 +29,9 @@ void test_squeeze() {
 
     strbuf_t b = STRBUF_INIT;
 
-    strbuf_append_str(&b, "aaabXXXcdefXXXXghijklXXmmmnopXXXXXqrstuXXvwxyXXz");
+    strbuf_squeeze(&b, 'X');
+
+    strbuf_append_str(&b, "aaabXXXcdefXXXXghijklXXmmmnopXXXXXqrstuXXvwxyXXzXX");
     strbuf_squeeze(&b, 'X');
     print_strbuf(&b);
     strbuf_free(&b);
@@ -38,6 +40,19 @@ void test_squeeze() {
     strbuf_squeeze(&b, 'X');
     print_strbuf(&b);
     strbuf_free(&b);
+}
+
+void test_term() {
+
+    strbuf_t b = STRBUF_INIT;
+    strbuf_t c = STRBUF_INIT;
+    strbuf_append_str(&b, "test");
+    strbuf_append_str(&c, "test.");
+    strbuf_term(&b, '.');
+    strbuf_term(&c, '.');
+    assert(strcmp(b.buf, c.buf) == 0);
+    strbuf_free(&b);
+    strbuf_free(&c);
 }
 
 void test() {
@@ -92,6 +107,8 @@ int main() {
     test_release_empty();
 
     test_squeeze();
+
+    test_term();
     
     return 0;
 }

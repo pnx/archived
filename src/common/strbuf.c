@@ -91,6 +91,12 @@ void strbuf_append_ch(strbuf_t *s, char ch) {
     s->buf[s->len] = '\0';
 }
 
+void strbuf_term(strbuf_t *s, char ch) {
+
+    if (s->buf[s->len-1] != ch)
+        strbuf_append_ch(s, ch);
+}
+
 void strbuf_trim(strbuf_t *s) {
 
 	strbuf_rtrim(s);
@@ -132,7 +138,10 @@ void strbuf_squeeze(strbuf_t *s, char ch) {
 
     size_t p;
 
-    for(p=s->len; p; p--) {
+    if (s->len <= 1)
+        return;
+
+    for(p=s->len-1; p; p--) {
 
         if (s->buf[p] != ch)
             continue;

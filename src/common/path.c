@@ -13,10 +13,13 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "debug.h"
 #include "strbuf.h"
 #include "path.h"
+
+static char path_null = '\0';
 
 /*
  * allocates and initilizes a path
@@ -118,17 +121,33 @@ size_t pathlen(const char *path) {
 	return size;
 }
 
+static char* expand_home() {
+
+    char *home = getenv("HOME");
+
+    if (!home)
+        home = &path_null;
+    return home;
+}
+
 char* path_normalize(const char *base, const char *name, unsigned char dir) {
 
     strbuf_t sb = STRBUF_INIT;
 
-    if (base == NULL || !is_abspath(base) || has_delim(name))
+    if (base == NULL || has_delim(name)) 
 		return NULL;
 
-    strbuf_append_str(&sb, base);
+    if (*base == '~') {
+        base++;
+        strbuf_append_str(&sb, expand_home());
+        strbuf_term(&sb, '/');
+    }
 
-    if (sb.buf[sb.len] != '/')
-        strbuf_append_ch(&sb, '/');
+    strbuf_append_str(&sb, base);
+    strbuf_term(&sb, '/');
+
+    if (!is_abspath(sb.buf))
+        goto cleanup;
 
     if (name) {
         strbuf_append_str(&sb, name);
@@ -140,4 +159,7 @@ char* path_normalize(const char *base, const char *name, unsigned char dir) {
     strbuf_squeeze(&sb, '/');
 
     return strbuf_release(&sb);
+cleanup:
+    strbuf_free(&sb);
+    return NULL;
 }

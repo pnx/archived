@@ -1,6 +1,7 @@
 
 #include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "unit.h"
 #include "../src/common/path.h"
 
@@ -21,6 +22,14 @@ void test_normalize() {
 
     ptr = path_normalize("/stuff/with/ahell/lot/of/slashes/at/the///", "end", 1);
     assert_string(ptr, "/stuff/with/ahell/lot/of/slashes/at/the/end/");
+    free(ptr);
+
+    ptr = path_normalize("~", NULL, 0);
+    printf("HOME EXPAND: %s\n", ptr);
+    free(ptr);
+
+    ptr = path_normalize("~/sub", "file", 0);
+    printf("HOME EXPAND2: %s\n", ptr);
     free(ptr);
 
     ptr = path_normalize("/mnt/cdrom", "keff", 0);

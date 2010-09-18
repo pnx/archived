@@ -10,30 +10,12 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <malloc.h>
-#include <assert.h>
+#include "xalloc.h"
 #include "strbuf.h"
 
 #define CHNK_SIZE 128
 
 char strbuf_null = '\0';
-
-static void* xrealloc(void *ptr, size_t size) {
-
-    assert(size);
-    ptr = realloc(ptr, size);
-    assert(ptr != NULL);
-    return ptr;
-}
-
-static void* xcalloc(size_t nmemb, size_t size) {
-
-    assert(nmemb);
-    assert(size);
-    void *ptr = calloc(nmemb, size);
-    assert(ptr != NULL);
-    return ptr;
-}
 
 void strbuf_init(strbuf_t *s) {
 
@@ -69,7 +51,7 @@ char* strbuf_release(strbuf_t *s) {
 	char *ret;
 	
 	if (!s->alloc_size)
-        ret = xcalloc(1, 1);
+        ret = xmallocz(1);
     else if (s->len + 1 != s->alloc_size)
 		ret = xrealloc(s->buf, s->len + 1);
 	else
@@ -85,7 +67,7 @@ void strbuf_free(strbuf_t *s) {
     if (!s->alloc_size)
         return;
         
-    free(s->buf);
+    xfree(s->buf);
     strbuf_init(s);
 }
 

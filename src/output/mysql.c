@@ -1,4 +1,4 @@
-/* arch/mysql.c - Mysql implementation
+/* output/mysql.c - Mysql output-driver
  *
  *   Copyright (C) 2010  Fredric Nilsson <fredric@fiktivkod.org>
  *
@@ -19,9 +19,6 @@
 #include "../ini/iniparser.h"
 #include "../common/xalloc.h"
 #include "../notify/event.h"
-
-
-#define STRSZ(s) (sizeof(char) * strlen(s))
 
 typedef struct {
     char *host;

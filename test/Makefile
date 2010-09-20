@@ -63,7 +63,13 @@ indexer :
 	t_indexer.c -o test_indexer
 
 mysql :
-	$(CC) -D DB_DEBUG $(CFLAGS) $(LDFLAGS) ../src/arch/mysql.c t_mysql.c -o test_mysql
+	$(CC) -D DB_DEBUG $(CFLAGS) $(LDFLAGS) \
+		../src/output/mysql.c \
+		../src/common/die.c \
+		../src/common/xalloc.c \
+		../src/ini/iniparser.c \
+		../src/ini/dictionary.c \
+	t_mysql.c -o test_mysql
 
 queue :
 	$(CC) $(CFLAGS) ../src/notify/queue.c t_queue.c -o test_queue

@@ -55,6 +55,10 @@ strbuf_squeeze():
 
 Squeezes "together" sequences of 'ch' into one character.
 
+strbuf_term():
+
+ensure the string is terminated with 'ch'. will not change the string if it is already terminated.
+
 strbuf_release():
 
 This function should be used to detach the ->buf member from the strbuf_t structure.

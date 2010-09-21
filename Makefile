@@ -19,11 +19,15 @@ endif
 
 SOURCES  := \
 	src/arch.c \
-    src/arch/mysql.c \
+	src/output/mysql.c \
+	src/ini/iniparser.c \
+	src/ini/dictionary.c \
 	src/indexer.c \
 	src/common/strbuf.c \
 	src/common/path.c \
 	src/common/rbtree.c \
+	src/common/xalloc.c \
+	src/common/die.c \
 	src/notify/inotify.c \
 	src/notify/event.c \
 	src/notify/tree.c

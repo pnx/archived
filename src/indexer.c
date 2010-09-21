@@ -11,7 +11,7 @@
 #include <string.h>
 #include "common/debug.h"
 #include "common/path.h"
-#include "arch/db.h"
+#include "output/output.h"
 #include "notify/notify.h"
 #include "notify/tree.h"
 #include "indexer.h"
@@ -27,8 +27,18 @@ static void index_entry(struct entry *ent) {
 #if __DEBUG__
 		printf("DEBUG: index_entry adding to db: %s %s %d\n", ent->base, ent->name, ent->dir);
 #endif
-    arch_db_insert(ent->base, ent->name, ent->dir);
+
     
+    // Event change, just for test.
+    notify_event ev;
+
+    ev.path = ent->base;
+    ev.filename = ent->name;
+    ev.type = NOTIFY_CREATE;
+    int status = output_process(&ev);
+    if (0 != status)
+        fprintf(stderr,"%s",output_error(status));
+
     if (ent->dir) {
         memcpy(buf, ent->base, strlen(ent->base));
         memcpy(buf + strlen(ent->base), ent->name, strlen(ent->name)+1);

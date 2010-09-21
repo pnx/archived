@@ -4,5 +4,4 @@
 ##################
 
  * Use queue in inotify_read(), tree and remove indexer
- * ini-like config support
  * fix mysql module

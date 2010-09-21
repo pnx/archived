@@ -212,6 +212,8 @@ int output_exit() {
  */
 char *output_error(int error) {
 
+    char *str;
+
     switch (error) {
         case 1:
             return "Missing 'host' in configuration";
@@ -224,7 +226,8 @@ char *output_error(int error) {
         case 5:
             return "Missing 'table' in configuration";
         case 6:
-            return mysql_error(db.connection);
+            sprintf(str, "mysql error: %s", mysql_error(db.connection));
+            return str;
         case 7:
             return "Error while creating table";
         case 8:
@@ -248,9 +251,9 @@ static int database_setup() {
                          "`Base` varchar(512) default NULL, "
                          "`Type` tinyint(1) default NULL, "
                          "`Status` tinyint(1) default NULL, "
-                         "`Date` datetime default NULL"
-                         "KEY `idx_path` (`Path`(333)),"
-                         "KEY `idx_base` (`Base`(333))"
+                         "`Date` datetime default NULL, "
+                         "KEY `idx_path` (`Path`(333)), "
+                         "KEY `idx_base` (`Base`(333)) "
                          ") ENGINE=MyISAM DEFAULT CHARSET=utf8 ";
     
     char stmt_trunc[] = "TRUNCATE TABLE `%s`";

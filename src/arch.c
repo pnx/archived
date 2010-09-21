@@ -2,8 +2,12 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "arch/db.h"
+#include "output/output.h"
 #include "notify/notify.h"
+#include "ini/iniparser.h"
+
+static dictionary *config;
+
 
 /* only way to exit the application properly
    when in main loop is by signal */
@@ -12,7 +16,15 @@ static void clean_exit(int excode) {
 	time_t t = time(NULL);
 	
 	notify_cleanup();
-	arch_db_close();
+
+        // Clean output
+	int status = output_exit();
+        if (0 != status) {
+            fprintf(stderr,"%s",output_error(status));
+        }
+
+        // Clean config
+        iniparser_freedict(config);
 	
 	printf("\nprocess exit at: %s", ctime(&t));
 	exit(excode);
@@ -43,95 +55,106 @@ static void sighandl(int sig) {
 
 void arch_loop() {
 
-	notify_event *event;
-	
-	for(;;) {
-		
-		if (indexer_pending() && !notify_is_ready()) {
+    int status;
+    notify_event *event;
+
+    for(;;) {
+
+        if (indexer_pending() && !notify_is_ready()) {
 #ifdef __DEBUG__
-        	printf("sched: running indexer\n");
+printf("sched: running indexer\n");
 #endif
             indexer_run(15);
             continue;
         }
-        
+
 #ifdef __DEBUG__
-        printf("sched: notify block\n");  
+printf("sched: notify block\n");  
 #endif
 
-		event = notify_read(-1);
-		
-		if (event == NULL)
-			continue;
-		
+        event = notify_read(-1);
+
+        if (event == NULL)
+            continue;
+
 #ifdef __DEBUG__
-		printf("-- EVENT --\n"
-			   " TYPE: %s\n"
-			   " DIR: %i\n"
-			   " PATH: %s%s\n"
-			   "---------------\n", notify_event_typetostr(event), event->dir, event->path, event->filename);
+printf("-- EVENT --\n"
+" TYPE: %s\n"
+" DIR: %i\n"
+" PATH: %s%s\n"
+"---------------\n", notify_event_typetostr(event), event->dir, event->path, event->filename);
 #endif
-		
-		switch(event->type) {
-			
+
+        switch(event->type) {
             case NOTIFY_MOVE_TO :
-            	
                 if (event->dir)
                     indexer_register(event->path, event->filename);
             case NOTIFY_CREATE :
-            	arch_db_insert(event->path, event->filename, event->dir);
-            	break;
+                break;
             case NOTIFY_MOVE_FROM :
-			case NOTIFY_DELETE :
-				arch_db_delete(event->path, event->filename);
-				break;
-		}
-		
+            case NOTIFY_DELETE :
+                break;
+        }
+
+        status = output_process(event);
+        if (0 != status) {
+            fprintf(stderr,"%s",output_error(status));
+        }
+
 #ifdef __DEBUG__
-		notify_stat();
+notify_stat();
 #endif
-	}
+    }
 }
 
 int main(int argc, char **argv) {
 
-	/* Validate arguments */
-	if (argc != 7) {
-		
-		printf("Usage: %s <Root Directory> <Db user> <Db pass> <Db name>.\n"
-			   "Root Directory - Path to indexroot. All subdirectories will be indexed.\n"
-			   "Db host - Database host\n"
-			   "Db user - Database user\n"
-                           "Db pass - Database password\n"
-                           "Db name - Database to use for indexing\n"
-			   "Db tbl  - Database tablename", argv[0]);
-		
-		return EXIT_FAILURE;
-	}
+    // Validate arguments
+    if (argc != 2) {
 
-    /* setup signal handlers */
-	signal(SIGTERM, sighandl);
-	signal(SIGKILL, sighandl);
-	signal(SIGQUIT, sighandl);
-	signal(SIGINT, sighandl);
-	signal(SIGSEGV, sighandl);
-	signal(SIGUSR1, sighandl);
-	signal(SIGUSR2, sighandl);
+        printf("Usage: %s <Root Directory>\n"
+        "Root Directory - Path to indexroot. All subdirectories will be indexed.\n", argv[0]);
 
-	/* connect to database */
-	if (!arch_db_init(argv[2], argv[3], argv[4], argv[5], argv[6]))
-		return EXIT_FAILURE;
-	
-	notify_init();
-	
-	if(notify_add_watch(argv[1]) == -1) {
-		fprintf(stderr, "Invalid path: %s\n", argv[1]);
-		return EXIT_FAILURE;
-	}
+        return EXIT_FAILURE;
+    }
+
+
+    // Load configuration
+    config = iniparser_load("config.ini");
+    if (NULL == config) {
+        fprintf(stderr,"Could not load configuration");
+        return EXIT_FAILURE;
+    }
+
+
+
+    // Setup signal handlers
+    signal(SIGTERM, sighandl);
+    signal(SIGKILL, sighandl);
+    signal(SIGQUIT, sighandl);
+    signal(SIGINT, sighandl);
+    signal(SIGSEGV, sighandl);
+    signal(SIGUSR1, sighandl);
+    signal(SIGUSR2, sighandl);
+
+    // Connect to database
+    int status = output_init(config);
+    if (0 != status) {
+        fprintf(stderr,"%s",output_error(status));
+        return EXIT_FAILURE;
+    }
+
+
+    notify_init();
+
+    if(notify_add_watch(argv[1]) == -1) {
+            fprintf(stderr, "Invalid path: %s\n", argv[1]);
+            return EXIT_FAILURE;
+    }
 
     indexer_register(argv[1], NULL);
-    
-	arch_loop();
-	
-	return EXIT_SUCCESS;
+
+    arch_loop();
+
+    return EXIT_SUCCESS;
 }

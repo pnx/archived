@@ -58,7 +58,9 @@ indexer :
 		../src/notify/tree.c \
 		../src/notify/inotify.c \
 		../src/notify/event.c \
-		../src/arch/mysql.c \
+		../src/ini/iniparser.c \
+		../src/ini/dictionary.c \
+		../src/output/stdout.c \
 		../src/indexer.c \
 	t_indexer.c -o test_indexer
 

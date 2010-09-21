@@ -19,7 +19,7 @@ xmalloc():
 
 xmallocz():
 
-    exactly like xmalloc but will initialize the block with zero.
+    exactly like xmalloc but will initialize the block with zero's.
 
 xrealloc():
 
@@ -33,5 +33,5 @@ xstrdup():
 
 xfree():
 
-    free's a previous allocated block pointed by 'ptr' that is allocated by xmalloc/malloc.
+    free's a previous allocated block (pointed to by 'ptr') that is allocated by xmalloc/malloc.
     if compiled with the __DEBUG__ symbol, the function will not allow 'ptr' to be a NULL pointer

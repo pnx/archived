@@ -10,8 +10,10 @@ processing.
 The output drivers have complete access to the configuration file to allow them
 a way to get user defined input. Eg. database access information.
 
-At this time we only provide two different output drivers. One for mysql and
-one for stdout.
+!NOTE! functions that returns and integer always has the following specification:
+
+    zero if everything went well and a non zero value that indicates an error
+    that later can be identified by the output_error() function.
 
 -- functions
 
@@ -20,11 +22,13 @@ output_init():
     This function is called on startup and allows the output driver to initialize
     stuff that is needed later on. Eg. loading configuration options and/or connecting
     to the database.
-
+    
 output_process():
 
     Is called every time a new event is triggered. The event is passed to the function
-    and after that it is up to the driver to do some magic.
+    and after that it is up to the driver to do some magic. NOTE that you are not supposed to free the memory
+    for the basic reason that you don't know now how it was allocated and even if you knew, it may change and
+    we are stuck with inconsistent modules.
 
 output_error():
 

@@ -29,7 +29,4 @@ notify_event* notify_read();
 
 void notify_stat();
 
-/* TODO: context-switch/threading should be implementation specific. */
-int notify_is_ready();
-
 #endif /* __NOTIFY_NOTIFY_H */

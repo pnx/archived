@@ -70,56 +70,24 @@ void arch_loop() {
 
     for(;;) {
 
-        if (indexer_pending() && !notify_is_ready()) {
-#ifdef __DEBUG__
-printf("sched: running indexer\n");
-#endif
-            indexer_run(15);
-            continue;
-        }
-
-#ifdef __DEBUG__
-printf("sched: notify block\n");  
-#endif
-
-        event = notify_read(-1);
+        event = notify_read();
 
         if (event == NULL)
             continue;
 
-#ifdef __DEBUG__
-printf("-- EVENT --\n"
-" TYPE: %s\n"
-" DIR: %i\n"
-" PATH: %s%s\n"
-"---------------\n", notify_event_typetostr(event), event->dir, event->path, event->filename);
-#endif
-
-        switch(event->type) {
-            case NOTIFY_MOVE_TO :
-                if (event->dir)
-                    indexer_register(event->path, event->filename);
-            case NOTIFY_CREATE :
-                break;
-            case NOTIFY_MOVE_FROM :
-            case NOTIFY_DELETE :
-                break;
-        }
-
         status = output_process(event);
-        if (0 != status) {
+        if (status)
             fprintf(stderr,"%s",output_error(status));
-        }
 
-#ifdef __DEBUG__
-notify_stat();
-#endif
+        notify_event_del(event);
     }
 }
 
 int main(int argc, char **argv) {
 
-    // Validate arguments
+    int status;
+
+    /* Validate arguments */
     if (argc != 2) {
 
         printf("Usage: %s <Root Directory>\n"
@@ -128,17 +96,14 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-
-    // Load configuration
+    /* Load configuration */
     config = iniparser_load("config.ini");
     if (NULL == config) {
         fprintf(stderr,"Could not load configuration");
         return EXIT_FAILURE;
     }
 
-
-
-    // Setup signal handlers
+    /* Setup signal handlers */
     signal(SIGTERM, sighandl);
     signal(SIGKILL, sighandl);
     signal(SIGQUIT, sighandl);
@@ -147,22 +112,21 @@ int main(int argc, char **argv) {
     signal(SIGUSR1, sighandl);
     signal(SIGUSR2, sighandl);
 
-    // Connect to database
-    int status = output_init(config);
-    if (0 != status) {
-        fprintf(stderr,"%s",output_error(status));
+    status = output_init(config);
+    if (status) {
+        fprintf(stderr, "%s", output_error(status));
         return EXIT_FAILURE;
     }
 
+    status = notify_init();
+    if (status == -1)
+        return EXIT_FAILURE;
 
-    notify_init();
-
-    if(notify_add_watch(argv[1]) == -1) {
-            fprintf(stderr, "Invalid path: %s\n", argv[1]);
-            return EXIT_FAILURE;
+    status = notify_add_watch(argv[1]);
+    if (status == -1) {
+        fprintf(stderr, "Invalid path: %s\n", argv[1]);
+        return EXIT_FAILURE;
     }
-
-    indexer_register(argv[1], NULL);
 
     arch_loop();
 

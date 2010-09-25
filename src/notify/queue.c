@@ -61,7 +61,7 @@ static void dealloc_node(struct ref *tail) {
 	tail->i = 0;
 }
 
-queue_t init_queue() {
+queue_t queue_init() {
 
     queue_t q = malloc(sizeof(struct __queue));
 

@@ -18,7 +18,7 @@
 
 typedef struct __queue* queue_t;
 
-queue_t init_queue(void);
+queue_t queue_init(void);
 
 void queue_enqueue(queue_t q, void *obj);
 

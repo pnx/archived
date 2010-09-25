@@ -25,7 +25,11 @@ path :
 	t_path.c -o test_path
 
 rbtree : 
-	$(CC) $(CFLAGS) unit.c ../src/common/rbtree.c t_rbtree.c -o test_rbtree
+	$(CC) $(CFLAGS) \
+		unit.c \
+		../src/common/die.c \
+		../src/common/rbtree.c \
+	t_rbtree.c -o test_rbtree
 
 inotify :
 	$(CC) -lpthread -D INOTIFY_DEBUG -D RB_DEBUG $(CFLAGS) \

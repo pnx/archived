@@ -9,17 +9,14 @@
  */
 
 #ifndef __COMMON_DEBUG_H
-
 #define __COMMON_DEBUG_H
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define __perror(...) fprintf(stderr, __VA_ARGS__)
+#include "util.h"
 
-#define die(...) \
-	__perror("DIE: " __VA_ARGS__); \
-	exit(1)
+#define __perror(...) fprintf(stderr, __VA_ARGS__)
 
 #ifdef __DEBUG__
 

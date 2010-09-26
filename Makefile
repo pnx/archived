@@ -45,9 +45,9 @@ obj += src/notify/event.o
 obj += src/notify/tree.o
 obj += src/notify/queue.o
 
-obj += src/indexer.o
 obj += src/arch.o
 
+.PHONY : all clean cleaner
 all : $(PROGRAM)
 
 $(PROGRAM) : $(obj)

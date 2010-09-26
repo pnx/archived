@@ -3,7 +3,7 @@ CC=gcc
 CFLAGS=-g -D__DEBUG__ 
 LDFLAGS=-L/usr/lib64/mysql -lmysqlclient
 
-all : raw_inotify strbuf path rbtree inotify tree indexer mysql stdout queue
+all : raw_inotify strbuf path rbtree inotify tree mysql stdout queue
 
 raw_inotify :
 	$(CC) -linotifytools t_raw_inotify.c -o test_raw_inotify
@@ -52,22 +52,6 @@ tree :
 		../src/common/die.c \
 		../src/common/strbuf.c \
 	t_tree.c -o test_tree
-	
-indexer :
-	$(CC) $(CFLAGS) $(LDFLAGS) \
-		../src/common/rbtree.c \
-		../src/common/path.c \
-		../src/common/xalloc.c \
-		../src/common/die.c \
-		../src/common/strbuf.c \
-		../src/notify/tree.c \
-		../src/notify/inotify.c \
-		../src/notify/event.c \
-		../src/ini/iniparser.c \
-		../src/ini/dictionary.c \
-		../src/output/stdout.c \
-		../src/indexer.c \
-	t_indexer.c -o test_indexer
 
 mysql :
 	$(CC) -D DB_DEBUG $(CFLAGS) $(LDFLAGS) \

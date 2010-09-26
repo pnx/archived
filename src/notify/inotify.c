@@ -9,54 +9,43 @@
  *  (at your option) any later version.
  */
 
-#include "notify.h"
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <time.h>
+#include <sys/ioctl.h>
+#include <sys/inotify.h>
+
+#include "../common/util.h"
 /* red black tree for watch descriptors */
 #include "../common/rbtree.h"
 #include "../common/debug.h"
 #include "../common/path.h"
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/inotify.h>
+#include "queue.h"
+#include "notify.h"
 
 typedef struct inotify_event inoev;
 
-#define MAXEVENT     0x200
-#define PADEVSIZE    (sizeof(inoev) + 0x40)
-#define INOBUFSIZE   (MAXEVENT*PADEVSIZE)
+#define INOBUFSIZE ((1 << 12) * (sizeof(inoev) + 0x40))
 
 #define WATCH_MASK (IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR)
 
 /* Inotify file descriptor */
 static int fd = 0;
 
-/* Available bytes on file descriptor */
-static unsigned int fd_bytes = 0;
-
 /* redblack tree */
 static rbtree tree;
 
-/* inotify queue buffer */
-static char *inobuf = NULL;
-
-/* current event */
-static notify_event event;
+static queue_t event_queue;
 
 static int addwatch(const char *path, const char *name) {
 	
 	rbnode *node;
 	char   *cpath;
 	int     wd;
-	
+    
 	cpath = path_normalize(path, name, 1);
-	
-	if (cpath == NULL)
-		return -1;
 	
 	wd = inotify_add_watch(fd, cpath, WATCH_MASK);
 	
@@ -94,14 +83,14 @@ static int rmwatch(unsigned int wd) {
 	return 1;
 }
 
-static int proc_event(inoev *iev) {
+static void proc_event(inoev *iev) {
 
 	rbnode *node;
+    notify_event *event;
     char buf[4096];
 	uint8_t type = NOTIFY_UNKNOWN;
 
-	if (iev == NULL)
-		return 0;
+    event = notify_event_new();
 	
 #ifdef __DEBUG__
 	fprintf(stderr, "RAW EVENT: %i, %x", iev->wd, iev->mask);
@@ -116,14 +105,14 @@ static int proc_event(inoev *iev) {
 	
 	if (node == NULL) {
 		dprint("-- IGNORING EVENT -- invalid watchdescriptor %i\n", iev->wd);
-		return 0;
+		goto cleanup;
 	}
 
-	notify_event_set_dir(&event, (iev->mask & IN_ISDIR) != 0);
+	notify_event_set_dir(event, (iev->mask & IN_ISDIR) != 0);
 	
 	/* set path, this is stored in void* node->data */
-	notify_event_set_path(&event, (char*)node->data);
-	notify_event_set_filename(&event, iev->name);
+	notify_event_set_path(event, (char*)node->data);
+	notify_event_set_filename(event, iev->name);
 	
 	iev->mask &= ~IN_ISDIR;
 	
@@ -131,37 +120,40 @@ static int proc_event(inoev *iev) {
 			
 		case IN_CREATE :
 						
-			if (event.dir) {
+			if (event->dir) {
 				dprint("IN_CREATE on directory, adding\n");
-				addwatch(event.path, event.filename);
+				addwatch(event->path, event->filename);
 			}
 			
 			type = NOTIFY_CREATE;
 			break;
 		case IN_MOVED_TO :
 			
-			if (event.dir) {
+			if (event->dir) {
 				dprint("IN_MOVED_TO on directory, adding\n");
-				addwatch(event.path, event.filename);
+				addwatch(event->path, event->filename);
 			}
             
 			type = NOTIFY_MOVE_TO;
 			break;
 		case IN_MOVED_FROM :
             /* TODO: clean this */
-            sprintf(buf, "%s%s/", event.path, event.filename);
+            sprintf(buf, "%s%s/", event->path, event->filename);
             notify_rm_watch(buf);
 		case IN_DELETE :
 			type = NOTIFY_DELETE;
 			break;
 		case IN_IGNORED :
 			rmwatch(iev->wd);
-			return 0;
+			goto cleanup;
 	}
 	
-	notify_event_set_type(&event, type);
-	
-	return 1;
+	notify_event_set_type(event, type);
+    
+	queue_enqueue(event_queue, event);
+    return;
+cleanup:
+    free(event);
 }
 
 int notify_init() {
@@ -177,13 +169,11 @@ int notify_init() {
 		perror("NOTIFY INIT");
 		return -1;
 	}
-	
-	dprint("inotify descriptor = %i\n", fd);
 
-	inobuf = malloc(INOBUFSIZE);
+	event_queue = queue_init();
 	
-	if (inobuf == NULL) {
-		perror("NOTIFY BUFFER");
+	if (event_queue == NULL) {
+		perror("EVENT QUEUE");
 		return -1;
 	}
 	
@@ -191,16 +181,16 @@ int notify_init() {
 }
 
 void notify_cleanup() {
-	
+
+	fd = 0;
+    
 	/* free rbtree */
 	rbtree_free(&tree, NULL);
 	
-	if (inobuf != NULL) {
-		free(inobuf);
-        inobuf = NULL;
+	if (event_queue) {
+		queue_destroy(event_queue);
+        event_queue = NULL;
     }
-	
-	fd = 0;
 }
 
 /*
@@ -225,45 +215,48 @@ int notify_rm_watch(const char *path) {
     return 0;
 }
 
-/*
- * Get next inotify event
- */
 notify_event* notify_read() {
-	
-	int			rc;
-	inoev 	   *rev = NULL;
-    static int  offset;
 
-	while(! proc_event(rev)) {
-		
-		if (fd_bytes < 1) {
-		
-			offset = 0;
+    char buf[INOBUFSIZE];
 
-			fd_bytes = read(fd, inobuf, INOBUFSIZE);
-		
-			if (fd_bytes < 1) {
-			
-				if (fd_bytes == 0) {
-					fprintf(stderr, "NOTIFY READ: EOF\n");
-				} 
-				/* EINTR = call interrupted, silent ignore */
-				else if (errno != EINTR) {
-					perror("NOTIFY READ");
-				}
-			
-				return NULL;
-			}
-		}
-	
-		rev = (inoev *) &inobuf[offset];
-		offset += sizeof(inoev) + rev->len;
-	
-		if (offset >= fd_bytes)
-			fd_bytes = 0;
-	}
-	
-	return &event;
+    /* time resolution */
+    struct timespec tres = { 0, 2000000 };
+
+    unsigned short tcount;
+
+    /* bytes ready on the inotify descriptor */
+    int ioready;
+    
+    for(tcount = 0; tcount < 10; tcount++) {
+
+        if (ioctl(fd, FIONREAD, &ioready) == -1)
+            break;
+
+        if (ioready > INOBUFSIZE)
+            break;
+
+        nanosleep(&tres, NULL);
+    }
+
+    /* read if we have data on fd */
+    while(ioready > 0) {
+
+        dprint("%i bytes avail\n", ioready);
+
+        int offset = 0, rbytes = read(fd, buf, INOBUFSIZE);
+
+        if (rbytes == -1)
+            die_errno("INOTIFY");
+
+        while(rbytes > offset) {
+            inoev *rev = (inoev *) &buf[offset];
+            proc_event(rev);
+            offset += sizeof(inoev) + rev->len;
+        }
+        ioready -= rbytes;
+    }
+
+    return queue_dequeue(event_queue);
 }
 
 static void print_node(rbnode *node) {
@@ -275,19 +268,4 @@ void notify_stat() {
 #ifdef __DEBUG__
 	rbtree_walk(&tree, print_node);
 #endif
-}
-
-int notify_is_ready() {
-	
-	unsigned int bytes;
-	
-	if (fd_bytes > 1)
-		return 1;
-	
-	if (ioctl(fd, FIONREAD, &bytes) == -1)
-		return 0;
-	
-    dprint("%i bytes ready!\n", bytes);
-    
-	return bytes > 512;
 }

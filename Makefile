@@ -7,7 +7,7 @@ CFLAGS   = -O2 -Werror
 LDFLAGS  = 
 
 ifdef DEBUG
-	CFLAGS	 += -g -D__DEBUG__
+	CFLAGS += -g -D__DEBUG__
 endif
 
 ifndef V
@@ -19,7 +19,6 @@ FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
 
 BUILD    := ./build
 PROGRAM  := $(BUILD)/arch
-
 
 ifeq ($(output), mysql)
 	CFLAGS  += `mysql_config --cflags`
@@ -44,6 +43,7 @@ obj += src/output/$(output).o
 obj += src/notify/inotify.o
 obj += src/notify/event.o
 obj += src/notify/tree.o
+obj += src/notify/queue.o
 
 obj += src/indexer.o
 obj += src/arch.o

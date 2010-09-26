@@ -40,6 +40,7 @@ inotify :
 	    ../src/common/path.c \
 	    ../src/notify/event.c \
 	    ../src/notify/tree.c \
+	    ../src/notify/queue.c \
 	    ../src/notify/inotify.c \
 	t_inotify.c -o test_inotify
 

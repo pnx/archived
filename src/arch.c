@@ -15,8 +15,9 @@
 #include "output/output.h"
 #include "notify/notify.h"
 #include "ini/iniparser.h"
+#include "common/util.h"
 
-static dictionary *config;
+static dictionary *config = NULL;
 
 
 /* only way to exit the application properly
@@ -97,12 +98,14 @@ int main(int argc, char **argv) {
     }
 
     /* Load configuration */
-    config = iniparser_load("config.ini");
-    if (NULL == config) {
-        fprintf(stderr,"Could not load configuration");
-        return EXIT_FAILURE;
+    if (file_exists("config.ini")) {
+        config = iniparser_load("config.ini");
+        if (NULL == config) {
+            fprintf(stderr, "Could not load configuration");
+            return EXIT_FAILURE;
+        }
     }
-
+    
     /* Setup signal handlers */
     signal(SIGTERM, sighandl);
     signal(SIGKILL, sighandl);

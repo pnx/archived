@@ -11,8 +11,12 @@
 #ifndef __COMMON_UTIL_H
 #define __COMMON_UTIL_H
 
+#include <unistd.h>
+
 void die(const char *, ...);
 
 void die_errno(const char *);
+
+#define file_exists(s) (access((s), F_OK) == 0)
 
 #endif /* __COMMOT_UTIL_H */

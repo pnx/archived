@@ -43,6 +43,9 @@ static int database_setup();
  */
 int output_init(dictionary *config) {
 
+    if (config == NULL)
+        return 9;
+
     // Load database information from ini config
     db.host     = iniparser_getstring(config, "mysql:host", NULL);
     db.port     = iniparser_getint(config, "mysql:port", 3306);
@@ -232,6 +235,8 @@ char *output_error(int error) {
             return "Error while creating table";
         case 8:
             return "Lost connection to database. Could not reconnect";
+        case 9:
+            return "Missing configuration";
     }
 
     return "Unkown error";

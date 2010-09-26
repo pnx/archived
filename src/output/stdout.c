@@ -27,8 +27,6 @@ int output_process(notify_event *event) {
 
     char *event_string;
 
-    printf("Running output_process()\n");
-
     switch (event->type) {
         case NOTIFY_CREATE:
             event_string = "create";
@@ -46,7 +44,7 @@ int output_process(notify_event *event) {
             event_string = "unknown";
     }
 
-    printf("Event: {Path: %s, Filename: %s, Type: %s}\n", event->path, event->filename, event_string);
+    printf("output_process: {Path: %s, Filename: %s, Type: %s}\n", event->path, event->filename, event_string);
     return 0;
 }
 

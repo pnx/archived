@@ -3,5 +3,4 @@
     TODO LIST
 ##################
 
- * Use queue in inotify_read(), tree and remove indexer
  * fix mysql module

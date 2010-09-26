@@ -217,32 +217,42 @@ int notify_rm_watch(const char *path) {
 
 notify_event* notify_read() {
 
-    char buf[INOBUFSIZE];
-
-    /* time resolution */
-    struct timespec tres = { 0, 2000000 };
-
-    unsigned short tcount;
-
     /* bytes ready on the inotify descriptor */
     int ioready;
     
-    for(tcount = 0; tcount < 10; tcount++) {
+    /* if we don't have pending events, wait for more data on fd  */
+    if (queue_isempty(event_queue)) {
 
-        if (ioctl(fd, FIONREAD, &ioready) == -1)
-            break;
+        /* time resolution */
+        struct timespec tres = { 0, 2000000 };
 
-        if (ioready > INOBUFSIZE)
-            break;
+        unsigned short tcount;
+        
+        for(tcount = 0; tcount < 10; tcount++) {
 
-        nanosleep(&tres, NULL);
+            if (ioctl(fd, FIONREAD, &ioready) == -1)
+                break;
+
+            if (ioready > INOBUFSIZE)
+                break;
+
+            nanosleep(&tres, NULL);
+        }
+    }
+    /* otherwise, only read if the data available at
+       this given moment is "large enough" */
+    else {
+        ioctl(fd, FIONREAD, &ioready);
+
+        if (ioready < INOBUFSIZE / 2)
+            ioready = 0;
     }
 
-    /* read if we have data on fd */
     while(ioready > 0) {
 
         dprint("%i bytes avail\n", ioready);
 
+        char buf[INOBUFSIZE];
         int offset = 0, rbytes = read(fd, buf, INOBUFSIZE);
 
         if (rbytes == -1)

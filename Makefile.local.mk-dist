@@ -1,0 +1,10 @@
+
+# Enable debug
+# DEBUG = 1
+
+# Verbose output
+# VERBOSE = 1
+
+# Define what type of output should be used. default stdout
+# output = stdout
+# output = mysql

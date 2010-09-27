@@ -4,21 +4,27 @@
 
 CC       = gcc
 CFLAGS   = -O2 -Werror
+LD		 = $(CC)
 LDFLAGS  = 
+
+FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
+
+BUILD    := build
+PROGRAM  := $(BUILD)/archived
+
+include Makefile.local.mk
 
 ifdef DEBUG
 	CFLAGS += -g -D__DEBUG__
 endif
 
-ifndef V
+ifndef VERBOSE
 	QUIET_CC = @echo '   ' CC $@;
 	QUIET_LD = @echo '   ' LD $@;
 endif
-
-FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
-
-BUILD    := ./build
-PROGRAM  := $(BUILD)/arch
+ifeq ($(VERBOSE), 2)
+	CFLAGS  += -v
+endif
 
 ifeq ($(output), mysql)
 	CFLAGS  += `mysql_config --cflags`
@@ -52,7 +58,7 @@ all : $(PROGRAM)
 
 $(PROGRAM) : $(obj)
 	@mkdir -p $(BUILD)
-	$(QUIET_LD)$(CC) $(LDFLAGS) $^ -o $@
+	$(QUIET_LD)$(LD) $(LDFLAGS) $^ -o $@
 
 clean :
 	@for obj in `$(FINDOBJ)`; do \
@@ -64,3 +70,7 @@ cleaner : clean
 
 %.o : %.c
 	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@
+
+Makefile.local.mk :
+	@echo " Can't find 'Makefile.local.mk'; copying default configuration"
+	@cp Makefile.local.mk-dist Makefile.local.mk

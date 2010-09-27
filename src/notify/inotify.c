@@ -180,7 +180,7 @@ int notify_init() {
 	return 1;
 }
 
-void notify_cleanup() {
+void notify_exit() {
 
 	fd = 0;
     

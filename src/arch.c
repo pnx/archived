@@ -26,7 +26,7 @@ static void clean_exit(int excode) {
 	
 	time_t t = time(NULL);
 	
-	notify_cleanup();
+	notify_exit();
 
         // Clean output
 	int status = output_exit();

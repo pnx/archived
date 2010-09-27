@@ -17,13 +17,11 @@
 
 int notify_init();
 
-void notify_cleanup();
+void notify_exit();
 
 int notify_add_watch(const char *path);
 
 int notify_rm_watch(const char *path);
-
-void notify_print_stat();
 
 notify_event* notify_read();
 

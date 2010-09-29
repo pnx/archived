@@ -21,6 +21,7 @@
 #include "../common/xalloc.h"
 #include "../ini/iniparser.h"
 #include "../common/util.h"
+#include "../common/debug.h"
 
 typedef struct {
     char *host;
@@ -40,6 +41,54 @@ static database db;
 
 static dictionary *config = NULL;
 
+/*
+ * Converts error codes to string
+ */
+static char *client_error(int error) {
+
+    char *str;
+
+    switch (error) {
+        case 1:
+            return "Missing 'host' in configuration";
+        case 2:
+            return "Missing 'username' in configuration";
+        case 3:
+            return "Missing 'password' in configuration";
+        case 4:
+            return "Missing 'database' in configuration";
+        case 5:
+            return "Missing 'table' in configuration";
+        case 6:
+            sprintf(str, "mysql error: %s", mysql_error(db.connection));
+            return str;
+        case 7:
+            return "Error while creating table";
+        case 8:
+            return "Lost connection to database. Could not reconnect";
+        case 9:
+            return "Missing configuration";
+    }
+
+    return "Unkown error";
+}
+
+
+/*
+ * Close database connection
+ */
+static int client_exit() {
+
+    /* Close database connection */
+    mysql_close(db.connection);
+
+    /* Another leak fix */
+    mysql_library_end();
+
+    return 0;
+}
+
+
 /* Only way to exit the application properly
    when in main loop is by signal */
 static void clean_exit(int excode) {
@@ -49,9 +98,10 @@ static void clean_exit(int excode) {
 	notify_exit();
 
         /* Clean mysql */
-	int status = mysql_exit();
+	int status = client_exit();
         if (0 != status) {
-            fprintf(stderr,"%s",mysql_error(status));
+            char *str = client_error(status);
+            fprintf(stderr,"%s", str);
         }
 
         /* Clean config */
@@ -86,32 +136,63 @@ static void sighandl(int sig) {
 }
 
 /*
- * The main loop - read events from notify API
+ * Database setup
  */
-void main_loop() {
+static int database_setup() {
 
-    int status;
-    notify_event *event;
+    int ret;
 
-    for(;;) {
+    /* Sql statements */
+    char stmt_create[] = "CREATE TABLE IF NOT EXISTS `%s` ("
+                         "`Path` varchar(512) default NULL, "
+                         "`Base` varchar(512) default NULL, "
+                         "`Type` tinyint(1) default NULL, "
+                         "`Status` tinyint(1) default NULL, "
+                         "`Date` datetime default NULL, "
+                         "KEY `idx_path` (`Path`(333)), "
+                         "KEY `idx_base` (`Base`(333)) "
+                         ") ENGINE=MyISAM DEFAULT CHARSET=utf8 ";
 
-        event = notify_read();
+    char stmt_trunc[] = "TRUNCATE TABLE `%s`";
 
-        if (event == NULL)
-            continue;
+    /* Build query
+       Notice: -1 for "%s" in stmt_create and \0 */
+    char *stmt = (char *) xmalloc(strlen(stmt_create) + strlen(db.table) - 1);
+    if (stmt == NULL || sprintf(stmt, stmt_create, db.table) < 0)
+        return 7;
 
-        status = mysql_process(event);
-        if (status)
-            fprintf(stderr,"%s", mysql_error(status));
+    /* Run mysql query */
+    ret = mysql_query(db.connection, stmt);
 
-        notify_event_del(event);
+    /* Make sure query was successfull */
+    if (ret != 0) {
+        free(stmt);
+        return 6;
     }
+
+    /* Build new query */
+    stmt = (char *) xrealloc(stmt, strlen(stmt_trunc) + strlen(db.table) - 1);
+    if (sprintf(stmt, stmt_trunc, db.table) < 0)
+        return 8;
+
+    /* Run mysql query */
+    ret = mysql_query(db.connection, stmt);
+
+    /* Make sure query was successfull */
+    if (ret != 0) {
+        free(stmt);
+        return 6;
+    }
+
+
+    return 0;
 }
+
 
 /*
  * Initialize database connection and connect to database
  */
-int mysql_init() {
+static int client_init() {
 
     /* Load database information from ini config */
     db.host     = iniparser_getstring(config, "mysql:host", NULL);
@@ -175,25 +256,25 @@ int mysql_init() {
 /*
  * Process events
  */
-int mysql_process(notify_event *event) {
+static int client_process(notify_event *event) {
 
-    int ret;
+    int ret, dir = 0;
     char *stmt;
 
     /* Skip if event is unknown */
     if (NOTIFY_UNKNOWN == event->type)
         return 0;
-
+    
     /* Insert new row in database */
     if (NOTIFY_CREATE == event->type) {
 
-        char stmt_insert[] = "INSERT INTO `%s` (`Path`, `Base`, `Type`, `Status`, `Date`) VALUES('%s','%s','1','0', NOW())";
+        char stmt_insert[] = "INSERT INTO `%s` (`Path`, `Base`, `Type`, `Status`, `Date`) VALUES('%s','%s','%i','0', NOW())";
 
         if(mysql_ping(db.connection) != 0) {
             return 8;
 	}
 
-        stmt = xmalloc(strlen(stmt_insert) + strlen(db.table) + strlen(event->path) + strlen(event->filename) + 1);
+        stmt = (char *)xmalloc(sizeof(char) * (strlen(stmt_insert) + strlen(db.table) + strlen(event->path) + strlen(event->filename) - 6));
 
         /* Escape paths */
         char *escaped_path = xmalloc(strlen(event->path) * 2 + 1);
@@ -202,20 +283,24 @@ int mysql_process(notify_event *event) {
         mysql_real_escape_string(db.connection, escaped_path, event->path, strlen(event->path));
         mysql_real_escape_string(db.connection, escaped_filename, event->filename, strlen(event->filename));
 
+        /* dir :D */
+        if (event->dir == 1) {
+            dir = 1;
+        }
+
         /* Create mysql query */
-	sprintf(stmt, stmt_insert, db.table, escaped_path, escaped_filename);
+	sprintf(stmt, stmt_insert, db.table, escaped_path, escaped_filename, dir);
 
 	/* Run mysql query */
 	ret = mysql_query(db.connection, stmt);
 
 	/* Clean up */
-	free(stmt);
-	free(escaped_path);
-	free(escaped_filename);
+	xfree(stmt);
+	xfree(escaped_path);
+	xfree(escaped_filename);
 
     /* Delete row in database */
     } else if (NOTIFY_DELETE == event->type) {
-
 
         char stmt_delete[] = "DELETE FROM `%s` WHERE `Path` LIKE '%s%s%%' OR (`Path` = '%s' AND `Base` = '%s')";
 
@@ -223,14 +308,14 @@ int mysql_process(notify_event *event) {
             return 8;
 	}
 
-        stmt = xmalloc(strlen(stmt_delete) + strlen(db.table) + strlen(event->path) + strlen(event->filename) + 1);
-
         /* Escape paths */
         char *escaped_path = xmalloc(strlen(event->path) * 2 + 1);
         char *escaped_filename = xmalloc(strlen(event->filename) * 2 + 1);
 
         mysql_real_escape_string(db.connection, escaped_path, event->path, strlen(event->path));
         mysql_real_escape_string(db.connection, escaped_filename, event->filename, strlen(event->filename));
+
+        stmt = xmalloc(strlen(stmt_delete) + strlen(db.table) + strlen(escaped_path)*2 + strlen(escaped_filename)*2 + 1);
 
         /* Create mysql query */
 	sprintf(stmt, stmt_delete, db.table, escaped_path, escaped_filename, escaped_path, escaped_filename);
@@ -239,9 +324,9 @@ int mysql_process(notify_event *event) {
 	ret = mysql_query(db.connection, stmt);
 
 	/* Clean up */
-	free(stmt);
-	free(escaped_path);
-	free(escaped_filename);
+	xfree(stmt);
+	xfree(escaped_path);
+	xfree(escaped_filename);
 
     }
 
@@ -250,7 +335,7 @@ int mysql_process(notify_event *event) {
         return 6;
     }
 
-#ifdef DB_DEBUG
+#ifdef __DEBUG__
 
     if(db.thread != mysql_thread_id(db.connection)) {
         fprintf(stderr, "Connection was lost. Reconnected. Old_Thread: %li, New_Thread: %li\n", db.thread, mysql_thread_id(db.connection));
@@ -263,104 +348,26 @@ int mysql_process(notify_event *event) {
 
 
 /*
- * Close database connection
+ * The main loop - read events from notify API
  */
-int mysql_exit() {
+static void main_loop() {
 
-    /* Close database connection */
-    mysql_close(db.connection);
+    int status;
+    notify_event *event;
 
-    /* Another leak fix */
-    mysql_library_end();
+    for(;;) {
 
-    return 0;
-}
+        event = notify_read();
 
+        if (event == NULL)
+            continue;
 
-/*
- * Converts error codes to string
- */
-char *mysql_error(int error) {
+        status = client_process(event);
+        if (status)
+            fprintf(stderr,"%s", client_error(status));
 
-    char *str;
-
-    switch (error) {
-        case 1:
-            return "Missing 'host' in configuration";
-        case 2:
-            return "Missing 'username' in configuration";
-        case 3:
-            return "Missing 'password' in configuration";
-        case 4:
-            return "Missing 'database' in configuration";
-        case 5:
-            return "Missing 'table' in configuration";
-        case 6:
-            sprintf(str, "mysql error: %s", mysql_error(db.connection));
-            return str;
-        case 7:
-            return "Error while creating table";
-        case 8:
-            return "Lost connection to database. Could not reconnect";
-        case 9:
-            return "Missing configuration";
+        notify_event_del(event);
     }
-
-    return "Unkown error";
-}
-
-
-/*
- * Database setup
- */
-static int database_setup() {
-
-    int ret;
-
-    /* Sql statements */
-    char stmt_create[] = "CREATE TABLE IF NOT EXISTS `%s` ("
-                         "`Path` varchar(512) default NULL, "
-                         "`Base` varchar(512) default NULL, "
-                         "`Type` tinyint(1) default NULL, "
-                         "`Status` tinyint(1) default NULL, "
-                         "`Date` datetime default NULL, "
-                         "KEY `idx_path` (`Path`(333)), "
-                         "KEY `idx_base` (`Base`(333)) "
-                         ") ENGINE=MyISAM DEFAULT CHARSET=utf8 ";
-
-    char stmt_trunc[] = "TRUNCATE TABLE `%s`";
-
-    /* Build query
-       Notice: -1 for "%s" in stmt_create and \0 */
-    char *stmt = (char *) xmalloc(strlen(stmt_create) + strlen(db.table) - 1);
-    if (stmt == NULL || sprintf(stmt, stmt_create, db.table) < 0)
-        return 7;
-
-    /* Run mysql query */
-    ret = mysql_query(db.connection, stmt);
-
-    /* Make sure query was successfull */
-    if (ret != 0) {
-        free(stmt);
-        return 6;
-    }
-
-    /* Build new query */
-    stmt = (char *) xrealloc(stmt, strlen(stmt_trunc) + strlen(db.table) - 1);
-    if (sprintf(stmt, stmt_trunc, db.table) < 0)
-        return 8;
-
-    /* Run mysql query */
-    ret = mysql_query(db.connection, stmt);
-
-    /* Make sure query was successfull */
-    if (ret != 0) {
-        free(stmt);
-        return 6;
-    }
-
-
-    return 0;
 }
 
 int main(int argc, char** argv) {
@@ -395,9 +402,9 @@ int main(int argc, char** argv) {
     signal(SIGUSR1, sighandl);
     signal(SIGUSR2, sighandl);
 
-    ret = output_init(config);
+    ret = client_init();
     if (ret) {
-        fprintf(stderr, "%s", output_error(ret));
+        fprintf(stderr, "%s", client_error(ret));
         return EXIT_FAILURE;
     }
 

@@ -42,6 +42,29 @@ void test_squeeze() {
     strbuf_free(&b);
 }
 
+void test_chop() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_rchop(&b, 'X');
+    print_strbuf(&b);
+
+    strbuf_append_str(&b, "X");
+    
+    strbuf_rchop(&b, 'X');
+    print_strbuf(&b);
+
+    strbuf_append_str(&b, "123456789X123456789");
+
+    strbuf_rchop(&b, 'X');
+    print_strbuf(&b);
+
+    strbuf_rchop(&b, 'X');
+    print_strbuf(&b);
+    
+    strbuf_free(&b);
+}
+
 void test_term() {
 
     strbuf_t b = STRBUF_INIT;
@@ -109,6 +132,8 @@ int main() {
     test_squeeze();
 
     test_term();
+
+    test_chop();
     
     return 0;
 }

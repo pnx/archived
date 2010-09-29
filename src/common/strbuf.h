@@ -39,6 +39,8 @@ void strbuf_append_str(strbuf_t *s, const char *str);
 
 void strbuf_append_ch(strbuf_t *s, char ch);
 
+void strbuf_rchop(strbuf_t *s, char ch);
+
 void strbuf_term(strbuf_t *s, char ch);
 
 void strbuf_trim(strbuf_t *s);

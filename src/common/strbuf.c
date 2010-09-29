@@ -12,6 +12,7 @@
 #include <string.h>
 #include "xalloc.h"
 #include "strbuf.h"
+#include "debug.h"
 
 #define CHNK_SIZE 128
 
@@ -89,6 +90,20 @@ void strbuf_append_ch(strbuf_t *s, char ch) {
     strbuf_expand(s, 1);
     s->buf[s->len++] = ch;
     s->buf[s->len] = '\0';
+}
+
+void strbuf_rchop(strbuf_t *s, char ch) {
+
+    int i;
+    
+    for(i=s->len-1; i >= 0; i--) {
+
+        if (s->buf[i] == ch) {
+            s->buf[i] = '\0';
+            s->len = i;
+            break;
+        }
+    }
 }
 
 void strbuf_term(strbuf_t *s, char ch) {

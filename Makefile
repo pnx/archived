@@ -48,7 +48,7 @@ obj += src/output/$(output).o
 
 obj += src/notify/inotify.o
 obj += src/notify/event.o
-obj += src/notify/tree.o
+obj += src/notify/fscrawl.o
 obj += src/notify/queue.o
 
 obj += src/arch.o

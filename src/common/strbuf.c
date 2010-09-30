@@ -72,6 +72,16 @@ void strbuf_free(strbuf_t *s) {
     strbuf_init(s);
 }
 
+void strbuf_attach(strbuf_t *s, void *buf, size_t len, size_t alloc_size) {
+
+    strbuf_free(s);
+    s->buf = buf;
+    s->len = len;
+    s->alloc_size = alloc_size;
+    strbuf_expand(s, 0);
+    s->buf[s->len] = '\0';
+}
+
 void strbuf_append(strbuf_t *s, const void *ptr, size_t len) {
 
     strbuf_expand(s, len);

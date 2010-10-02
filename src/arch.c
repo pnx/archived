@@ -54,7 +54,7 @@ static void sighandl(int sig) {
 	/* segmentation violation, let user now */
 	case SIGSEGV :
 		fprintf(stderr, "SEGFAULT: o no he didn't\n");
-		clean_exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	case SIGUSR1 :
 	case SIGUSR2 :
 		printf("notify stat:\n");

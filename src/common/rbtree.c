@@ -37,12 +37,12 @@ static rbnode* node_alloc(uint key, void *ptr, size_t len) {
  */
 static void node_dealloc(rbnode *n, void (*action)(rbnode *)) {
 	
-	if (n == NULL)
+	if (!n)
 		return;
 
-	if (action != NULL) {
+	if (action) {
 		action(n);
-	} else if (n->data != NULL) {
+	} else if (n->data) {
 		xfree(n->data);
         n->data = NULL;
     }
@@ -83,7 +83,7 @@ static rbnode* rbcmp(rbnode *n, void *cmpdata, size_t len) {
 	
 	rbnode *r;
 	
-	if (n == NULL)
+	if (!n)
 		return NULL;
 
     dprint("CMP %s - %s\n", (char*)n->data, (char*)cmpdata);
@@ -134,7 +134,7 @@ rbnode* rbtree_search(rbtree *tree, uint key) {
 	
 	n = tree->root;
 	
-	while(n != NULL) {
+	while(n) {
 		
 		dprint("SEARCH: check %u\n", n->key);
 		
@@ -235,7 +235,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
 		last = dir;
 		dir = q->key < key;
 			
-		if (g != NULL)
+		if (g)
 			t = g;
 		g = p, p = q;
 		q = q->child[dir];
@@ -278,7 +278,7 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	
 	/* more dragons (killed some of them though) */
 	
-	while(q->child[dir] != NULL) {
+	while(q->child[dir]) {
 		last = dir;
 		
 		g = p, p = q;
@@ -318,7 +318,7 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	}
 	
 	tree->root = head.child[1];
-	if (tree->root != NULL)
+	if (tree->root)
 		tree->root->color = RB_BLACK;
 	
 	/* remove if found */

@@ -3,7 +3,7 @@ CC=gcc
 CFLAGS=-g -D__DEBUG__ 
 LDFLAGS=-L/usr/lib64/mysql -lmysqlclient
 
-all : raw_inotify strbuf path rbtree inotify fscrawl mysql stdout queue
+all : raw_inotify strbuf path rbtree inotify fscrawl queue
 
 raw_inotify :
 	$(CC) -linotifytools t_raw_inotify.c -o test_raw_inotify
@@ -53,22 +53,6 @@ fscrawl :
 		../src/common/die.c \
 		../src/common/strbuf.c \
 	t_fscrawl.c -o test_fscrawl
-
-mysql :
-	$(CC) -D DB_DEBUG $(CFLAGS) $(LDFLAGS) \
-		../src/output/mysql.c \
-		../src/common/die.c \
-		../src/common/xalloc.c \
-		../src/ini/iniparser.c \
-		../src/ini/dictionary.c \
-	t_mysql.c -o test_mysql
-
-stdout :
-	$(CC) $(CFLAGS) $(LDFLAGS) \
-		../src/output/stdout.c \
-		../src/ini/iniparser.c \
-		../src/ini/dictionary.c \
-	t_stdout.c -o test_stdout
 
 queue :
 	$(CC) $(CFLAGS) ../src/notify/queue.c t_queue.c -o test_queue

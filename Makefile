@@ -26,17 +26,17 @@ ifeq ($(VERBOSE), 2)
 	CFLAGS  += -v
 endif
 
-ifeq ($(output), mysql)
-	CFLAGS  += `mysql_config --cflags`
-	LDFLAGS += -L/usr/lib/mysql -lmysqlclient
-else
-	output = stdout
-endif
-
 obj =
 
-obj += src/ini/iniparser.o
-obj += src/ini/dictionary.o
+ifeq ($(DEBUG), 2)
+	obj += src/client/stdout.o
+else
+	CFLAGS  += `mysql_config --cflags`
+	LDFLAGS += -L/usr/lib/mysql -lmysqlclient
+	obj += src/ini/iniparser.o
+	obj += src/ini/dictionary.o
+	obj += src/client/mysql.o
+endif
 
 obj += src/common/rbtree.o
 obj += src/common/path.o
@@ -44,14 +44,10 @@ obj += src/common/strbuf.o
 obj += src/common/xalloc.o
 obj += src/common/die.o
 
-obj += src/output/$(output).o
-
 obj += src/notify/inotify.o
 obj += src/notify/event.o
 obj += src/notify/fscrawl.o
 obj += src/notify/queue.o
-
-obj += src/arch.o
 
 .PHONY : all clean cleaner
 all : $(PROGRAM)
@@ -64,7 +60,7 @@ clean :
 	@for obj in `$(FINDOBJ)`; do \
 		echo $(RM) $$obj;$(RM) $$obj; \
 	done
-	
+
 cleaner : clean
 	$(RM) -r $(BUILD)
 

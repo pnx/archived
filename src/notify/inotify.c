@@ -23,6 +23,7 @@
 #include "../common/path.h"
 
 #include "queue.h"
+#include "fscrawl.h"
 #include "notify.h"
 
 typedef struct inotify_event inoev;
@@ -50,10 +51,10 @@ static int addwatch(const char *path, const char *name) {
 	wd = inotify_add_watch(fd, npath, WATCH_MASK);
 	
 	if (wd < 0) {
-		perror("NOTIFY ADD");
-		dprint("%i path %s\n", errno == EBADF, npath);
         free(npath);
-		return -errno;
+        wd = -errno;
+        errno = 0;
+		return wd;
 	}
 
 	/* we must update to not introduce duplicated wd's (keys) */
@@ -73,15 +74,16 @@ static int addwatch(const char *path, const char *name) {
 }
 
 static int rmwatch(unsigned int wd) {
-	
+
 	void *data = rbtree_delete(&tree, wd);
 	
 	if (data == NULL)
 		return 0;
 	
-	dprint("remove watch: %i %s\n", wd, (char*) data);
+	dprint("rmwatch: %i %s\n", wd, (char*) data);
     inotify_rm_watch(fd, wd);
-	free(data);
+    if (data)
+        free(data);
 	return 1;
 }
 
@@ -110,14 +112,25 @@ static void proc_event(inoev *iev) {
 		goto cleanup;
 	}
 
-	notify_event_set_dir(event, (iev->mask & IN_ISDIR) != 0);
-	
 	/* set path, this is stored in void* node->data */
-	notify_event_set_path(event, (char*)node->data);
+	notify_event_set_path(event, node->data);
 	notify_event_set_filename(event, iev->name);
+
+    notify_event_set_dir(event, (iev->mask & IN_ISDIR) != 0);
 	
 	iev->mask &= ~IN_ISDIR;
-	
+
+    /* this event is always generated and works better
+       for removing the node in the binary tree */
+    if (iev->mask == IN_IGNORED) {
+        rmwatch(iev->wd);
+        goto cleanup;
+    }
+
+    /* queue event before doing any fscrawl on a subdirectory
+       to prevent messing up the order */
+    queue_enqueue(event_queue, event);
+    
 	switch (iev->mask) {
 			
 		case IN_CREATE :
@@ -133,29 +146,59 @@ static void proc_event(inoev *iev) {
 			
 			if (event->dir) {
 				dprint("IN_MOVED_TO on directory, adding\n");
-				addwatch(event->path, event->filename);
+                /* TODO: clean this */
+                sprintf(buf, "%s%s/", event->path, event->filename);
+				notify_add_watch(buf);
 			}
             
-			type = NOTIFY_MOVE_TO;
+			type = NOTIFY_CREATE;
 			break;
 		case IN_MOVED_FROM :
-            /* TODO: clean this */
+            /* TODO: and this */
             sprintf(buf, "%s%s/", event->path, event->filename);
             notify_rm_watch(buf);
 		case IN_DELETE :
 			type = NOTIFY_DELETE;
 			break;
-		case IN_IGNORED :
-			rmwatch(iev->wd);
-			goto cleanup;
 	}
 	
 	notify_event_set_type(event, type);
-    
-	queue_enqueue(event_queue, event);
+
     return;
 cleanup:
     free(event);
+}
+
+static void addrecursive(const char *path) {
+
+    fscrawl_t fsc;
+    fs_entry *ent;
+    notify_event *ev;
+
+    fsc = fsc_open(path);
+
+    if (!fsc)
+        return;
+
+    for(;;) {
+        
+        ent = fsc_read(fsc);
+
+        if (!ent)
+            return;
+
+        if (ent->dir)
+            addwatch(ent->base, ent->name);
+
+        ev = notify_event_new();
+        
+        notify_event_set_type(ev, NOTIFY_CREATE);
+        notify_event_set_path(ev, ent->base);
+        notify_event_set_filename(ev, ent->name);
+        notify_event_set_dir(ev, ent->dir);
+
+        queue_enqueue(event_queue, ev);
+    }
 }
 
 int notify_init() {
@@ -186,7 +229,6 @@ void notify_exit() {
 
 	fd = 0;
     
-	/* free rbtree */
 	rbtree_free(&tree, NULL);
 	
 	if (event_queue) {
@@ -199,8 +241,13 @@ void notify_exit() {
  * Add inotify watch on path
  */
 int notify_add_watch(const char *path) {
-	
-	return addwatch(path, NULL);
+
+    if (addwatch(path, NULL) < 0)
+        return -1;
+
+    addrecursive(path);
+    
+	return 1;
 }
 
 int notify_rm_watch(const char *path) {

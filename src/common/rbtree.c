@@ -11,23 +11,20 @@
  *   http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
  */
 
-#include <malloc.h>
-
+#include "xalloc.h"
 #include "debug.h"
 #include "rbtree.h"
 
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 #define swap(n,d,q) ((n)->child[(n)->child[d] == (q)])
 
-static rbnode* node_alloc(uint key, void *ptr) {
+static rbnode* node_alloc(uint key, void *ptr, size_t len) {
 	
-	rbnode *n = malloc(sizeof(rbnode));
-	
-	if (n == NULL)
-		return NULL;
+	rbnode *n = xmalloc(sizeof(rbnode));
 	
 	n->key      = key;
 	n->data     = ptr;
+    n->len      = len;
 	n->color    = RB_RED;
 	n->child[0] = NULL;
 	n->child[1] = NULL;
@@ -46,14 +43,14 @@ static void node_dealloc(rbnode *n, void (*action)(rbnode *)) {
 	if (action != NULL) {
 		action(n);
 	} else if (n->data != NULL) {
-		free(n->data);
+		xfree(n->data);
         n->data = NULL;
     }
 	
 	node_dealloc(n->child[0], action);
 	node_dealloc(n->child[1], action);
 	
-	free(n);
+	xfree(n);
 }
 
 /*
@@ -185,7 +182,7 @@ void rbtree_free(rbtree *tree, void (*action)(rbnode *)) {
  *
  * the function now returns -1 in that situation // H Hautakoski
  */
-int rbtree_insert(rbtree *tree, uint key, void *data) {
+int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
 	
 	rbnode head = {0};
 	
@@ -198,7 +195,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data) {
 	unsigned char dir = 0, dir2, last, inserted = 0;
 	
 	if (tree->root == NULL) {
-		tree->root = node_alloc(key, data);
+		tree->root = node_alloc(key, data, len);
 		if (tree->root == NULL)
 			return 0;
         goto done;
@@ -212,7 +209,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data) {
 		
 	for(;;) {
 		if (q == NULL) {
-			p->child[dir] = q = node_alloc(key, data);
+			p->child[dir] = q = node_alloc(key, data, len);
 			if (q == NULL)
 				return 0;
             inserted = 1;
@@ -325,18 +322,15 @@ void* rbtree_delete(rbtree *tree, uint key) {
 		tree->root->color = RB_BLACK;
 	
 	/* remove if found */
-	if (f != NULL) {
-		ret = q->data;
-		if (q == tree->root) {
-			tree->root = NULL;
-		} else {
-			if (f != q) {
-				f->key  = q->key;
-				f->data = q->data;
-			}
-			swap(p, 1, q) = swap(q, 0, NULL);
-		}
-		free(q);
+	if (f) {
+        ret = f->data;
+        if (f != q) {
+            f->key  = q->key;
+            f->data = xmemdup(q->data, q->len);
+            f->len  = q->len;
+        }
+        swap(p, 1, q) = swap(q, 0, NULL);
+        xfree(q);
 	}
 	
 	return ret;

@@ -75,6 +75,17 @@ bail:
     die_errno("xstrdup");
 }
 
+void* xmemdup(const void *src, size_t size) {
+
+    CHECK_INPUT(src);
+
+    void *dest = xmalloc(size);
+    memcpy(dest, src, size);
+    return dest;
+bail:
+    die_errno("xmemdup");
+}
+
 void xfree(void *ptr) {
 
     CHECK_INPUT(ptr);

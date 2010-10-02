@@ -28,6 +28,7 @@ rbtree :
 	$(CC) $(CFLAGS) \
 		unit.c \
 		../src/common/die.c \
+		../src/common/xalloc.c \
 		../src/common/rbtree.c \
 	t_rbtree.c -o test_rbtree
 

@@ -42,16 +42,17 @@ static queue_t event_queue;
 static int addwatch(const char *path, const char *name) {
 	
 	rbnode *node;
-	char   *cpath;
+	char   *npath;
 	int     wd;
     
-	cpath = path_normalize(path, name, 1);
+	npath = path_normalize(path, name, 1);
 	
-	wd = inotify_add_watch(fd, cpath, WATCH_MASK);
+	wd = inotify_add_watch(fd, npath, WATCH_MASK);
 	
 	if (wd < 0) {
 		perror("NOTIFY ADD");
-		dprint("%i path %s\n", errno == EBADF, cpath);
+		dprint("%i path %s\n", errno == EBADF, npath);
+        free(npath);
 		return -errno;
 	}
 
@@ -59,12 +60,13 @@ static int addwatch(const char *path, const char *name) {
 	node = rbtree_search(&tree, wd);
 	
 	if (node == NULL) {
-		dprint("added wd = %i on %s\n", wd, cpath);
-		rbtree_insert(&tree, wd, (void*)cpath);
+		dprint("added wd = %i on %s\n", wd, npath);
+		rbtree_insert(&tree, wd, (void*)npath, strlen(npath)+1);
 	} else {
-		dprint("updated wd = %i from %s to %s\n", wd, (char*)node->data, cpath);
+		dprint("updated wd = %i from %s to %s\n", wd, (char*)node->data, npath);
 		free(node->data);
-		node->data = (void*) cpath;
+		node->data = (void*) npath;
+        node->len = strlen(npath)+1;
 	}
 	
 	return wd;

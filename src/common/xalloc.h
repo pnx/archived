@@ -21,6 +21,8 @@ void* xrealloc(void *, size_t);
 
 char* xstrdup(const char *);
 
+void* xmemdup(const void *, size_t);
+
 void xfree(void *);
 
 #endif /* __COMMON_XALLOC_H */

@@ -42,7 +42,7 @@ void rbtree_walk(rbtree *tree, void (*action)(rbnode *));
 
 void rbtree_free(rbtree *tree, void (*action)(rbnode *));
 
-int rbtree_insert(rbtree *tree, uint key, void *data);
+int rbtree_insert(rbtree *tree, uint key, void *data, size_t len);
 
 void* rbtree_delete(rbtree *tree, uint key);
 

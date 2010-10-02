@@ -60,7 +60,8 @@ static int rb_assert(rbnode *node) {
 
 /* data */
 static rbtree tree;
-static uint keyref[NODES];
+static uint  keyref[NODES];
+static char *dataref[NODES];
 static uint search_key = -1;
 static char search_data[32];
 
@@ -79,7 +80,7 @@ void test_insert() {
         data = utest_ran_string(32);
 		
         /* insert into rbtree and assert it */
-		ret = rbtree_insert(&tree, ckey, data);
+		ret = rbtree_insert(&tree, ckey, data, 32);
         rb_assert(tree.root);
         
         dprint("INSERT: %i %s\n", ckey, data);
@@ -89,6 +90,7 @@ void test_insert() {
             continue;
         
 		keyref[i] = ckey;
+        dataref[i] = data;
         
 		if (i == ((NODES/2))) {
 			search_key = ckey;
@@ -99,7 +101,7 @@ void test_insert() {
 	}
     
     /* insert duplicate key */
-    assert(rbtree_insert(&tree, search_key, "duplicate") == -1);
+    assert(rbtree_insert(&tree, search_key, "duplicate", 10) == -1);
     rb_assert(tree.root);
 }
 
@@ -107,13 +109,16 @@ void test_delete() {
 
     int i;
     uint key;
+    char *data, *dref;
 
     /* remove some values */	
 	for(i=0; i < 10; i++) {
 
         key = keyref[(NODES/2)+i];
+        dref = dataref[(NODES/2)+i];
 
-	    rbtree_delete(&tree, key);
+	    data = rbtree_delete(&tree, key);
+        assert_string(data, dref);
         rb_assert(tree.root);
 	}
 }

@@ -46,8 +46,6 @@ static dictionary *config = NULL;
  */
 static char *client_error(int error) {
 
-    char *str;
-
     switch (error) {
         case 1:
             return "Missing 'host' in configuration";
@@ -60,8 +58,7 @@ static char *client_error(int error) {
         case 5:
             return "Missing 'table' in configuration";
         case 6:
-            sprintf(str, "mysql error: %s", mysql_error(db.connection));
-            return str;
+            return mysql_error(db.connection);
         case 7:
             return "Error while creating table";
         case 8:
@@ -258,7 +255,7 @@ static int client_init() {
  */
 static int client_process(notify_event *event) {
 
-    int ret, dir = 0;
+    int ret = 0, dir = 0;
     char *stmt;
 
     /* Skip if event is unknown */
@@ -274,7 +271,7 @@ static int client_process(notify_event *event) {
             return 8;
 	}
 
-        stmt = (char *)xmalloc(sizeof(char) * (strlen(stmt_insert) + strlen(db.table) + strlen(event->path) + strlen(event->filename) - 6));
+        stmt = (char *)xmalloc(sizeof(char) * (strlen(stmt_insert) + strlen(db.table) + strlen(event->path)*2 + strlen(event->filename)*2 - 6));
 
         /* Escape paths */
         char *escaped_path = xmalloc(strlen(event->path) * 2 + 1);
@@ -292,7 +289,7 @@ static int client_process(notify_event *event) {
 	sprintf(stmt, stmt_insert, db.table, escaped_path, escaped_filename, dir);
 
 	/* Run mysql query */
-	ret = mysql_query(db.connection, stmt);
+	ret = mysql_real_query(db.connection, stmt, strlen(stmt));
 
 	/* Clean up */
 	xfree(stmt);

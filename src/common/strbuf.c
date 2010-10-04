@@ -163,19 +163,21 @@ void strbuf_squeeze(strbuf_t *s, char ch) {
 
     size_t p;
 
-    if (s->len <= 1)
-        return;
+    for(p=s->len; p; p--) {
 
-    for(p=s->len-1; p; p--) {
-
-        if (s->buf[p] != ch)
+        if (s->buf[p-1] != ch)
             continue;
 
         size_t np = p, of = 0;
         
-        for(; np && s->buf[np-1] == ch; np--)
+        for(; np-1 && s->buf[np-2] == ch; np--)
             of++;
-        for(s->len -= of; np <= s->len; np++)
-            s->buf[np] = s->buf[np + of];
+
+        if (of) {
+            
+            p = np;
+            for(s->len -= of; np <= s->len; np++)
+                s->buf[np] = s->buf[np + of];
+        }
     }
 }

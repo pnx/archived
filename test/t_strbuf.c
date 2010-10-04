@@ -31,12 +31,17 @@ void test_squeeze() {
 
     strbuf_squeeze(&b, 'X');
 
-    strbuf_append_str(&b, "aaabXXXcdefXXXXghijklXXmmmnopXXXXXqrstuXXvwxyXXzXX");
+    strbuf_append_str(&b, "aaabXXXcdefXXXXghijklXXmmmnopXXXXXqrXstuXXvwxyXXzXX");
     strbuf_squeeze(&b, 'X');
     print_strbuf(&b);
     strbuf_free(&b);
 
     strbuf_append_str(&b, "XXXX");
+    strbuf_squeeze(&b, 'X');
+    print_strbuf(&b);
+    strbuf_free(&b);
+
+    strbuf_append_str(&b, "A");
     strbuf_squeeze(&b, 'X');
     print_strbuf(&b);
     strbuf_free(&b);

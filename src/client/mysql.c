@@ -232,11 +232,6 @@ static int client_init() {
     if (!mysql_real_connect(db.connection, db.host, db.username, db.password, db.database, db.port, NULL, 0))
         return 6;
 
-
-    /* Fix for mysql versions prior to 5.0.19 */
-    mysql_options(db.connection, MYSQL_OPT_RECONNECT, &db.reconnect);
-
-
     /* Save mysql thread id */
     db.thread = mysql_thread_id(db.connection);
 

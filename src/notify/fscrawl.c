@@ -32,14 +32,15 @@ struct __fscrawl {
 static int mvup(struct __fscrawl *f) {
 	
 	if (closedir(f->dirs[f->depth]) == -1) {
-		perror("TREE");
+		perror("closedir");
+        errno = 0;
 		return -1;
 	}
 	
 	if (f->depth == 0)
 		return 0;
         
-    dprint("tree_next_ent: tree depth is: %i \n", f->depth);
+    dprint("fscrawl: tree depth is: %i \n", f->depth);
     
 	f->depth--;
 
@@ -90,7 +91,6 @@ fscrawl_t fsc_open(const char *path) {
 
     strbuf_init(&f->path);
 
-    
     char *npath = path_normalize(path, NULL, 1);
 
     if (!npath)

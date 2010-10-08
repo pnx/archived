@@ -16,16 +16,16 @@
 #include "../common/path.h"
 
 #define dealloc_data(ev) \
-	if (ev->path != NULL) \
+	if (ev->path) \
 		free(ev->path); \
-	if (ev->filename != NULL) \
+	if (ev->filename) \
 		free(ev->filename)
 
 static void init_event(notify_event* ev) {
 	
 	ev->filename = NULL;
 	ev->path 	 = NULL;
-	ev->type 	 = 0;
+	ev->type 	 = NOTIFY_UNKNOWN;
 	ev->dir 	 = 0;
 }
 
@@ -36,7 +36,7 @@ notify_event* notify_event_new() {
 	
 	notify_event *ev = malloc(sizeof(notify_event));
 	
-	if(ev == NULL)
+	if (ev == NULL)
 		return NULL;
 		
 	init_event(ev);
@@ -49,7 +49,7 @@ notify_event* notify_event_new() {
  */
 void notify_event_del(notify_event *event) {
 
-	if(event != NULL)
+	if (event)
 		return;
 		
 	dealloc_data(event);
@@ -61,12 +61,10 @@ void notify_event_del(notify_event *event) {
  */
 void notify_event_clear(notify_event *event) {
 
-	if(event == NULL)
+	if (event == NULL)
 		return;
 
 	dealloc_data(event);
-	
-	// set init values
 	init_event(event);
 }
 
@@ -77,17 +75,17 @@ void notify_event_set_path(notify_event *event, const char *path) {
 	
 	char *ptr;
 	
-	if(event == NULL || path == NULL)
+	if (event == NULL || path == NULL)
 		return;
 	
 	ptr = realloc(event->path, sizeof(char) * (strlen(path)+1));
 	
 	if (ptr == NULL)
 		return;
-	
-	memcpy(ptr, path, strlen(path)+1);
-	
+		
 	event->path = ptr;
+	
+	memcpy(event->path, path, strlen(path)+1);
 }
 
 /*
@@ -97,13 +95,13 @@ void notify_event_set_filename(notify_event *event, const char *filename) {
 	
 	char *tmp;
 	
-	if(event == NULL || filename == NULL)
+	if (event == NULL || filename == NULL)
 		return;
 	
 	
 	tmp = realloc(event->filename, sizeof(char) * (strlen(filename)+1));
 	
-	if(tmp == NULL)
+	if (tmp == NULL)
 		return;
 	
 	memcpy(tmp, filename, strlen(filename)+1);
@@ -114,7 +112,7 @@ void notify_event_set_filename(notify_event *event, const char *filename) {
 /* set directory */
 void notify_event_set_dir(notify_event *event, uint8_t dir) {
 
-	if(event == NULL)
+	if (event == NULL)
 		return;
 
 	event->dir = dir;
@@ -122,14 +120,17 @@ void notify_event_set_dir(notify_event *event, uint8_t dir) {
 
 void notify_event_set_type(notify_event *event, uint8_t type) {
 	
-	if(event == NULL)
+	if (event == NULL)
 		return;
 		
 	event->type = type;
 }
 
 const char* notify_event_typetostr(notify_event *event) {
-	
+
+    if (!event)
+        return "(null)";
+    
 	switch(event->type) {
 		case NOTIFY_CREATE :
 			return "CREATE";

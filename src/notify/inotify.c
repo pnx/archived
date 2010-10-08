@@ -47,14 +47,12 @@ static int addwatch(const char *path, const char *name) {
 	int     wd;
     
 	npath = path_normalize(path, name, 1);
-	
+    
 	wd = inotify_add_watch(fd, npath, WATCH_MASK);
 	
 	if (wd < 0) {
         free(npath);
-        wd = -errno;
-        errno = 0;
-		return wd;
+		return -1;
 	}
 
 	/* we must update to not introduce duplicated wd's (keys) */
@@ -93,8 +91,6 @@ static void proc_event(inoev *iev) {
     notify_event *event;
     char buf[4096];
 	uint8_t type = NOTIFY_UNKNOWN;
-
-    event = notify_event_new();
 	
 #ifdef __DEBUG__
 	fprintf(stderr, "RAW EVENT: %i, %x", iev->wd, iev->mask);
@@ -103,29 +99,35 @@ static void proc_event(inoev *iev) {
 	else
 		fprintf(stderr, "\n");
 #endif
-	
+
+    /* this event is triggered when a watch descriptor is removed.
+       so we can do a binary search instead of useing the IN_DELETE
+       event (that may be triggered on a parent wd) to do a traverse search */
+    if (iev->mask & IN_IGNORED) {
+        rmwatch(iev->wd);
+        return;
+    }
+    
 	/* lookup the watch descriptor in rbtree */
 	node = rbtree_search(&tree, iev->wd);
 	
-	if (node == NULL) {
+	if (!node) {
 		dprint("-- IGNORING EVENT -- invalid watchdescriptor %i\n", iev->wd);
-		goto cleanup;
+		return;
 	}
 
-	/* set path, this is stored in void* node->data */
+	event = notify_event_new();
+	
+	if (event == NULL) {
+		return;
+	}
+	
+	/* set dir and drop that bit off (so its not in the way) */
+	event->dir = (iev->mask & IN_ISDIR) != 0;
+	iev->mask &= ~IN_ISDIR;
+	
 	notify_event_set_path(event, node->data);
 	notify_event_set_filename(event, iev->name);
-
-    notify_event_set_dir(event, (iev->mask & IN_ISDIR) != 0);
-	
-	iev->mask &= ~IN_ISDIR;
-
-    /* this event is always generated and works better
-       for removing the node in the binary tree */
-    if (iev->mask == IN_IGNORED) {
-        rmwatch(iev->wd);
-        goto cleanup;
-    }
 
     /* queue event before doing any fscrawl on a subdirectory
        to prevent messing up the order */
@@ -162,11 +164,7 @@ static void proc_event(inoev *iev) {
 			break;
 	}
 	
-	notify_event_set_type(event, type);
-
-    return;
-cleanup:
-    free(event);
+	event->type = type;
 }
 
 static void addrecursive(const char *path) {
@@ -209,18 +207,14 @@ int notify_init() {
 	}
 	
 	fd = inotify_init();
-	
-	if (fd < 1) {
-		perror("NOTIFY INIT");
+    
+	if (fd < 0)
 		return -1;
-	}
 
 	event_queue = queue_init();
 	
-	if (event_queue == NULL) {
-		perror("EVENT QUEUE");
+	if (event_queue == NULL)
 		return -1;
-	}
 	
 	return 1;
 }

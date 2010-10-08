@@ -1,0 +1,102 @@
+-----------------------------------
+  Notify API
+-----------------------------------
+
+This API is here to provide an abstraction to the underlaying low-level filesystem notification mechanism
+to try to make applications portable but also throw away detail from client-code.
+
+Note that the design is only tested with inotify and may
+need to change in the future to support more subsystems that may have some limitations. 
+
+-- Data structures
+
+notify_event:
+
+    
+    members:
+
+        type     - the type of event (NOTIFY_* constants)
+        dir      - non zero if event is triggered on a directory
+        path     - path of the triggered event
+        filename - the filename event was triggered on
+
+    types:
+
+        NOTIFY_UNKNOWN
+
+            Events that do occur but can't be mapped to a more relevant type ends up being marked as
+            an unknown event, you can most likely only tell that "something" happened on
+            the given path (so unless your application wants to know that "something" happened, ignore this)
+
+        NOTIFY_CREATE
+
+            A file/directory was created on the filesystem.
+
+        NOTIFY_DELETE
+
+            A file/directory was deleted from the filesystem, note that it is possible to get just one
+            event for a directory that has files/subdirectorys, so when getting this event you should always
+            make sure your actions does handle the possible recursion.
+
+        NOTIFY_MOVE_FROM
+        NOTIFY_MOVE_TO
+
+            As of the time of writing no implementation support these types and uses create/delete types instead.
+            A drastic design change to the 'notify_event' structure should be made before this type of events
+            will be usefull.
+
+-- Functions
+
+notify_init():
+
+    instantiate notify. making it ready for further notify_* calls. returns a positive number if everything went OK.
+    returns zero if notify has already been instantiated.
+    And returns -1 and sets errno if an error occur.
+
+notify_add_watch():
+
+    tells notify to start listening on 'path'.
+    one create event will be genereted for every file under 'path'
+    and all subdirectorys will be watched.
+    
+    returns 1 if everything went ok and returns -1 and sets 'errno' if an error occure.
+
+notify_rm_watch():
+
+    'path' will be removed from notify and all events triggered on this path
+    will be ignored from now on.
+
+notify_read():
+
+    fetches and returns one event from the subsystem. A NULL pointer is returned if no events
+    is available at the given moment.
+    
+    Note that the implementation may read and process the data from whatever source it has
+    in this function, the only requirement is that the function never blocks.
+
+notify_exit():
+
+    free's all memory associated with notify and other cleanup routines.
+
+notify_event_new():
+
+    allocates memory and initilize values for a new 'notify_event' structure
+
+notify_event_clear():
+
+    free's all the memory and sets values back to default.
+
+notify_event_set_*():
+
+    use these functions to set members of the 'notify_event' structure.
+    
+notify_event_del():
+
+    free's all the memory from the notify_event structure.
+
+notify_event_typetostr():
+
+    returns a string representation of a event's type. the pointer should
+    not be free'ed, so its safe to be used like this:
+
+        printf("type: %s\n", notify_event_typetostr(event));

@@ -15,7 +15,7 @@
     } while(0)
 
 /* internal function. assert_* macros below expands to this */
-void __assert_str(char *file, int line, char *func, char *a, char *b);
+void __assert_str(const char *file, int line, const char *func, const char *a, const char *b);
 
 #define assert_string(a, b) __assert_str(__FILE__, __LINE__, __FUNCTION__, a, b)
 

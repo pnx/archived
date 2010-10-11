@@ -44,8 +44,8 @@ static dictionary *config = NULL;
 /*
  * Converts error codes to string
  */
-static char *client_error(int error) {
-
+static const char* client_error(int error) {
+    
     switch (error) {
         case 1:
             return "Missing 'host' in configuration";
@@ -97,7 +97,7 @@ static void clean_exit(int excode) {
         /* Clean mysql */
 	int status = client_exit();
         if (0 != status) {
-            char *str = client_error(status);
+            const char *str = client_error(status);
             fprintf(stderr,"%s", str);
         }
 
@@ -362,7 +362,7 @@ static void main_loop() {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 
     /* Return value */
     int ret;

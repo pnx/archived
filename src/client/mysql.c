@@ -387,7 +387,6 @@ int main(int argc, char **argv) {
 
     /* Setup signal handlers */
     signal(SIGTERM, sighandl);
-    signal(SIGKILL, sighandl);
     signal(SIGQUIT, sighandl);
     signal(SIGINT, sighandl);
     signal(SIGSEGV, sighandl);

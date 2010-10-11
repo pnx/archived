@@ -69,14 +69,13 @@ int main(int argc, char **argv) {
 
     signal(SIGINT, sighandler);
     signal(SIGTERM, sighandler);
-    signal(SIGKILL, sighandler);
     signal(SIGQUIT, sighandler);
     signal(SIGSEGV, sighandler);
 
     rc = notify_init();
     if (rc < 0)
         return EXIT_FAILURE;
-
+    
     rc = notify_add_watch(argv[1]);
     if (rc < 0) {
         fprintf(stderr, "Invalid path: %s\n", argv[1]);

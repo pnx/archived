@@ -44,10 +44,10 @@ obj += src/common/strbuf.o
 obj += src/common/xalloc.o
 obj += src/common/die.o
 
-obj += src/notify/inotify.o
-obj += src/notify/event.o
-obj += src/notify/fscrawl.o
-obj += src/notify/queue.o
+obj += src/inotify.o
+obj += src/event.o
+obj += src/fscrawl.o
+obj += src/queue.o
 
 .PHONY : all clean cleaner
 all : $(PROGRAM)

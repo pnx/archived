@@ -39,23 +39,23 @@ inotify :
 		../src/common/die.c \
 		../src/common/strbuf.c \
 	    ../src/common/path.c \
-	    ../src/notify/event.c \
-		../src/notify/fscrawl.c \
-	    ../src/notify/queue.c \
-	    ../src/notify/inotify.c \
+	    ../src/event.c \
+		../src/fscrawl.c \
+	    ../src/queue.c \
+	    ../src/inotify.c \
 	t_inotify.c -o test_inotify
 
 fscrawl :
 	$(CC) $(CFLAGS) \
 		../src/common/path.c \
-		../src/notify/fscrawl.c \
+		../src/fscrawl.c \
 		../src/common/xalloc.c \
 		../src/common/die.c \
 		../src/common/strbuf.c \
 	t_fscrawl.c -o test_fscrawl
 
 queue :
-	$(CC) $(CFLAGS) ../src/notify/queue.c t_queue.c -o test_queue
+	$(CC) $(CFLAGS) ../src/queue.c t_queue.c -o test_queue
 
 clean :
 	rm -f test_*

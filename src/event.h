@@ -1,4 +1,4 @@
-/* notify/event.h - event data structure and operation's for notify API
+/* event.h - event data structure and operation's for notify API
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>

@@ -1,4 +1,4 @@
-/* notify/queue.c
+/* queue.c
  *
  *   Copyright (C) 2010       Henrik Hautakoski <henrik@fiktivkod.org>
  *

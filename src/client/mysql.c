@@ -16,8 +16,8 @@
 
 #include <mysql/mysql.h>
 
-#include "../notify/notify.h"
-#include "../notify/event.h"
+#include "../notify.h"
+#include "../event.h"
 #include "../common/xalloc.h"
 #include "../ini/iniparser.h"
 #include "../common/util.h"

@@ -1,4 +1,4 @@
-/* notify/notify.h - filesystem notification API
+/* notify.h - filesystem notification API
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>

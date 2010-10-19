@@ -1,4 +1,4 @@
-/* notify/inotify.c - inotify implementation
+/* inotify.c - inotify implementation
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@unknown.org>
@@ -16,12 +16,11 @@
 #include <sys/ioctl.h>
 #include <sys/inotify.h>
 
-#include "../common/util.h"
+#include "common/util.h"
 /* red black tree for watch descriptors */
-#include "../common/rbtree.h"
-#include "../common/debug.h"
-#include "../common/path.h"
-
+#include "common/rbtree.h"
+#include "common/debug.h"
+#include "common/path.h"
 #include "queue.h"
 #include "fscrawl.h"
 #include "notify.h"

@@ -1,4 +1,4 @@
-/* notify/event.c - notify event implementation
+/* event.c
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>
@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "event.h"
-#include "../common/path.h"
+#include "common/path.h"
 
 #define dealloc_data(ev) \
 	if (ev->path) \

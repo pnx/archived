@@ -1,4 +1,4 @@
-/* notify/fscrawl.h - Filesystem traversal
+/* fscrawl.h - Filesystem traversal
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *

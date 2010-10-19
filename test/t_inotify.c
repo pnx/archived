@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include "../src/notify/notify.h"
+#include "../src/notify.h"
 
 PROT_SCAN_CALLBACK(my_callback) {
 	//printf("FROM THREAD -- path: %s; is_dir = %i\n", path, dir);

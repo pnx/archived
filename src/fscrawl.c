@@ -1,4 +1,4 @@
-/* notify/fscrawl.c - Filesystem traversal
+/* fscrawl.c - Filesystem traversal
  * 
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *
@@ -13,9 +13,9 @@
 #include <errno.h>
 #include <dirent.h>
 
-#include "../common/strbuf.h"
-#include "../common/path.h"
-#include "../common/debug.h"
+#include "common/strbuf.h"
+#include "common/path.h"
+#include "common/debug.h"
 #include "fscrawl.h"
 
 #define MAX_DEPTH 0x20

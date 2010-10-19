@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "../notify/notify.h"
+#include "../notify.h"
 
 static void p_exit_time() {
 

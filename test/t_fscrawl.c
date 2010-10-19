@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include "../src/notify/fscrawl.h"
+#include "../src/fscrawl.h"
 
 int main(int argc, char *argv[]) {
 	

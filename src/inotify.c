@@ -16,11 +16,11 @@
 #include <sys/ioctl.h>
 #include <sys/inotify.h>
 
-#include "common/util.h"
+#include "util.h"
 /* red black tree for watch descriptors */
-#include "common/rbtree.h"
-#include "common/debug.h"
-#include "common/path.h"
+#include "rbtree.h"
+#include "debug.h"
+#include "path.h"
 #include "queue.h"
 #include "fscrawl.h"
 #include "notify.h"

@@ -13,7 +13,6 @@
 #include <string.h>
 
 #include "event.h"
-#include "common/path.h"
 
 #define dealloc_data(ev) \
 	if (ev->path) \

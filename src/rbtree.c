@@ -1,4 +1,4 @@
-/* common/rbtree.c - red black tree implementation
+/* rbtree.c - red black tree implementation
  * 
  *   Copyright (C) 2010  Henrik Hautakoski <henrik@fiktivkod.org>
  *

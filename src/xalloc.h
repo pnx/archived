@@ -1,4 +1,4 @@
-/* common/xalloc.h - stricter memory allocation.
+/* xalloc.h - stricter memory allocation.
  *
  *   Copyright (C) 2010   Henrik Hautakoski <henrik@fiktivkod.org>
  *

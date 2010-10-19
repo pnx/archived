@@ -1,4 +1,4 @@
-/* common/util.h
+/* util.h
  *
  *   Copyright (C) 2010   Henrik Hautakoski <henrik@fiktivkod.org>
  *

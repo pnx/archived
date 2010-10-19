@@ -1,4 +1,4 @@
-/* common/rbtree.h
+/* rbtree.h
  * 
  *   Copyright (C) 2010  Henrik Hautakoski <henrik@fiktivkod.org>
  *

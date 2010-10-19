@@ -1,4 +1,4 @@
-/* common/debug.h - debugging macros and definitions
+/* debug.h - debugging macros and definitions
  *
  *   Copyright (C) 2010  Henrik Hautakoski <henrik@fiktivkod.org>
  *

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "unit.h"
-#include "../src/common/path.h"
+#include "../src/path.h"
 
 void test_normalize() {
 

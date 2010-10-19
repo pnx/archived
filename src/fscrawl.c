@@ -13,9 +13,9 @@
 #include <errno.h>
 #include <dirent.h>
 
-#include "common/strbuf.h"
-#include "common/path.h"
-#include "common/debug.h"
+#include "strbuf.h"
+#include "path.h"
+#include "debug.h"
 #include "fscrawl.h"
 
 #define MAX_DEPTH 0x20

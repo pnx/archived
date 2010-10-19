@@ -1,4 +1,4 @@
-/* common/path.c - path handling routines
+/* path.c - path handling routines
  * 
  *   Copyright (C) 2010  Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *

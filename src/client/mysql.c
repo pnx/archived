@@ -18,10 +18,10 @@
 
 #include "../notify.h"
 #include "../event.h"
-#include "../common/xalloc.h"
+#include "../xalloc.h"
 #include "../ini/iniparser.h"
-#include "../common/util.h"
-#include "../common/debug.h"
+#include "../util.h"
+#include "../debug.h"
 
 typedef struct {
     char *host;

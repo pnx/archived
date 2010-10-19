@@ -1,4 +1,4 @@
-/* common/path.h - path handling routines
+/* path.h - path handling routines
  * 
  *   Copyright (C) 2010  Henrik Hautakoski <henrik@fiktivkod.org>
  *

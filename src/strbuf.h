@@ -1,4 +1,4 @@
-/* common/strbuf.h
+/* strbuf.h
  *
  *   Copyright (C) 2010   Henrik Hautakoski <henrik@fiktivkod.org>
  *

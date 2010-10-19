@@ -10,35 +10,35 @@ raw_inotify :
 
 strbuf :
 	$(CC) $(CFLAGS) \
-		../src/common/strbuf.c \
-		../src/common/xalloc.c \
-		../src/common/die.c \
+		../src/strbuf.c \
+		../src/xalloc.c \
+		../src/die.c \
 	t_strbuf.c -o test_strbuf
 	
 path :
 	$(CC) $(CFLAGS) \
 		unit.c \
-		../src/common/xalloc.c \
-		../src/common/die.c \
-		../src/common/strbuf.c \
-		../src/common/path.c \
+		../src/xalloc.c \
+		../src/die.c \
+		../src/strbuf.c \
+		../src/path.c \
 	t_path.c -o test_path
 
 rbtree : 
 	$(CC) $(CFLAGS) \
 		unit.c \
-		../src/common/die.c \
-		../src/common/xalloc.c \
-		../src/common/rbtree.c \
+		../src/die.c \
+		../src/xalloc.c \
+		../src/rbtree.c \
 	t_rbtree.c -o test_rbtree
 
 inotify :
 	$(CC) -lpthread -D INOTIFY_DEBUG -D RB_DEBUG $(CFLAGS) \
-	    ../src/common/rbtree.c \
-	    ../src/common/xalloc.c \
-		../src/common/die.c \
-		../src/common/strbuf.c \
-	    ../src/common/path.c \
+	    ../src/rbtree.c \
+	    ../src/xalloc.c \
+		../src/die.c \
+		../src/strbuf.c \
+	    ../src/path.c \
 	    ../src/event.c \
 		../src/fscrawl.c \
 	    ../src/queue.c \
@@ -47,11 +47,11 @@ inotify :
 
 fscrawl :
 	$(CC) $(CFLAGS) \
-		../src/common/path.c \
+		../src/path.c \
 		../src/fscrawl.c \
-		../src/common/xalloc.c \
-		../src/common/die.c \
-		../src/common/strbuf.c \
+		../src/xalloc.c \
+		../src/die.c \
+		../src/strbuf.c \
 	t_fscrawl.c -o test_fscrawl
 
 queue :

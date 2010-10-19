@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "unit.h"
-#include "../src/common/rbtree.h"
-#include "../src/common/debug.h"
+#include "../src/rbtree.h"
+#include "../src/debug.h"
 
 #define MAX_VAL 500
 #define NODES   20

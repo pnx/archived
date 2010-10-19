@@ -38,11 +38,11 @@ else
 	obj += src/client/mysql.o
 endif
 
-obj += src/common/rbtree.o
-obj += src/common/path.o
-obj += src/common/strbuf.o
-obj += src/common/xalloc.o
-obj += src/common/die.o
+obj += src/rbtree.o
+obj += src/path.o
+obj += src/strbuf.o
+obj += src/xalloc.o
+obj += src/die.o
 
 obj += src/inotify.o
 obj += src/event.o

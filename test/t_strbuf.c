@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-#include "../src/common/strbuf.h"
+#include "../src/strbuf.h"
 
 typedef unsigned int uint;
 

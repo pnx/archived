@@ -1,4 +1,4 @@
-/* common/die.c - functionality for killing things in creative ways.
+/* die.c - functionality for killing things in creative ways.
  *
  *   Copyright (C) 2010   Henrik Hautakoski <henrik@fiktivkod.org>
  *

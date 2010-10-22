@@ -3,9 +3,9 @@
 #
 
 CC       = gcc
-CFLAGS   = -O2 -Werror
+CFLAGS   = -O2 -Werror `mysql_config --cflags`
 LD		 = $(CC)
-LDFLAGS  = 
+LDFLAGS  = -L/usr/lib/mysql -lmysqlclient
 
 FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
 
@@ -28,16 +28,6 @@ endif
 
 obj =
 
-ifeq ($(DEBUG), 2)
-	obj += src/client/stdout.o
-else
-	CFLAGS  += `mysql_config --cflags`
-	LDFLAGS += -L/usr/lib/mysql -lmysqlclient
-	obj += src/ini/iniparser.o
-	obj += src/ini/dictionary.o
-	obj += src/client/mysql.o
-endif
-
 obj += src/rbtree.o
 obj += src/path.o
 obj += src/strbuf.o
@@ -48,6 +38,10 @@ obj += src/inotify.o
 obj += src/event.o
 obj += src/fscrawl.o
 obj += src/queue.o
+
+obj += src/ini/iniparser.o
+obj += src/ini/dictionary.o
+obj += src/archived.o
 
 .PHONY : all clean cleaner
 all : $(PROGRAM)

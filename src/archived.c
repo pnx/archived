@@ -18,10 +18,10 @@
 #include <signal.h>
 
 #include <mysql/mysql.h>
+#include <ini/iniparser.h>
 
 #include "notify.h"
 #include "xalloc.h"
-#include "ini/iniparser.h"
 #include "util.h"
 #include "debug.h"
 

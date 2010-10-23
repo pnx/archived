@@ -3,7 +3,7 @@
 #
 
 CC       = gcc
-CFLAGS   = -O2 -Werror `mysql_config --cflags`
+CFLAGS   = -O2 -Werror `mysql_config --cflags` -Ilib
 LD		 = $(CC)
 LDFLAGS  = -L/usr/lib/mysql -lmysqlclient
 
@@ -28,6 +28,9 @@ endif
 
 obj =
 
+obj += lib/ini/iniparser.o
+obj += lib/ini/dictionary.o
+
 obj += src/rbtree.o
 obj += src/path.o
 obj += src/strbuf.o
@@ -40,8 +43,6 @@ obj += src/event.o
 obj += src/fscrawl.o
 obj += src/queue.o
 
-obj += src/ini/iniparser.o
-obj += src/ini/dictionary.o
 obj += src/archived.o
 
 .PHONY : all clean cleaner

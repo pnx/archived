@@ -1,0 +1,51 @@
+
+ Archived - event driven filesystem indexer
+--------------------------------------------
+
+Archived is a daemon that aims to provide a full filesystem indexing solution.
+it keeps track of changed made on the filesystem and updates the index when notification
+from the subsystem API occurs making the indexing occure in real-time and minimize the
+need to crawl filsystem structures.
+
+ License
+---------
+
+The project is licenced under GPL but third party modules may be licenced under
+different documents that ofcourse is compatible with GPL.
+
+see COPYING file for details and the respective modules found in the 'lib' directory.
+
+ Documentation
+---------------
+
+documentation exist in the 'docs' directory and covers pretty much everything internal api's, contribution guidelines etc.
+read this if you want to know how stuff works and you should if you are going to write code.
+
+ Compilation and Installation
+------------------------------
+
+This project uses the GNU Compiler Collection and GNU make, so you must have those.
+consult your platform's documentation for how install on your system.
+
+ 1. copy the configuration file (you can skip this step if you want to use the default configuration)
+    cp Makefile.local.mk-dist Makefile.local.mk
+
+ 2. Make changes in Makefile.local.mk to reflect your system.
+
+ 3. run `make`.
+
+ 4. if everything went OK. the 'build' directory now contains the binary files.
+
+ 5. run `make clean` to cleanup any temporary files generated during the build process.
+
+ Authors
+---------
+
+Henrik Hautakoski <henrik@fiktivkod.org>
+- initial coding
+
+Fredric Nilsson <fredric@fiktivkod.org>
+- database support.
+
+----------------------------------
+ Copyright (C) 2010 fiktivkod.org

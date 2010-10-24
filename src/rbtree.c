@@ -10,7 +10,7 @@
  *   Based on the work of Julienne Walker's rbtree implementation
  *   http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
  */
-
+#include <string.h>
 #include "xalloc.h"
 #include "debug.h"
 #include "rbtree.h"

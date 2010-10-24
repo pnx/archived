@@ -68,9 +68,12 @@ char* xstrdup(const char *s) {
 
     CHECK_INPUT(s);
 
-    char *c = strdup(s);
-    CHECK(c);
-    return c;
+    size_t len = strlen(s) + 1;
+    char *dest = xmalloc(len);
+
+    CHECK(dest);
+    memcpy(dest, s, len);
+    return dest;
 bail:
     die_errno("xstrdup");
 }
@@ -79,7 +82,8 @@ void* xmemdup(const void *src, size_t size) {
 
     CHECK_INPUT(src);
 
-    void *dest = xmalloc(size);
+    void *dest = malloc(size);
+    CHECK(dest);
     memcpy(dest, src, size);
     return dest;
 bail:

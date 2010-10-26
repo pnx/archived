@@ -9,8 +9,7 @@ LDFLAGS  = -L/usr/lib/mysql -lmysqlclient
 
 FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
 
-BUILD    := build
-PROGRAM  := $(BUILD)/archived
+PROGRAM  := archived
 
 include Makefile.local.mk
 
@@ -31,6 +30,8 @@ obj =
 obj += lib/ini/iniparser.o
 obj += lib/ini/dictionary.o
 
+obj += src/database/mysql.o
+
 obj += src/rbtree.o
 obj += src/path.o
 obj += src/strbuf.o
@@ -49,7 +50,6 @@ obj += src/archived.o
 all : $(PROGRAM)
 
 $(PROGRAM) : $(obj)
-	@mkdir -p $(BUILD)
 	$(QUIET_LD)$(LD) $(LDFLAGS) $^ -o $@
 
 clean :
@@ -58,7 +58,7 @@ clean :
 	done
 
 cleaner : clean
-	$(RM) -r $(BUILD)
+	$(RM) $(PROGRAM)
 
 %.o : %.c
 	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@

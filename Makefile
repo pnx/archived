@@ -3,9 +3,9 @@
 #
 
 CC       = gcc
-CFLAGS   = -O2 -Werror `mysql_config --cflags` -Ilib
+CFLAGS   = -O2 -Werror -Ilib
 LD		 = $(CC)
-LDFLAGS  = -L/usr/lib/mysql -lmysqlclient
+LDFLAGS  = 
 
 FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
 
@@ -30,7 +30,18 @@ obj =
 obj += lib/ini/iniparser.o
 obj += lib/ini/dictionary.o
 
-obj += src/database/mysql.o
+ifeq ($(database), mongo)
+	CFLAGS += -DMONGO_HAVE_STDINT
+	obj += lib/mongodb/md5.o
+	obj += lib/mongodb/bson.o
+	obj += lib/mongodb/numbers.o
+	obj += lib/mongodb/mongo.o
+	obj += src/database/mongo.o
+else
+	CFLAGS += $(shell mysql_config --cflags)
+	LDFLAGS += $(shell mysql_config --libs)
+	obj += src/database/mysql.o
+endif
 
 obj += src/rbtree.o
 obj += src/path.o
@@ -50,7 +61,7 @@ obj += src/archived.o
 all : $(PROGRAM)
 
 $(PROGRAM) : $(obj)
-	$(QUIET_LD)$(LD) $(LDFLAGS) $^ -o $@
+	$(QUIET_LD)$(LD) $^ -o $@ $(LDFLAGS)
 
 clean :
 	@for obj in `$(FINDOBJ)`; do \

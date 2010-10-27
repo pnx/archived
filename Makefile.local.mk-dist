@@ -4,3 +4,7 @@
 
 # Verbose output
 # VERBOSE = 1
+
+# database adapter, mysql is default
+# database = mysql
+# database = mongo

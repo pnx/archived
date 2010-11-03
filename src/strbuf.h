@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __COMMON_STRBUF_H
-#define __COMMON_STRBUF_H
+#ifndef __STRBUF_H
+#define __STRBUF_H
 
 #include <stddef.h>
 
@@ -55,4 +55,4 @@ void strbuf_rev(strbuf_t *s);
 
 void strbuf_squeeze(strbuf_t *s, char ch);
 
-#endif /* __COMMON_STRBUF_H */
+#endif /* __STRBUF_H */

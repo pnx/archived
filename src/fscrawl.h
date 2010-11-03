@@ -1,6 +1,6 @@
 /* fscrawl.h - Filesystem traversal
  * 
- *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
+ *  Copyright (C) 2010   Henrik Hautakoski <henrik@fiktivkod.org>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -8,8 +8,8 @@
  *  (at your option) any later version.
  */
 
-#ifndef __NOTIFY_FSCRAWL_H
-#define __NOTIFY_FSCRAWL_H
+#ifndef __FSCRAWL_H
+#define __FSCRAWL_H
 
 typedef struct {
     char *name;
@@ -27,4 +27,4 @@ fs_entry* fsc_cpy(fs_entry *ent);
 
 fs_entry* fsc_read(fscrawl_t f);
 
-#endif /* __NOTIFY_FSCRAWL_H */
+#endif /* __FSCRAWL_H */

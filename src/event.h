@@ -9,8 +9,8 @@
  *  (at your option) any later version.
  */
 
-#ifndef __NOTIFY_EVENT_H
-#define __NOTIFY_EVENT_H
+#ifndef __EVENT_H
+#define __EVENT_H
 
 #include <stdint.h>
 
@@ -44,4 +44,4 @@ void notify_event_set_type(notify_event *event, uint8_t type);
 
 const char* notify_event_typetostr(notify_event *event);
 
-#endif /* __NOTIFY_EVENT_H */
+#endif /* __EVENT_H */

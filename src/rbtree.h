@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __COMMON_RBTREE_H
-#define __COMMON_RBTREE_H
+#ifndef __RBTREE_H
+#define __RBTREE_H
 
 #define RB_RED   0
 #define RB_BLACK 1
@@ -46,4 +46,4 @@ int rbtree_insert(rbtree *tree, uint key, void *data, size_t len);
 
 void* rbtree_delete(rbtree *tree, uint key);
 
-#endif /* _COMMON_RBTREE_H */
+#endif /* __RBTREE_H */

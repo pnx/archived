@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __COMMON_PATH_H
-#define __COMMON_PATH_H
+#ifndef __PATH_H
+#define __PATH_H
 
 #include <stddef.h>
 #include <libgen.h>
@@ -20,4 +20,4 @@ size_t pathlen(const char *path);
 
 char* path_normalize(const char *base, const char *name, unsigned char dir);
 
-#endif /* __COMMON_PATH_H */
+#endif /* __PATH_H */

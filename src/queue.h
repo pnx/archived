@@ -11,8 +11,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NOTIFY_QUEUE_H
-#define __NOTIFY_QUEUE_H
+#ifndef __QUEUE_H
+#define __QUEUE_H
 
 #include <stddef.h>
 
@@ -32,4 +32,4 @@ void queue_clear(queue_t q);
 
 void queue_destroy(queue_t q);
 
-#endif /* __NOTIFY_QUEUE_H */
+#endif /* __QUEUE_H */

@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __COMMON_UTIL_H
-#define __COMMON_UTIL_H
+#ifndef __UTIL_H
+#define __UTIL_H
 
 void die(const char *, ...);
 
@@ -17,4 +17,4 @@ void die_errno(const char *);
 
 int file_exists(const char *);
 
-#endif /* __COMMOT_UTIL_H */
+#endif /* __UTIL_H */

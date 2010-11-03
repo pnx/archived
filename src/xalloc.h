@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __COMMON_XALLOC_H
-#define __COMMON_XALLOC_H
+#ifndef __XALLOC_H
+#define __XALLOC_H
 
 #include <stddef.h>
 
@@ -25,4 +25,4 @@ void* xmemdup(const void *, size_t);
 
 void xfree(void *);
 
-#endif /* __COMMON_XALLOC_H */
+#endif /* __XALLOC_H */

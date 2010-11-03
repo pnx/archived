@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __COMMON_DEBUG_H
-#define __COMMON_DEBUG_H
+#ifndef __DEBUG_H
+#define __DEBUG_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,4 +38,4 @@
 #define dprint(...)
 #endif /* __DEBUG__ */
 
-#endif /* __COMMON_DEBUG_H */
+#endif /* __DEBUG_H */

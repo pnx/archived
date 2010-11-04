@@ -1,37 +1,37 @@
------------------------------------
-  xalloc - safe memory allocation
------------------------------------
+xalloc - safe memory allocation
+-------------------------------
 
 this module implements malloc and friends + some extensions.
-if __DEBUG__ symbol is defined. the functions will provide extended
+If `__DEBUG__` symbol is defined. The functions will provide extended
 debug logic and kills the program (passing 0 as size to malloc for example).
 
-the funtions will at all times kill the program if memory can't be allocated for
-some reason, this makes the need for client-code to check for null pointers returned
+The funtions will at all times kill the program if memory can't be allocated for
+some reason, this makes the need for client-code to check for `NULL` pointers returned
 by these functions redundant.
 
--- functions
+functions
+~~~~~~~~~
 
-xmalloc():
+`xmalloc()`::
 
-    just like malloc, this function allocates a block of memory of 'size' bytes.
-    if compiled with the __DEBUG__ symbol, the function will not allow zero size
+    Just like malloc, this function allocates a block of memory of 'size' bytes. +
+    If compiled with the `__DEBUG__` symbol, the function will not allow zero size
 
-xmallocz():
+`xmallocz()`::
 
-    exactly like xmalloc but will initialize the block with zero's.
+    Exactly like xmalloc but will initialize the block with zero's.
 
-xrealloc():
+`xrealloc()`::
 
-    reallocates a previous allocated block of memory to 'size' bytes.
-    if compiled with the __DEBUG__ symbol, the function will not allow zero size
+    Reallocates a previous allocated block of memory to 'size' bytes. +
+    If compiled with the `__DEBUG__` symbol, the function will not allow zero size
 
-xstrdup():
+`xstrdup()`::
 
-    allocates and copies the string 's' to a new memory location and returns it to the user.
-    if compiled with the __DEBUG__ symbol, the function will not allow 's' to be a NULL pointer
+    Allocates and copies the string 's' to a new memory location and returns it to the user. +
+    If compiled with the `__DEBUG__` symbol, the function will not allow 's' to be a `NULL` pointer
 
-xfree():
+`xfree()`::
 
-    free's a previous allocated block (pointed to by 'ptr') that is allocated by xmalloc/malloc.
-    if compiled with the __DEBUG__ symbol, the function will not allow 'ptr' to be a NULL pointer
+    Free's a previous allocated block (pointed to by 'ptr') that is allocated by xmalloc/malloc. +
+    If compiled with the `__DEBUG__` symbol, the function will not allow 'ptr' to be a NULL pointer

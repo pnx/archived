@@ -80,21 +80,23 @@ void test_insert() {
         data = utest_ran_string(32);
 		
         /* insert into rbtree and assert it */
-		ret = rbtree_insert(&tree, ckey, data, 32);
+		ret = rbtree_insert(&tree, ckey, data, 33);
         rb_assert(tree.root);
         
         dprint("INSERT: %i %s\n", ckey, data);
         
         /* ignore duplicate key */
-        if (ret == -1)
+        if (ret == -1) {
+            free(data);
             continue;
+        }
         
 		keyref[i] = ckey;
         dataref[i] = data;
         
 		if (i == ((NODES/2))) {
 			search_key = ckey;
-            memcpy(&search_data, data, 32);
+            memcpy(&search_data, data, 33);
         }
 
         i++;
@@ -119,6 +121,7 @@ void test_delete() {
 
 	    data = rbtree_delete(&tree, key);
         assert_string(data, dref);
+        free(data);
         rb_assert(tree.root);
 	}
 }

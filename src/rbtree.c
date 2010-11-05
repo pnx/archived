@@ -198,6 +198,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
 		tree->root = node_alloc(key, data, len);
 		if (tree->root == NULL)
 			return 0;
+        inserted = 1;
         goto done;
 	}
 		
@@ -326,7 +327,7 @@ void* rbtree_delete(rbtree *tree, uint key) {
         ret = f->data;
         if (f != q) {
             f->key  = q->key;
-            f->data = xmemdup(q->data, q->len);
+            f->data = q->data;
             f->len  = q->len;
         }
         swap(p, 1, q) = swap(q, 0, NULL);

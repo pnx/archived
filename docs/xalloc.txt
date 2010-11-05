@@ -31,6 +31,11 @@ functions
     Allocates and copies the string 's' to a new memory location and returns it to the user. +
     If compiled with the `__DEBUG__` symbol, the function will not allow 's' to be a `NULL` pointer
 
+`xmemdup()`::
+
+    Allocates and copies `len` bytes from `ptr` to a new memory location and returns it to the user. +
+    If compiled with the `__DEBUG__` symbol, the function will not allow 'ptr' to be a `NULL` pointer
+
 `xfree()`::
 
     Free's a previous allocated block (pointed to by 'ptr') that is allocated by xmalloc/malloc. +

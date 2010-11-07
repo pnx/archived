@@ -18,7 +18,7 @@
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 #define swap(n,d,q) ((n)->child[(n)->child[d] == (q)])
 
-static rbnode* node_alloc(uint key, void *data) {
+static rbnode* node_alloc(unsigned key, void *data) {
 	
 	rbnode *n = xmalloc(sizeof(rbnode));
 	
@@ -103,7 +103,7 @@ inline int rbtree_is_empty(rbtree *tree) {
 /*
  * Searches a tree by key.
  */
-rbnode* rbtree_search(rbtree *tree, uint key) {
+rbnode* rbtree_search(rbtree *tree, unsigned key) {
 	
 	rbnode *n;
 	
@@ -150,7 +150,7 @@ void rbtree_free(rbtree *tree) {
 	tree->root = NULL;
 }
 
-int rbtree_insert(rbtree *tree, uint key, void *data) {
+int rbtree_insert(rbtree *tree, unsigned key, void *data) {
 	
 	rbnode head = {0};
 	
@@ -223,7 +223,7 @@ done:
     return inserted;
 }
 
-int rbtree_delete(rbtree *tree, uint key) {
+int rbtree_delete(rbtree *tree, unsigned key) {
 	
 	rbnode head = {0};
 	

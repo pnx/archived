@@ -16,15 +16,12 @@
 
 #include <stddef.h>
 
-typedef unsigned char color_t;
-typedef unsigned int uint;
-
 /* node definition */
 typedef struct _rbn {
-	uint 		 key;
-    void        *data;
-	struct _rbn *child[2];
-	color_t      color;
+	unsigned      key;
+    void         *data;
+	struct _rbn  *child[2];
+	unsigned char color;
 } rbnode;
 
 typedef struct {
@@ -40,7 +37,7 @@ typedef struct {
 
 int rbtree_is_empty(rbtree *tree);
 
-rbnode* rbtree_search(rbtree *tree, uint key);
+rbnode* rbtree_search(rbtree *tree, unsigned key);
 
 rbnode* rbtree_cmp_search(rbtree *tree, const void *data);
 
@@ -48,8 +45,8 @@ void rbtree_walk(rbtree *tree, void (*action)(rbnode *));
 
 void rbtree_free(rbtree *tree);
 
-int rbtree_insert(rbtree *tree, uint key, void *data);
+int rbtree_insert(rbtree *tree, unsigned key, void *data);
 
-int rbtree_delete(rbtree *tree, uint key);
+int rbtree_delete(rbtree *tree, unsigned key);
 
 #endif /* __RBTREE_H */

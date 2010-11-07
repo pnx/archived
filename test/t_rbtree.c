@@ -5,6 +5,7 @@
  * function is done.
  */
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "unit.h"
@@ -14,7 +15,7 @@
 #define MAX_VAL 500
 #define NODES   20
 
-#define is_red(n) (n != NULL && n->color == RB_RED)
+#define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 
 static int rb_assert(rbnode *node) {
 	
@@ -58,12 +59,76 @@ static int rb_assert(rbnode *node) {
 	return 0;
 }
 
+static int vcmp(const char *a, const char *b);
+static void vfree(void *ptr);
+static void vupdate(void *old, void *new);
+
 /* data */
-static rbtree tree;
-static uint  keyref[NODES];
+static rbtree tree = RBTREE_INIT(vfree, vupdate, vcmp);
+static int   keyref[NODES];
 static char *dataref[NODES];
-static uint search_key = -1;
-static char search_data[32];
+
+static int vcmp(const char *a, const char *b) {
+
+    printf("cmp: %s -> %s\n", a, b); 
+    
+    return strcmp(a, b);
+}
+
+static void vupdate(void *old, void *new) {
+
+    int i;
+
+    printf("update: %s -> %s\n", (char*)old, (char*)new);
+
+    for(i=0; i < NODES; i++) {
+
+        if (keyref[i] == -1)
+            continue;
+        
+        if (old == dataref[i]) {
+            dataref[i] = new;
+            break;
+        }
+    }
+}
+
+static void vfree(void *ptr) {
+
+    int i;
+
+    printf("free: %s\n", (char*)ptr);
+
+    for(i=0; i < NODES; i++) {
+
+        if (keyref[i] == -1)
+            continue;
+        
+        if (ptr == dataref[i]) {
+            keyref[i]  = -1;
+            dataref[i] = NULL;
+            break;
+        }
+    }
+
+    free(ptr);
+}
+
+static void vwalk(rbnode *node) {
+
+    int i, found = 0;
+    
+    /* check if this node exist in the reference list */
+    for(i=0; i < NODES; i++) {
+        
+        if (node->key == keyref[i] && node->data == dataref[i]) {
+            found = 1;
+            break;
+        }
+    }
+
+    assert(found);
+}
 
 void test_insert() {
 
@@ -77,79 +142,95 @@ void test_insert() {
 	while(i < NODES) {
 		
 		ckey = (uint) (rand() % MAX_VAL);
-        data = utest_ran_string(32);
+        data = utest_ran_string(16);
 		
         /* insert into rbtree and assert it */
-		ret = rbtree_insert(&tree, ckey, data, 33);
+		ret = rbtree_insert(&tree, ckey, data);
         rb_assert(tree.root);
-        
-        dprint("INSERT: %i %s\n", ckey, data);
-        
-        /* ignore duplicate key */
-        if (ret == -1) {
-            free(data);
+
+        if (!ret)
             continue;
-        }
+        
+        printf("insert: %i %s\n", ckey, data);
         
 		keyref[i] = ckey;
         dataref[i] = data;
         
-		if (i == ((NODES/2))) {
-			search_key = ckey;
-            memcpy(&search_data, data, 33);
-        }
-
         i++;
 	}
-    
+
     /* insert duplicate key */
-    assert(rbtree_insert(&tree, search_key, "duplicate", 10) == -1);
+    rbtree_insert(&tree, keyref[rand() % NODES], strdup("---- update ----"));
     rb_assert(tree.root);
 }
 
 void test_delete() {
 
-    int i;
-    uint key;
-    char *data, *dref;
+    int i, key;
 
-    /* remove some values */	
+    /* remove some values */
 	for(i=0; i < 10; i++) {
 
-        key = keyref[(NODES/2)+i];
-        dref = dataref[(NODES/2)+i];
+        do
+            key = keyref[rand() % NODES];
+        while(key < 0);
 
-	    data = rbtree_delete(&tree, key);
-        assert_string(data, dref);
-        free(data);
+	    rbtree_delete(&tree, key);
         rb_assert(tree.root);
 	}
 }
 
 void test_search() {
 
+    int index;
+
     rbnode *n;
 
+    do
+        index = rand() % NODES;
+    while(keyref[index] < 0);
+
+    printf("search: expecting to find key %i\n", keyref[index]);
+
     /* search for a key we know exists */
-    n = rbtree_search(&tree, search_key);
-    
+    n = rbtree_search(&tree, keyref[index]);
+    rb_assert(tree.root);
+
     assert(n != NULL);
-	assert(n->key == search_key);
+    assert(n->key == keyref[index]);
+    assert_string(n->data, dataref[index]);
+
+    printf("search: expecting to not find key: %i\n", MAX_VAL+512);
 
     /* search for a key we now don't exist */
     n = rbtree_search(&tree, MAX_VAL+512);
+    rb_assert(tree.root);
 
     assert(n == NULL);
 }
 
 void test_cmp_search() {
 
+    char *search;
     rbnode *n;
 
-    n = rbtree_cmp_search(&tree, &search_data, 32);
+    do
+        search = dataref[rand()%NODES];
+    while(search == NULL);
 
+    printf("cmp_search: searching for %s\n", search);
+    
+    n = rbtree_cmp_search(&tree, search);
+    
+    rb_assert(tree.root);
     assert(n != NULL);
-    assert_string(n->data, search_data);
+    assert_string(n->data, search);
+}
+
+void test_walk() {
+
+    rbtree_walk(&tree, vwalk);
+    rb_assert(tree.root);
 }
 
 int main(int argc, char **argv) {
@@ -157,20 +238,27 @@ int main(int argc, char **argv) {
 	tree.root = NULL;
 	
     /* a new tree is empty */
-	assert(rbtree_is_empty(&tree) == 1);
+	assert(rbtree_is_empty(&tree));
 
     test_insert();
+    
     test_search();
     test_cmp_search();
+    test_walk();
+    
     test_delete();
+    
+    test_search();
+    test_cmp_search();
+    test_walk();
 
     /* free the tree */
-    rbtree_free(&tree, NULL);
+    rbtree_free(&tree);
     
 	/* tree is now empty again */
-	assert(rbtree_is_empty(&tree) == 1);
+	assert(rbtree_is_empty(&tree));
 
     printf("-- TEST PASS --\n");
-    
+
 	return 0;
 }

@@ -18,13 +18,12 @@
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 #define swap(n,d,q) ((n)->child[(n)->child[d] == (q)])
 
-static rbnode* node_alloc(uint key, void *ptr, size_t len) {
+static rbnode* node_alloc(uint key, void *data) {
 	
 	rbnode *n = xmalloc(sizeof(rbnode));
 	
 	n->key      = key;
-	n->data     = ptr;
-    n->len      = len;
+	n->data     = data;
 	n->color    = RB_RED;
 	n->child[0] = NULL;
 	n->child[1] = NULL;
@@ -35,22 +34,18 @@ static rbnode* node_alloc(uint key, void *ptr, size_t len) {
 /*
  * Recursivly deallocate a tree.
  */
-static void node_dealloc(rbnode *n, void (*action)(rbnode *)) {
+static void node_dealloc(rbnode *n, void (*dealloc)(void *)) {
 	
 	if (!n)
 		return;
 
-	if (action) {
-		action(n);
-	} else if (n->data) {
-		xfree(n->data);
-        n->data = NULL;
-    }
+    if (dealloc)
+        dealloc(n->data);
 	
-	node_dealloc(n->child[0], action);
-	node_dealloc(n->child[1], action);
+	node_dealloc(n->child[0], dealloc);
+	node_dealloc(n->child[1], dealloc);
 	
-	xfree(n);
+	free(n);
 }
 
 /*
@@ -61,40 +56,23 @@ static void rbwalk(rbnode *n, void (*action)(rbnode *)) {
 	if (n == NULL)
 		return;
 	
-	action(n);
-	
 	rbwalk(n->child[0], action);
+    action(n);
 	rbwalk(n->child[1], action);
 }
 
-static inline int datacmp(void *d1, void *d2, size_t l) {
+static rbnode* rbcmp(rbnode *n, int (*cmp_fn)(const char *, const char *), const void *cmpdata) {
 
-    if (d1 == NULL || d2 == NULL)
-        return d1 == d2;
-        
-    return !memcmp(d1, d2, l);
-}
+    if (!n)
+        return NULL;
 
-/*
- * Compares every node's data member with cmpdata along the
- * path. comparison is done at memory level and returns the first node that match.
- */
-static rbnode* rbcmp(rbnode *n, void *cmpdata, size_t len) {
-	
-	rbnode *r;
-	
-	if (!n)
-		return NULL;
+    if (cmp_fn(n->data, cmpdata) == 0)
+        return n;
 
-    dprint("CMP %s - %s\n", (char*)n->data, (char*)cmpdata);
-
-	if (datacmp(n->data, cmpdata, len))
-		return n;
+    rbnode *r = rbcmp(n->child[0], cmp_fn, cmpdata);
 	
-	r = rbcmp(n->child[0], cmpdata, len);
-	
-	if (r == NULL)
-		r = rbcmp(n->child[1], cmpdata, len);
+	if (!r)
+		r = rbcmp(n->child[1], cmp_fn, cmpdata);
 	
 	return r;
 }
@@ -147,42 +125,32 @@ rbnode* rbtree_search(rbtree *tree, uint key) {
 	return n;
 }
 
-rbnode* rbtree_cmp_search(rbtree *tree, void *cmpdata, size_t len) {
+rbnode* rbtree_cmp_search(rbtree *tree, const void *cmpdata) {
 	
-	if (tree == NULL)
+	if (tree == NULL || tree->cmp_fn == NULL)
 		return NULL;
 				
-	return rbcmp(tree->root, cmpdata, len);
+	return rbcmp(tree->root, tree->cmp_fn, cmpdata);
 }
 
 void rbtree_walk(rbtree *tree, void (*action)(rbnode *)) {
 	
-	if (tree == NULL)
+	if (tree == NULL || action == NULL)
 		return;
 			
 	rbwalk(tree->root, action);
 }
 
-void rbtree_free(rbtree *tree, void (*action)(rbnode *)) {
+void rbtree_free(rbtree *tree) {
 		
 	if (tree == NULL)
 		return;
 	
-	node_dealloc(tree->root, action);
+	node_dealloc(tree->root, tree->delete_fn);
 	tree->root = NULL;
 }
 
-/*
- * duplicate keys result in the tree remains unchanged
- * this can cause memory leaks as data fields can (should) 
- * be heap allocated, and the client expects us to keep track of it.
- *
- * for general purposes, we should notify client about it so 
- * then they can choose what to do
- *
- * the function now returns -1 in that situation // H Hautakoski
- */
-int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
+int rbtree_insert(rbtree *tree, uint key, void *data) {
 	
 	rbnode head = {0};
 	
@@ -195,9 +163,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
 	unsigned char dir = 0, dir2, last, inserted = 0;
 	
 	if (tree->root == NULL) {
-		tree->root = node_alloc(key, data, len);
-		if (tree->root == NULL)
-			return 0;
+		tree->root = node_alloc(key, data);
         inserted = 1;
         goto done;
 	}
@@ -210,9 +176,7 @@ int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
 		
 	for(;;) {
 		if (q == NULL) {
-			p->child[dir] = q = node_alloc(key, data, len);
-			if (q == NULL)
-				return 0;
+			p->child[dir] = q = node_alloc(key, data);
             inserted = 1;
 		} else if (is_red(q->child[0]) && is_red(q->child[1])) {
 			/* color flip case */
@@ -241,20 +205,25 @@ int rbtree_insert(rbtree *tree, uint key, void *data, size_t len) {
 		g = p, p = q;
 		q = q->child[dir];
 	}
-		
+
+    if (!inserted) {
+        if (tree->update_fn)
+            tree->update_fn(q->data, data);
+        if (tree->delete_fn)
+            tree->delete_fn(q->data);
+        q->data = data;
+    }
+
 	tree->root = head.child[1];
-    
+
 done:
 	/* root should be black */
 	tree->root->color = RB_BLACK;
-	
-    if (!inserted)
-        return -1;
-    
-	return 1;
+
+    return inserted;
 }
 
-void* rbtree_delete(rbtree *tree, uint key) {
+int rbtree_delete(rbtree *tree, uint key) {
 	
 	rbnode head = {0};
 	
@@ -264,14 +233,10 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	/* found item */
 	rbnode *f = NULL;
 	
-	/* pointer to the data member of the node we delete,
-       returned so it can be free'd */
-	void *ret = NULL;
-	
 	unsigned char dir = 1, dir2, last;
 	
 	if (rbtree_is_empty(tree))
-		return NULL;
+		return 0;
 	
 	q = &head;
 	g = p = NULL;
@@ -324,15 +289,16 @@ void* rbtree_delete(rbtree *tree, uint key) {
 	
 	/* remove if found */
 	if (f) {
-        ret = f->data;
+        if (tree->delete_fn)
+            tree->delete_fn(f->data);
+
         if (f != q) {
             f->key  = q->key;
             f->data = q->data;
-            f->len  = q->len;
         }
         swap(p, 1, q) = swap(q, 0, NULL);
         xfree(q);
+        return 1;
 	}
-	
-	return ret;
+	return 0;
 }

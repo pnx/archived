@@ -22,28 +22,34 @@ typedef unsigned int uint;
 /* node definition */
 typedef struct _rbn {
 	uint 		 key;
-	void		*data;
-    size_t       len;
+    void        *data;
 	struct _rbn *child[2];
 	color_t      color;
 } rbnode;
 
 typedef struct {
 	rbnode *root;
+    /* user defined operations */
+    void (*delete_fn)(void *);
+    void (*update_fn)(void *, void *);
+    /* note: char* is used here to make derefernce easier inside the function */
+    int  (*cmp_fn)(const char *, const char *);
 } rbtree;
+
+#define RBTREE_INIT(delete, update, cmp) { NULL, delete, update, cmp}
 
 int rbtree_is_empty(rbtree *tree);
 
 rbnode* rbtree_search(rbtree *tree, uint key);
 
-rbnode* rbtree_cmp_search(rbtree *tree, void *cmpdata, size_t len);
+rbnode* rbtree_cmp_search(rbtree *tree, const void *data);
 
 void rbtree_walk(rbtree *tree, void (*action)(rbnode *));
 
-void rbtree_free(rbtree *tree, void (*action)(rbnode *));
+void rbtree_free(rbtree *tree);
 
-int rbtree_insert(rbtree *tree, uint key, void *data, size_t len);
+int rbtree_insert(rbtree *tree, uint key, void *data);
 
-void* rbtree_delete(rbtree *tree, uint key);
+int rbtree_delete(rbtree *tree, uint key);
 
 #endif /* __RBTREE_H */

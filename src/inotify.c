@@ -35,13 +35,12 @@ typedef struct inotify_event inoev;
 static int fd = 0;
 
 /* redblack tree */
-static rbtree tree;
+static rbtree tree = RBTREE_INIT(free, NULL, strcmp);
 
 static queue_t event_queue;
 
 static int addwatch(const char *path, const char *name) {
 	
-	rbnode *node;
 	char   *npath;
 	int     wd;
     
@@ -54,33 +53,22 @@ static int addwatch(const char *path, const char *name) {
 		return -1;
 	}
 
-	/* we must update to not introduce duplicated wd's (keys) */
-	node = rbtree_search(&tree, wd);
-	
-	if (node == NULL) {
-		dprint("added wd = %i on %s\n", wd, npath);
-		rbtree_insert(&tree, wd, (void*)npath, strlen(npath)+1);
-	} else {
-		dprint("updated wd = %i from %s to %s\n", wd, (char*)node->data, npath);
-		free(node->data);
-		node->data = (void*) npath;
-        node->len = strlen(npath)+1;
-	}
+    rbtree_insert(&tree, wd, npath);
+    
+    dprint("added wd = %i on %s\n", wd, npath);
 	
 	return wd;
 }
 
 static int rmwatch(unsigned int wd) {
 
-	void *data = rbtree_delete(&tree, wd);
+	int ret = rbtree_delete(&tree, wd);
 	
-	if (data == NULL)
+	if (!ret)
 		return 0;
 	
-	dprint("rmwatch: %i %s\n", wd, (char*) data);
     inotify_rm_watch(fd, wd);
-    if (data)
-        free(data);
+
 	return 1;
 }
 
@@ -222,7 +210,7 @@ void notify_exit() {
 
 	fd = 0;
     
-	rbtree_free(&tree, NULL);
+	rbtree_free(&tree);
 	
 	if (event_queue) {
 		queue_destroy(event_queue);
@@ -245,7 +233,7 @@ int notify_add_watch(const char *path) {
 
 int notify_rm_watch(const char *path) {
 	
-	rbnode *node = rbtree_cmp_search(&tree, (void*)path, strlen(path));
+	rbnode *node = rbtree_cmp_search(&tree, path);
 	
 	if (node == NULL) {
 		dprint("remove watch: can't find %s\n", path);

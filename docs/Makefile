@@ -1,7 +1,7 @@
 
 ASCIIDOC = asciidoc
 
-HTML_DOCS = index.html api-notify.html strbuf.html xalloc.html
+HTML_DOCS = index.html api-notify.html strbuf.html xalloc.html rbtree.html
 
 ifndef VERBOSE
 	QUIET_ASCIIDOC = @echo '   ' GEN $@;

@@ -1,0 +1,99 @@
+Red-Black Tree
+--------------
+
+Macros
+~~~~~~
+
+`RB_RED`::
+`RB_BLACK`::
+    Used to mark the color of a `rbnode`.
+
+`RBTREE_INIT`::
+Initialize a `rbtree` structure. +
+should only be used with the declaration like:
++
+----
+rbtree tree = RBTREE_INIT(...);
+----
++
+the arguments are pointers to callback functions, in order: `delete_fn`, `update_fn`, `cmp_fn`
+
+Data structures
+~~~~~~~~~~~~~~~
+
+* `rbnode`
+
+The binary tree node.
+
+`key`::
+    The key of this node
+
+`data`::
+    pointer to the data associated with the key
+    
+`child`::
+    pointers to the left and right child to this node
+
+`color`::
+    the color, should be a value of `RB_BLACK` or `RB_RED`
+
+++++
+++++
+
+* `rbtree`
+
+Structure that holds a tree of nodes
+
+`root`::
+    Pointer to the node that is the root of the tree.
+
+`delete_fn`::
+    Pointer to the function that should handle the delete routines for the `rbnode->data` pointer.
+
+`update_fn`::
+    Pointer to the function that is called when the implementation performs an update of an `rbnode->data` pointer. +
+    The function gets the following information passed in order: old pointer, new pointer.
+
+NOTE: You may only need this if you store the data in another structure and has to keep it synchronized with the RB-tree.
+
+`cmp_fn`::
+    Pointer to the function that is used to compare `rbnode->data` pointers. +
+    Shall return a value greater than zero if 'ptr1' > 'ptr2', a value less than zero if 'ptr1' < 'ptr2' and zero if 'ptr1' == 'ptr2'.
+
+Functions
+~~~~~~~~~
+
+`rbtree_insert()`::
+
+    Creates and inserts a new node in the tree. +
+    If provided, calls `rbtree->update_fn` and `rbtree->delete_fn` if a node should be updated. +
+    Returns a nonzero value if a new node was inserted, zero if 'key' already existed and that node was updated.
+
+NOTE: The memory pointed to by the 'data' pointer is *not* copied so you must ensure that it has a infinite lifetime.
+
+`rbtree_delete()`::
+
+    Deletes a node from the tree. if provided, calls `rbtree->delete_fn` for the node. +
+    Returns non zero if a node was removed. zero otherwise.
+    
+`rbtree_free()`::
+
+    Deletes the whole tree. if provided, calls `rbtree->delete_fn` for every node.
+    
+`rbtree_walk()`::
+
+    Walks the tree in in-order and calls the 'action' callback function for every node.
+
+`rbtree_search()`::
+
+    Searches the tree for 'key'. +
+    Returns a pointer to the node if found else `NULL`.
+    
+`rbtree_cmp_search()`::
+
+    Searches the tree by compareing 'cmpdata' and `rbnode->data` to find a match. +
+    Returns the node if found, `NULL` otherwise.
+
+`rbtree_is_empty()`::
+
+    Checks if a tree is empty, retruns zero if the tree is empty, nonzero otherwise. 

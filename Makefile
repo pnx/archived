@@ -31,11 +31,7 @@ obj += lib/ini/iniparser.o
 obj += lib/ini/dictionary.o
 
 ifeq ($(database), mongo)
-	CFLAGS += -DMONGO_HAVE_STDINT
-	obj += lib/mongodb/md5.o
-	obj += lib/mongodb/bson.o
-	obj += lib/mongodb/numbers.o
-	obj += lib/mongodb/mongo.o
+	LDFLAGS += -lmongoc -lbson
 	obj += src/database/mongo.o
 else
 	CFLAGS += $(shell mysql_config --cflags)

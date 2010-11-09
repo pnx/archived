@@ -6,5 +6,7 @@
 # VERBOSE = 1
 
 # database adapter, mysql is default
+# Note: mysql is recomended, the mongo driver is not stable and you have to figure out
+# how to install the libray and header files by yourself.
 # database = mysql
 # database = mongo

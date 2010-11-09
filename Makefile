@@ -11,7 +11,7 @@ FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
 
 PROGRAM  := archived
 
-include Makefile.local.mk
+-include Makefile.local.mk
 
 ifdef DEBUG
 	CFLAGS += -g -D__DEBUG__

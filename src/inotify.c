@@ -224,6 +224,9 @@ void notify_exit() {
 	rbtree_free(&tree);
 	
 	if (event_queue) {
+        notify_event *e;
+        while(e = queue_dequeue(event_queue))
+            notify_event_del(e); 
 		queue_destroy(event_queue);
         event_queue = NULL;
     }

@@ -28,8 +28,6 @@ int queue_isempty(queue_t q);
 
 size_t queue_num_items(queue_t q);
 
-void queue_clear(queue_t q);
-
 void queue_destroy(queue_t q);
 
 #endif /* __QUEUE_H */

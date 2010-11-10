@@ -27,7 +27,7 @@ int main() {
 
     assert(queue_isempty(q) == 0);
 
-    queue_clear(q);
+    while(queue_dequeue(q));
 
     assert(queue_isempty(q));
 

@@ -70,28 +70,10 @@ queue_t queue_init() {
     return q;
 }
 
-void queue_clear(queue_t q) {
-
-    struct node *t, *n;
-
-    if (q == NULL)
-        return;
-
-    n = q->tail.n;
-
-    while(n) {
-        t = n->next;
-        free(n);
-        n = t;
-    }
-
-    init(q);
-}
-
 void queue_destroy(queue_t q) {
 
-    queue_clear(q);
-    free(q);
+    if (q)
+        free(q);
 }
 
 void queue_enqueue(queue_t q, void *obj) {

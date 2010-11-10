@@ -39,12 +39,15 @@ static rbtree tree = RBTREE_INIT(free, NULL, strcmp);
 
 static queue_t event_queue;
 
-static int addwatch(const char *path, const char *name) {
+static int addwatch(const char *path, const char *name, unsigned recursive) {
 	
 	char   *npath;
 	int     wd;
     
 	npath = path_normalize(path, name, 1);
+
+    if (!npath)
+        return -1;
     
 	wd = inotify_add_watch(fd, npath, WATCH_MASK);
 	
@@ -54,29 +57,67 @@ static int addwatch(const char *path, const char *name) {
 	}
 
     rbtree_insert(&tree, wd, npath);
-    
+
     dprint("added wd = %i on %s\n", wd, npath);
+
+    if (recursive) {
+        fscrawl_t f = fsc_open(npath);
+
+        if (!f)
+            return -1;
+        
+        for(;;) {
+            notify_event *ev;
+            fs_entry *ent = fsc_read(f);
+
+            if (!ent)
+                break;
+
+            ev = notify_event_new();
+        
+            notify_event_set_type(ev, NOTIFY_CREATE);
+            notify_event_set_path(ev, ent->base);
+            notify_event_set_filename(ev, ent->name);
+            notify_event_set_dir(ev, ent->dir);
+
+            queue_enqueue(event_queue, ev);
+            
+            if (ent->dir)
+                addwatch(ent->base, ent->name, 0);
+        }
+    }
 	
-	return wd;
+	return 1;
 }
 
-static int rmwatch(unsigned int wd) {
+static int rmwatch(const char *path, const char *name) {
 
-	int ret = rbtree_delete(&tree, wd);
-	
-	if (!ret)
-		return 0;
-	
-    inotify_rm_watch(fd, wd);
+    char *fpath;
+    rbnode *node;
 
-	return 1;
+    fpath = path_normalize(path, name, 1);
+
+    if (!fpath)
+        return -1;
+
+    node = rbtree_cmp_search(&tree, fpath);
+	
+	if (node == NULL) {
+		dprint("remove watch: can't find %s\n", fpath);
+        free(fpath);
+		return -1;
+	}
+    free(fpath);
+	
+	dprint("remove watch: %i %s\n", node->key, (char*) node->data);
+
+    return inotify_rm_watch(fd, node->key);
 }
 
 static void proc_event(inoev *iev) {
 
 	rbnode *node;
     notify_event *event;
-    char buf[4096];
 	uint8_t type = NOTIFY_UNKNOWN;
 	
 #ifdef __DEBUG__
@@ -91,7 +132,7 @@ static void proc_event(inoev *iev) {
        so we can do a binary search instead of useing the IN_DELETE
        event (that may be triggered on a parent wd) to do a traverse search */
     if (iev->mask & IN_IGNORED) {
-        rmwatch(iev->wd);
+        rbtree_delete(&tree, iev->wd);
         return;
     }
     
@@ -126,7 +167,7 @@ static void proc_event(inoev *iev) {
 						
 			if (event->dir) {
 				dprint("IN_CREATE on directory, adding\n");
-				addwatch(event->path, event->filename);
+				addwatch(event->path, event->filename, 0);
 			}
 			
 			type = NOTIFY_CREATE;
@@ -135,55 +176,21 @@ static void proc_event(inoev *iev) {
 			
 			if (event->dir) {
 				dprint("IN_MOVED_TO on directory, adding\n");
-                /* TODO: clean this */
-                sprintf(buf, "%s%s/", event->path, event->filename);
-				notify_add_watch(buf);
+				addwatch(event->path, event->filename, 1);
 			}
             
 			type = NOTIFY_CREATE;
 			break;
 		case IN_MOVED_FROM :
-            /* TODO: and this */
-            sprintf(buf, "%s%s/", event->path, event->filename);
-            notify_rm_watch(buf);
+        
+            if (event->dir)
+                rmwatch(event->path, event->filename);
 		case IN_DELETE :
 			type = NOTIFY_DELETE;
 			break;
 	}
 	
 	event->type = type;
-}
-
-static void addrecursive(const char *path) {
-
-    fscrawl_t fsc;
-    fs_entry *ent;
-    notify_event *ev;
-
-    fsc = fsc_open(path);
-
-    if (!fsc)
-        return;
-
-    for(;;) {
-        
-        ent = fsc_read(fsc);
-
-        if (!ent)
-            return;
-
-        if (ent->dir)
-            addwatch(ent->base, ent->name);
-
-        ev = notify_event_new();
-        
-        notify_event_set_type(ev, NOTIFY_CREATE);
-        notify_event_set_path(ev, ent->base);
-        notify_event_set_filename(ev, ent->name);
-        notify_event_set_dir(ev, ent->dir);
-
-        queue_enqueue(event_queue, ev);
-    }
 }
 
 int notify_init() {
@@ -223,26 +230,12 @@ void notify_exit() {
  */
 int notify_add_watch(const char *path) {
 
-    if (addwatch(path, NULL) < 0)
-        return -1;
-
-    addrecursive(path);
-    
-	return 1;
+    return (addwatch(path, NULL, 1) > 0) ? 1 : -1;
 }
 
 int notify_rm_watch(const char *path) {
 	
-	rbnode *node = rbtree_cmp_search(&tree, path);
-	
-	if (node == NULL) {
-		dprint("remove watch: can't find %s\n", path);
-		return -1;
-	}
-	
-	dprint("remove watch: %i %s\n", node->key, (char*) node->data);
-	rmwatch(node->key);
-    return 0;
+	return rmwatch(path, NULL);
 }
 
 notify_event* notify_read() {

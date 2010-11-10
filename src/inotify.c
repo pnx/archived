@@ -31,8 +31,10 @@ typedef struct inotify_event inoev;
 
 #define WATCH_MASK (IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR)
 
+static int init = 0;
+
 /* Inotify file descriptor */
-static int fd = 0;
+static int fd;
 
 /* redblack tree */
 static rbtree tree = RBTREE_INIT(free, NULL, strcmp);
@@ -195,10 +197,8 @@ static void proc_event(inoev *iev) {
 
 int notify_init() {
 
-	if (fd > 0) {
-		fprintf(stderr, "inotify already instantiated.");
+	if (init)
 		return 0;
-	}
 	
 	fd = inotify_init();
     
@@ -209,13 +209,17 @@ int notify_init() {
 	
 	if (event_queue == NULL)
 		return -1;
-	
-	return 1;
+        
+    init = 1;
+	return 0;
 }
 
 void notify_exit() {
 
-	fd = 0;
+    if (!init)
+        return;
+        
+    close(fd);
     
 	rbtree_free(&tree);
 	
@@ -230,11 +234,15 @@ void notify_exit() {
  */
 int notify_add_watch(const char *path) {
 
+    if (!init)
+        die("inotify is not instantiated.");
     return (addwatch(path, NULL, 1) > 0) ? 1 : -1;
 }
 
 int notify_rm_watch(const char *path) {
-	
+    
+	if (!init)
+        die("inotify is not instantiated.");
 	return rmwatch(path, NULL);
 }
 
@@ -242,6 +250,9 @@ notify_event* notify_read() {
 
     /* bytes ready on the inotify descriptor */
     int ioready;
+
+    if (!init)
+        die("inotify is not instantiated.");
     
     /* if we don't have pending events, wait for more data on fd  */
     if (queue_isempty(event_queue)) {
@@ -297,6 +308,9 @@ static void print_node(rbnode *node) {
 }
 
 void notify_stat() {
+
+    if (!init)
+        die("inotify is not instantiated.");
 
 #ifdef __DEBUG__
 	rbtree_walk(&tree, print_node);

@@ -43,7 +43,7 @@ inotify :
 		../src/fscrawl.c \
 	    ../src/queue.c \
 	    ../src/inotify.c \
-	t_inotify.c -o test_inotify
+	t_notify.c -o test_inotify
 
 fscrawl :
 	$(CC) $(CFLAGS) \

@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include "../src/notify.h"
 
-PROT_SCAN_CALLBACK(my_callback) {
-	//printf("FROM THREAD -- path: %s; is_dir = %i\n", path, dir);
-}
-
 int main(int argc, char *argv[]) {
 	
 	notify_event *event;
@@ -22,7 +18,7 @@ int main(int argc, char *argv[]) {
 	
 	for (;;) {
 		
-		event = notify_read(3);
+		event = notify_read();
 		
 		if (event == NULL)
 			continue;

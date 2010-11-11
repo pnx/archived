@@ -148,9 +148,8 @@ static void proc_event(inoev *iev) {
 
 	event = notify_event_new();
 	
-	if (event == NULL) {
+	if (!event)
 		return;
-	}
 	
 	/* set dir and drop that bit off (so its not in the way) */
 	event->dir = (iev->mask & IN_ISDIR) != 0;
@@ -163,33 +162,27 @@ static void proc_event(inoev *iev) {
        to prevent messing up the order */
     queue_enqueue(event_queue, event);
     
-	switch (iev->mask) {
-			
-		case IN_CREATE :
-						
-			if (event->dir) {
-				dprint("IN_CREATE on directory, adding\n");
-				addwatch(event->path, event->filename, 0);
-			}
-			
-			type = NOTIFY_CREATE;
-			break;
-		case IN_MOVED_TO :
-			
-			if (event->dir) {
-				dprint("IN_MOVED_TO on directory, adding\n");
-				addwatch(event->path, event->filename, 1);
-			}
-            
-			type = NOTIFY_CREATE;
-			break;
-		case IN_MOVED_FROM :
-        
-            if (event->dir)
-                rmwatch(event->path, event->filename);
-		case IN_DELETE :
-			type = NOTIFY_DELETE;
-			break;
+	switch(iev->mask) {
+    case IN_CREATE :			
+        if (event->dir) {
+            dprint("IN_CREATE on directory, adding\n");
+            addwatch(event->path, event->filename, 0);
+        }
+        type = NOTIFY_CREATE;
+        break;
+    case IN_MOVED_TO :
+        if (event->dir) {
+            dprint("IN_MOVED_TO on directory, adding\n");
+            addwatch(event->path, event->filename, 1);
+        }
+        type = NOTIFY_CREATE;
+        break;
+    case IN_MOVED_FROM :
+        if (event->dir)
+            rmwatch(event->path, event->filename);
+    case IN_DELETE :
+        type = NOTIFY_DELETE;
+        break;
 	}
 	
 	event->type = type;

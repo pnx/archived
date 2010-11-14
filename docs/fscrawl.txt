@@ -1,0 +1,48 @@
+fscrawl - Filesystem traversal
+------------------------------
+
+API for traversing a filesystem tree/subtree.
+
+Data Structures
+~~~~~~~~~~~~~~~
+
+* `fscrawl_t`
+
+An abstract datatype, holds information about where in the filesystem you currently are etc.
+
+* `fs_entry`
+
+Holds information about a node on the filesystem
+
+`name`::
+    name of the entry (filename, directory name)
+    
+`base`::
+    The base directory where `name` exists in.
+    
+`dir`::
+    zero if the entry is a file, non zero otherwise
+
+Functions
+~~~~~~~~~
+
+`fsc_open()`::
+
+    Tries to open 'path' for traversal. +
+    Returns `NULL` if 'path' can't be open, otherwise a valid pointer to a `fscrawl_t` that can be passed to other fsc_* functions.
+
+`fsc_close()`::
+
+    Closes a `fscrawl_t` and free's all memory used by the structure.
+
+`fsc_cpy()`::
+
+    Returns a copy of 'ent'.
+
+`fsc_read()`::
+
+Reads one entry from `fscrawl_t` and returns it. +
+If the traversal is completed. the function closes `fscrawl_t` and returns `NULL`.
++
+NOTE: if you need to safe the `fs_entry` structure this function returns, make a call to `fsc_cpy()` +
+      otherwise you data will be overwritten by further calls to `fsc_read()`.

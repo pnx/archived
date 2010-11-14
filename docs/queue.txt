@@ -1,0 +1,57 @@
+Queue
+-----
+
+Simple FIFO queue allowing enqueueing and dequeing from the start and end. +
+This implementation only stores generic pointers to objects.
+So you must take care of the objects lifetime, size etc by yourself.
+
+Data structures
+~~~~~~~~~~~~~~~
+
+* `queue_t`
+    An abstract datatype holding the queue, used by queue_* functions.
+
+Functions
+~~~~~~~~~
+
+`queue_init()`::
+
+    Initalize the queue and returns a pointer to it.
+
+`queue_enqueue()`::
+
+    Places the pointer 'obj' at the end of the queue.
++
+NOTE: no data is copied, only the address 'obj' is stored in the queue.
+
+`queue_dequeue()`::
+
+    Removes and returns a item from the start of the queue.
+
+`queue_isempty()`::
+
+    Returns non zero if 'q' is empty. zero otherwise.
+    
+`queue_num_items`::
+
+    Returns the number of items in 'q' at this given moment.
+
+`queue_destroy()`::
+
+    Free's the metadata from `queue_t`.
++
+[IMPORTANT]
+===========
+This function does not take care of the objects in the queue, to avoid memory leaks
+be sure to clear out the queue before destroying. +
+
+[blue]#The example below assumes malloc:ed pointers is stored in the queue:#
+--------------------------------------
+while(!queue_isempty(queue)) {
+    void *item = queue_dequeue(queue);
+    if (item)
+        free(item);
+}
+queue_destroy(queue);
+--------------------------------------
+===========

@@ -37,15 +37,6 @@ void test_normalize() {
     free(ptr);
 }
 
-void test_pathlen() {
-
-    assert(pathlen("/usr/src/linux-2.6.30-r5/drivers") == 32);
-    assert(pathlen("/usr///src/") == 9);
-    assert(pathlen("/usr//include/sys//") == 17);
-    assert(pathlen("///var/lib/misc") == 13);
-    assert(pathlen("dir") == 3);
-}
-
 void test_isabspath() {
 
     assert(is_abspath("file") == 0);
@@ -108,7 +99,6 @@ int main(int argc, char *argv[]) {
 
     test_isabspath();
     test_normalize();
-    test_pathlen();
     test_basename();
     test_dirname();
 

@@ -21,27 +21,6 @@
 
 static char path_null = '\0';
 
-/*
- * allocates and initilizes a path
- */
-static char* alloc_path(size_t s) {
-	
-	char *ptr;
-		
-	if (s < 1)
-		return NULL;
-
-    ptr = malloc(s+1);
-    
-	if (ptr == NULL)
-		return NULL;
-		
-	*ptr = '/';
-	memset(ptr+1, 0, s);
-		
-	return ptr;
-}
-
 static const char* path_clear(const char *path) {
 	
 	while(*path == '/')
@@ -56,33 +35,6 @@ static inline int has_delim(const char *str) {
 		return 0;
 	
 	return strchr(str, '/') != NULL;
-}
-
-/*
- * copy a clean path to buf
- * NOTE: buffer should be atleast of size pathlen(path)+1
- */
-static char* cpy_path(char *buf, const char *path) {
-	
-	if (*path == 0)
-		return buf;
-	
-	while(*path) {
-		
-		*(buf++) = *path;
-		
-		if (*path == '/')
-			path = path_clear(path);
-		else
-			path++;
-	}
-
-	if (*(buf-1) != '/')
-		*(buf++) = '/';
-	
-	dassert(*buf == 0);
-	
-	return buf;
 }
 
 int is_abspath(const char *path) {
@@ -102,23 +54,6 @@ int is_abspath(const char *path) {
     }
 
 	return 1;
-}
-
-size_t pathlen(const char *path) {
-	
-	size_t size = 0;
-	
-	while(*path) {
-		
-		size++;
-		
-		if (*path == '/')
-			path = path_clear(path);
-        else
-            path++;
-	}
-
-	return size;
 }
 
 static char* expand_home() {

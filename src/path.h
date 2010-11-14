@@ -16,8 +16,6 @@
 
 int is_abspath(const char *path);
 
-size_t pathlen(const char *path);
-
 char* path_normalize(const char *base, const char *name, unsigned char dir);
 
 #endif /* __PATH_H */

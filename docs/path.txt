@@ -1,0 +1,35 @@
+Path - Path handling routines
+-----------------------------
+
+This module implements common routines for dealing with paths.
+
+Functions
+~~~~~~~~~
+
+`is_abspath()`::
+
+    Returns a non zero value if 'path' is an absolute path. zero otherwise.
+
+`is_file()`::
+
+    Returns a non zero value if 'path' is a regular file. zero otherwise.
+
+`is_dir()`::
+
+    Returns a non zero value if 'path' is a directory. zero otherwise.
+    
+`path_normalize`::
+
+Returns a string that contains the normalized full path specified by 'base', 'name' and 'dir'. +
+The function performs this type of checks/manipulation:
++
+--
+    * If the first character in 'base' is "~" it is expanded to the users home directory.
+    * Sequences of delimiters are replaced with one delimiter.
+    * Makes sure 'base' is an absolute path.
+    * 'name' must not contain an delimiter.
+    * terminates the string with an delimiter if 'dir' is non-zero.
+--
++
+Returns `NULL` if 'base' is not an absolute path or 'name' contains a delimiter.
+

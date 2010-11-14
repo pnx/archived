@@ -2,7 +2,7 @@
 ASCIIDOC = asciidoc
 
 HTML_DOCS = index.html api-notify.html strbuf.html xalloc.html rbtree.html \
-			log.html fscrawl.html
+			log.html fscrawl.html path.html
 
 ifndef VERBOSE
 	QUIET_ASCIIDOC = @echo '   ' GEN $@;

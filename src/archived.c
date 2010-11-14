@@ -74,8 +74,6 @@ static void sighandl(int sig) {
 	case SIGUSR2 :
 		printf("notify stat:\n");
 		notify_stat();
-		/* don't know why, but everything goes bananas if we keep executing */
-		clean_exit(EXIT_SUCCESS);
 	}
 }
 

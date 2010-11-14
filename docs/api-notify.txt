@@ -98,9 +98,9 @@ in this function, the only requirement is that the function never blocks.
 
 `notify_event_typetostr()`::
 
-    returns a string representation of a event's type. the pointer should +
-    not be free'ed, so its safe to be used like this:
+returns a string representation of a event's type. the pointer should +
+not be free'ed, so its safe to be used like this:
 +
-==========================
+----
 printf("type: %s\n", notify_event_typetostr(event));
-==========================
+----

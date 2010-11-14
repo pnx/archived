@@ -1,8 +1,9 @@
 
 ASCIIDOC = asciidoc
 
-HTML_DOCS = index.html api-notify.html strbuf.html xalloc.html rbtree.html \
-			log.html fscrawl.html path.html
+SOURCE_DOCS = $(subst index.txt,,$(wildcard *.txt))
+
+HTML_DOCS = index.html $(patsubst %.txt,%.html,$(SOURCE_DOCS))
 
 ifndef VERBOSE
 	QUIET_ASCIIDOC = @echo '   ' GEN $@;
@@ -10,14 +11,14 @@ ifndef VERBOSE
 endif
 
 .PHONY : clean
-all : $(HTML_DOCS)
+all : html
 html : $(HTML_DOCS)
 
 %.html : %.txt
 	$(QUIET_ASCIIDOC)$(ASCIIDOC) -b xhtml11 -o $@ $<
 
-index.txt :
+index.txt : $(SOURCE_DOCS)
 	$(QUIET_SCRIPT)$(shell ./genindex.sh index.txt)
 
 clean :
-	$(RM) index.txt $(HTML_DOCS)
+	$(RM) index.txt *.html

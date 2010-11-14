@@ -308,7 +308,5 @@ void notify_stat() {
     if (!init)
         die("inotify is not instantiated.");
 
-#ifdef __DEBUG__
 	rbtree_walk(&tree, print_node);
-#endif
 }

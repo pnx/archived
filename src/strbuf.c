@@ -130,7 +130,8 @@ void strbuf_trim(strbuf_t *s) {
 
 void strbuf_rtrim(strbuf_t *s) {
 
-    for(; s->len && isspace(s->buf[s->len-1]); s->len--);
+    while(s->len && isspace(s->buf[s->len-1]))
+         s->len--;
     s->buf[s->len] = '\0';
 }
 

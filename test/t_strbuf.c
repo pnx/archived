@@ -14,6 +14,22 @@ void print_strbuf(strbuf_t *s) {
     printf("block: %u, len: %u |%s|\n", (uint)s->alloc_size, (uint)s->len, s->buf);
 }
 
+void test_release() {
+
+    strbuf_t b = STRBUF_INIT;
+    char *str;
+
+    strbuf_append_str(&b, "release");
+
+    print_strbuf(&b);
+
+    str = strbuf_release(&b);
+	
+	printf("released |%s|\n", str);
+	
+	free(str);
+}
+
 void test_release_empty() {
 
     strbuf_t b = STRBUF_INIT;
@@ -83,7 +99,7 @@ void test_term() {
     strbuf_free(&c);
 }
 
-void test() {
+void test_trim() {
 
     strbuf_t b = STRBUF_INIT;
 	
@@ -105,39 +121,55 @@ void test() {
     print_strbuf(&b);
 	
 	strbuf_ltrim(&b);
-
-    print_strbuf(&b);
-	
-	strbuf_trim(&b);
 	
 	print_strbuf(&b);
+
+    strbuf_free(&b);
+}
+
+void test_rev() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_append_str(&b, "reversed");
+
+    print_strbuf(&b);
 
 	strbuf_rev(&b);
 	
 	print_strbuf(&b);
 
-    strbuf_reduce(&b, 6);
+    strbuf_free(&b);
+}
+
+void test_reduce() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_append_str(&b, "reduce...");
 
     print_strbuf(&b);
 
-    /* testing release */
-    char *str = strbuf_release(&b);
-	
-	printf("released |%s|\n", str);
-	
-	free(str);
+    strbuf_reduce(&b, 3);
+
+    print_strbuf(&b);
+
+    strbuf_reduce(&b, 256);
+
+    print_strbuf(&b);
+
+    strbuf_free(&b);
 }
 
 int main() {
 
-    test();
-    
     test_release_empty();
-
+    test_release();
+    test_reduce();
+    test_rev();
     test_squeeze();
-
+    test_trim();
     test_term();
-
     test_chop();
     
     return 0;

@@ -1,6 +1,6 @@
 # Test makefile
 CC=gcc
-CFLAGS=-g -D__DEBUG__ 
+CFLAGS=-g -D__DEBUG__
 LDFLAGS=-L/usr/lib64/mysql -lmysqlclient
 
 all : raw_inotify strbuf path rbtree inotify fscrawl queue
@@ -56,6 +56,9 @@ fscrawl :
 
 queue :
 	$(CC) $(CFLAGS) ../src/queue.c t_queue.c -o test_queue
+
+log :
+	$(CC) $(CFLAGS) ../src/die.c ../src/strbuf.c ../src/xalloc.c ../src/log.c t_log.c -o test_log
 
 clean :
 	rm -f test_*

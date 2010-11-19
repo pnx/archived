@@ -50,6 +50,10 @@ NOTE: This doesn't shrink the memory block
 
     Removes space characters from the beginning (ltrim) of the ->buf string, the end (rtrim) or both (trim).
 
+`strbuf_rchop()`::
+
+    Chops off everything to the right of the rightmost 'ch' encountered in the string.
+
 `strbuf_rev()`::
 
     Reverses the ->buf string.

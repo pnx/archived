@@ -102,6 +102,14 @@ void strbuf_append_ch(strbuf_t *s, char ch) {
     s->buf[s->len] = '\0';
 }
 
+void strbuf_append_repeat(strbuf_t *s, char ch, size_t len) {
+
+    strbuf_expand(s, len);
+    memset(s->buf + s->len, ch, len);
+    s->len += len;
+    s->buf[s->len] = '\0';
+}
+
 void strbuf_rchop(strbuf_t *s, char ch) {
 
     int i;

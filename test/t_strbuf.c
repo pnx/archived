@@ -105,14 +105,14 @@ void test_trim() {
 	
     print_strbuf(&b);
 
-    strbuf_append(&b, "    ", 4);
+    strbuf_append_repeat(&b, ' ', 4);
     strbuf_append(&b, "abcdef", 6);
 	
 	print_strbuf(&b);
 	
     strbuf_append(&b, "012345678901234567890123456789", 30);
     strbuf_append_ch(&b, 'a'); 
-    strbuf_append_str(&b, "      ");
+    strbuf_append_repeat(&b, ' ', 6);
 
     print_strbuf(&b);
 

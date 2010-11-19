@@ -83,7 +83,6 @@ static int mvdown(struct __fscrawl *f, const char *dir) {
 
 fscrawl_t fsc_open(const char *path) {
 	
-	int i;
 	struct __fscrawl *f = malloc(sizeof(struct __fscrawl));
 	
 	if (f == NULL)

@@ -29,7 +29,7 @@ typedef struct {
     /* user defined operations */
     void (*delete_fn)(void *);
     void (*update_fn)(void *, void *);
-    /* note: char* is used here to make derefernce easier inside the function */
+    /* note: char* is used here to make dereference easier inside the function */
     int  (*cmp_fn)(const char *, const char *);
 } rbtree;
 

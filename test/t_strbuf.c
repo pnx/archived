@@ -161,6 +161,13 @@ void test_reduce() {
     strbuf_free(&b);
 }
 
+void test_free_empty() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_free(&b);
+}
+
 int main() {
 
     test_release_empty();
@@ -171,6 +178,7 @@ int main() {
     test_trim();
     test_term();
     test_chop();
+    test_free_empty();
     
     return 0;
 }

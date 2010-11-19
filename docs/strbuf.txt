@@ -37,6 +37,10 @@ Functions
 
     Adds one character 'ch' to the end of ->buf
 
+`strbuf_append_repeat()`::
+
+    Adds 'len' characters of 'ch' to the end of ->buf
+
 `strbuf_reduce()`::
 
 Will reduce ->buf by 'len' bytes from the end.

@@ -177,7 +177,15 @@ fs_entry* fsc_read(fscrawl_t f) {
 
     f->ent.base = f->path.buf;
 	f->ent.name = &ent->d_name[0];
-	f->ent.dir  = ent->d_type == 4;
+
+    if (ent->d_type == DT_UNKNOWN) {
+        size_t tmp = strlen(f->ent.name);
+        strbuf_append(&f->path, f->ent.name, tmp);
+        f->ent.dir = is_dir(f->path.buf);
+        strbuf_reduce(&f->path, tmp);
+    } else {
+        f->ent.dir = ent->d_type == DT_DIR;
+    }
 
     return &f->ent;
 }

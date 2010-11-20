@@ -3,9 +3,9 @@
 #
 
 CC       = gcc
-CFLAGS   = -O2 -Werror -Ilib
+CFLAGS   = -O2 -Werror -Ilib $(shell getconf LFS_CFLAGS)
 LD		 = $(CC)
-LDFLAGS  = 
+LDFLAGS  = $(shell getconf LFS_LDFLAGS)
 
 FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
 

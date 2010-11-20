@@ -1,7 +1,7 @@
 # Test makefile
 CC=gcc
-CFLAGS=-g -D__DEBUG__
-LDFLAGS=-L/usr/lib64/mysql -lmysqlclient
+CFLAGS=-g -D__DEBUG__ $(shell getconf LFS_CFLAGS)
+LDFLAGS=-L/usr/lib64/mysql -lmysqlclient $(shell getconf LFS_LDFLAGS)
 
 all : raw_inotify strbuf path rbtree inotify fscrawl queue
 

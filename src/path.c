@@ -14,6 +14,8 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "debug.h"
 #include "strbuf.h"
@@ -54,6 +56,15 @@ int is_abspath(const char *path) {
     }
 
 	return 1;
+}
+
+int is_dir(const char *path) {
+
+    struct stat st;
+    
+    if (path && stat(path, &st) >= 0)
+        return S_ISDIR(st.st_mode);
+    return 0;
 }
 
 static char* expand_home() {

@@ -51,6 +51,13 @@ void test_isabspath() {
     assert(is_abspath("/ab/..xy/file") ==1);
 }
 
+void test_isdir() {
+
+    assert(is_dir("t_path.c") == 0);
+    assert(is_dir("../src") == 1);
+    assert(is_dir("/") == 1);
+}
+
 void test_basename() {
 
     int i;
@@ -98,6 +105,7 @@ void test_dirname() {
 int main(int argc, char *argv[]) {
 
     test_isabspath();
+    test_isdir();
     test_normalize();
     test_basename();
     test_dirname();

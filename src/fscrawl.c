@@ -152,8 +152,8 @@ fs_entry* fsc_read(fscrawl_t f) {
     if (f->ent.dir)
         mvdown(f, f->ent.name);
 
+    errno = 0;
 	for(;;) {
-		
 		ent = readdir(f->dirs[f->depth]);
 
         if (ent) {
@@ -163,14 +163,14 @@ fs_entry* fsc_read(fscrawl_t f) {
         }
 
         if (errno) {
-            perror("fsc_read");
-            errno = 0;
+            if (errno != EACCES)
+                perror("fsc_read");
             continue;
         }
-			
+
         if (mvup(f))
             continue;
-			
+
         fsc_close(f);
         return NULL;
 	}

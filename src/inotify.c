@@ -10,6 +10,8 @@
  */
 
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -19,7 +21,7 @@
 #include "util.h"
 /* red black tree for watch descriptors */
 #include "rbtree.h"
-#include "debug.h"
+#include "log.h"
 #include "path.h"
 #include "queue.h"
 #include "fscrawl.h"
@@ -60,7 +62,7 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
 
     rbtree_insert(&tree, wd, npath);
 
-    dprint("added wd = %i on %s\n", wd, npath);
+    logmsg(LOG_DEBUG, "added wd = %i on %s", wd, npath);
 
     if (recursive) {
         fscrawl_t f = fsc_open(npath);
@@ -105,13 +107,13 @@ static int rmwatch(const char *path, const char *name) {
     node = rbtree_cmp_search(&tree, fpath);
 	
 	if (node == NULL) {
-		dprint("remove watch: can't find %s\n", fpath);
+		logmsg(LOG_DEBUG, "remove watch: can't find %s", fpath);
         free(fpath);
 		return -1;
 	}
     free(fpath);
 	
-	dprint("remove watch: %i %s\n", node->key, (char*) node->data);
+	logmsg(LOG_DEBUG, "remove watch: %i %s", node->key, (char*) node->data);
 
     return inotify_rm_watch(fd, node->key);
 }
@@ -122,13 +124,7 @@ static void proc_event(inoev *iev) {
     notify_event *event;
 	uint8_t type = NOTIFY_UNKNOWN;
 	
-#ifdef __DEBUG__
-	fprintf(stderr, "RAW EVENT: %i, %x", iev->wd, iev->mask);
-	if (iev->len)
-		fprintf(stderr, ", %s\n", iev->name);
-	else
-		fprintf(stderr, "\n");
-#endif
+    logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
 
     /* this event is triggered when a watch descriptor is removed.
        so we can do a binary search instead of useing the IN_DELETE
@@ -142,7 +138,7 @@ static void proc_event(inoev *iev) {
 	node = rbtree_search(&tree, iev->wd);
 	
 	if (!node) {
-		dprint("-- IGNORING EVENT -- invalid watchdescriptor %i\n", iev->wd);
+		logmsg(LOG_WARN, "-- IGNORING EVENT -- invalid watchdescriptor %i", iev->wd);
 		return;
 	}
 
@@ -165,14 +161,14 @@ static void proc_event(inoev *iev) {
 	switch(iev->mask) {
     case IN_CREATE :			
         if (event->dir) {
-            dprint("IN_CREATE on directory, adding\n");
+            logmsg(LOG_DEBUG, "IN_CREATE on directory, adding");
             addwatch(event->path, event->filename, 0);
         }
         type = NOTIFY_CREATE;
         break;
     case IN_MOVED_TO :
         if (event->dir) {
-            dprint("IN_MOVED_TO on directory, adding\n");
+            logmsg(LOG_DEBUG, "IN_MOVED_TO on directory, adding");
             addwatch(event->path, event->filename, 1);
         }
         type = NOTIFY_CREATE;
@@ -280,13 +276,15 @@ notify_event* notify_read() {
 
     while(ioready > 0) {
 
-        dprint("%i bytes avail\n", ioready);
-
         char buf[INOBUFSIZE];
         int offset = 0, rbytes = read(fd, buf, INOBUFSIZE);
 
-        if (rbytes == -1)
-            die_errno("INOTIFY");
+        logmsg(LOG_DEBUG, "%i bytes avail", ioready);
+
+        if (rbytes == -1) {
+            logerrno(LOG_WARN, "INOTIFY", errno);
+            break;
+        }
 
         while(rbytes > offset) {
             inoev *rev = (inoev *) &buf[offset];

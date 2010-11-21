@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include "unit.h"
 #include "../src/rbtree.h"
-#include "../src/debug.h"
 
 #define MAX_VAL 500
 #define NODES   20

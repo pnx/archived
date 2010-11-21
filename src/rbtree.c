@@ -10,9 +10,9 @@
  *   Based on the work of Julienne Walker's rbtree implementation
  *   http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
  */
+#include <malloc.h>
 #include <string.h>
 #include "xalloc.h"
-#include "debug.h"
 #include "rbtree.h"
 
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
@@ -113,8 +113,6 @@ rbnode* rbtree_search(rbtree *tree, unsigned key) {
 	n = tree->root;
 	
 	while(n) {
-		
-		dprint("SEARCH: check %u\n", n->key);
 		
 		if (n->key == key)
 			break;

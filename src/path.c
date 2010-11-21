@@ -17,7 +17,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "debug.h"
 #include "strbuf.h"
 #include "path.h"
 

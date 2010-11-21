@@ -12,7 +12,6 @@
 #include <string.h>
 #include "xalloc.h"
 #include "strbuf.h"
-#include "debug.h"
 
 #define CHNK_SIZE 128
 

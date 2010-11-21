@@ -35,6 +35,8 @@ rbtree :
 inotify :
 	$(CC) -lpthread -D INOTIFY_DEBUG -D RB_DEBUG $(CFLAGS) \
 	    ../src/rbtree.c \
+	    ../src/log.c \
+	    ../src/log-file.c \
 	    ../src/xalloc.c \
 		../src/die.c \
 		../src/strbuf.c \
@@ -49,6 +51,8 @@ fscrawl :
 	$(CC) $(CFLAGS) \
 		../src/path.c \
 		../src/fscrawl.c \
+		../src/log.c \
+	    ../src/log-file.c \
 		../src/xalloc.c \
 		../src/die.c \
 		../src/strbuf.c \

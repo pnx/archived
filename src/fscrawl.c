@@ -9,13 +9,14 @@
  */
 #include <unistd.h>
 #include <string.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <errno.h>
 #include <dirent.h>
 
+#include "log.h"
 #include "strbuf.h"
 #include "path.h"
-#include "debug.h"
 #include "fscrawl.h"
 
 #define MAX_DEPTH 0x20
@@ -32,16 +33,14 @@ struct __fscrawl {
 static int mvup(struct __fscrawl *f) {
 	
 	if (closedir(f->dirs[f->depth]) == -1) {
-		perror("closedir");
+		logerrno(LOG_WARN, "ftc: closedir", errno);
         errno = 0;
 		return -1;
 	}
 	
 	if (f->depth == 0)
 		return 0;
-        
-    dprint("fscrawl: tree depth is: %i \n", f->depth);
-    
+
 	f->depth--;
 
     if (f->path.buf[f->path.len-1] == '/')
@@ -67,7 +66,7 @@ static int mvdown(struct __fscrawl *f, const char *dir) {
 
 	if (!ds) {
         if (errno != EACCES)
-            perror("opendir");
+            logerrno(LOG_WARN, "ftc: opendir", errno);
         errno = 0;
         
 		strbuf_reduce(&f->path, 1);
@@ -104,7 +103,7 @@ fscrawl_t fsc_open(const char *path) {
 	
 	if (!f->dirs[f->depth]) {
         
-        perror("fsc_open");
+        logerrno(LOG_WARN, "fsc_open", errno);
         errno = 0;
         
         strbuf_free(&f->path);
@@ -164,7 +163,7 @@ fs_entry* fsc_read(fscrawl_t f) {
 
         if (errno) {
             if (errno != EACCES)
-                perror("fsc_read");
+                logerrno(LOG_WARN, "fsc_read", errno);
             continue;
         }
 

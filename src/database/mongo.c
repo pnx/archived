@@ -19,7 +19,6 @@
 #include <time.h>
 #include <mongo/mongo.h>
 #include <ini/iniparser.h>
-#include "../debug.h"
 #include "../path.h"
 #include "../database.h"
 

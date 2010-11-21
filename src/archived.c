@@ -22,6 +22,7 @@
 #include "notify.h"
 #include "database.h"
 #include "util.h"
+#include "path.h"
 #include "debug.h"
 
 static dictionary *config = NULL;
@@ -30,7 +31,7 @@ static int load_config(const char *file) {
 
     iniparser_freedict(config);
 
-    if (file_exists(file)) {
+    if (is_file(file)) {
         config = iniparser_load(file);
         if (NULL == config)
             return -1;

@@ -16,6 +16,8 @@
 
 int is_abspath(const char *path);
 
+int is_file(const char *path);
+
 int is_dir(const char *path);
 
 char* path_normalize(const char *base, const char *name, unsigned char dir);

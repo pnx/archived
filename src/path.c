@@ -58,6 +58,15 @@ int is_abspath(const char *path) {
 	return 1;
 }
 
+int is_file(const char *path) {
+
+    struct stat st;
+
+    if (path && stat(path, &st) >= 0)
+        return S_ISREG(st.st_mode);
+    return 0;
+}
+
 int is_dir(const char *path) {
 
     struct stat st;

@@ -15,6 +15,4 @@ void die(const char *, ...);
 
 void die_errno(const char *);
 
-int file_exists(const char *);
-
 #endif /* __UTIL_H */

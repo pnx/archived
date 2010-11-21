@@ -21,9 +21,8 @@
 
 #include "notify.h"
 #include "database.h"
-#include "util.h"
+#include "log.h"
 #include "path.h"
-#include "debug.h"
 
 static dictionary *config = NULL;
 
@@ -91,8 +90,8 @@ static void main_loop() {
 
         if (event == NULL)
             continue;
-
-        dprint("%s: (%c) %s%s\n", notify_event_typetostr(event),
+            
+        logmsg(LOG_DEBUG, "%s: (%c) %s%s", notify_event_typetostr(event),
             event->dir ? 'D' : 'F', event->path, event->filename);
 
         if (event->type == NOTIFY_CREATE)
@@ -127,6 +126,15 @@ int main(int argc, char **argv) {
     if (load_config(configfile) < 0)
         return EXIT_FAILURE;
 
+#ifdef __DEBUG__
+    init_log(LOG_ALL, NULL);
+#else
+    if (iniparser_getboolean(config, "general:uselog", 0)) {
+        char *path = iniparser_getstring(config, "general:logdir", NULL);
+        init_log(LOG_INFO | LOG_WARN | LOG_CRIT, path);
+    }
+#endif
+    
     ret = database_init(config);
     if (ret == -1)
         return EXIT_FAILURE;

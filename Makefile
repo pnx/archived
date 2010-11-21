@@ -44,6 +44,7 @@ obj += src/path.o
 obj += src/strbuf.o
 obj += src/xalloc.o
 obj += src/die.o
+obj += src/log.o
 
 obj += src/inotify.o
 obj += src/event.o

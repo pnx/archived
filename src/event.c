@@ -77,7 +77,7 @@ void notify_event_set_path(notify_event *event, const char *path) {
 	if (event == NULL || path == NULL)
 		return;
 	
-	ptr = realloc(event->path, sizeof(char) * (strlen(path)+1));
+	ptr = realloc(event->path, strlen(path)+1);
 	
 	if (ptr == NULL)
 		return;
@@ -98,7 +98,7 @@ void notify_event_set_filename(notify_event *event, const char *filename) {
 		return;
 	
 	
-	tmp = realloc(event->filename, sizeof(char) * (strlen(filename)+1));
+	tmp = realloc(event->filename, strlen(filename)+1);
 	
 	if (tmp == NULL)
 		return;

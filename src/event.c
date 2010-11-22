@@ -48,7 +48,7 @@ notify_event* notify_event_new() {
  */
 void notify_event_del(notify_event *event) {
 
-	if (event)
+	if (event == NULL)
 		return;
 		
 	dealloc_data(event);

@@ -123,6 +123,14 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
+    /* Setup signal handlers */
+    signal(SIGTERM, sighandl);
+    signal(SIGQUIT, sighandl);
+    signal(SIGINT, sighandl);
+    signal(SIGSEGV, sighandl);
+    signal(SIGUSR1, sighandl);
+    signal(SIGUSR2, sighandl);
+
     if (load_config(configfile) < 0)
         return EXIT_FAILURE;
 
@@ -148,14 +156,6 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Invalid path: %s\n", rootdir);
         return EXIT_FAILURE;
     }
-
-    /* Setup signal handlers */
-    signal(SIGTERM, sighandl);
-    signal(SIGQUIT, sighandl);
-    signal(SIGINT, sighandl);
-    signal(SIGSEGV, sighandl);
-    signal(SIGUSR1, sighandl);
-    signal(SIGUSR2, sighandl);
 
     main_loop();
 

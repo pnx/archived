@@ -9,16 +9,16 @@
  *  (at your option) any later version.
  */
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 
 #include "event.h"
+#include "xalloc.h"
 
-#define dealloc_data(ev) \
-	if (ev->path) \
-		free(ev->path); \
-	if (ev->filename) \
-		free(ev->filename)
+#define dealloc_data(ev)    \
+	if (ev->path)           \
+		xfree(ev->path);    \
+	if (ev->filename)       \
+		xfree(ev->filename)
 
 static void init_event(notify_event* ev) {
 	
@@ -33,11 +33,8 @@ static void init_event(notify_event* ev) {
  */
 notify_event* notify_event_new() {
 	
-	notify_event *ev = malloc(sizeof(notify_event));
+	notify_event *ev = xmalloc(sizeof(notify_event));
 	
-	if (ev == NULL)
-		return NULL;
-		
 	init_event(ev);
 	
 	return ev;
@@ -52,7 +49,7 @@ void notify_event_del(notify_event *event) {
 		return;
 		
 	dealloc_data(event);
-	free(event);
+	xfree(event);
 }
 
 /*
@@ -72,17 +69,10 @@ void notify_event_clear(notify_event *event) {
  */
 void notify_event_set_path(notify_event *event, const char *path) {
 	
-	char *ptr;
-	
 	if (event == NULL || path == NULL)
 		return;
 	
-	ptr = realloc(event->path, strlen(path)+1);
-	
-	if (ptr == NULL)
-		return;
-		
-	event->path = ptr;
+	event->path = xrealloc(event->path, strlen(path)+1);
 	
 	memcpy(event->path, path, strlen(path)+1);
 }
@@ -92,20 +82,12 @@ void notify_event_set_path(notify_event *event, const char *path) {
  */
 void notify_event_set_filename(notify_event *event, const char *filename) {
 	
-	char *tmp;
-	
 	if (event == NULL || filename == NULL)
 		return;
 	
+	event->filename = xrealloc(event->filename, strlen(filename)+1);
 	
-	tmp = realloc(event->filename, strlen(filename)+1);
-	
-	if (tmp == NULL)
-		return;
-	
-	memcpy(tmp, filename, strlen(filename)+1);
-	
-	event->filename = tmp;
+	memcpy(event->filename, filename, strlen(filename)+1);
 }
 
 /* set directory */

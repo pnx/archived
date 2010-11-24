@@ -14,87 +14,78 @@
 #include "util.h"
 #include "xalloc.h"
 
-#define CHECK(expr) \
-    if (!(expr)) \
-        goto bail
-
-#define CHECK_SET_ERRNO(expr, no) \
-    if (!(expr)) { \
-        errno = no; \
-        goto bail; \
-    }
-
 #ifdef __DEBUG__
-# define CHECK_INPUT(s) CHECK_SET_ERRNO(s, EINVAL)
+# define CHECK_INPUT(s, prefix) \
+    if (!(s))                   \
+        die(prefix ": Invalid argument '%s'\n", #s)
 #else
-# define CHECK_INPUT(s)
+# define CHECK_INPUT(s, prefix)
 #endif
 
 void* xmalloc(size_t size) {
 
-    CHECK_INPUT(size);
+    void *ptr;
 
-    void *ptr = malloc(size);
-    CHECK(ptr);
+    CHECK_INPUT(size, "xmalloc");
+
+    ptr = malloc(size);
+    if (!ptr)
+        die("xmalloc: %s, tried to allocate %lu bytes",
+            strerror(errno), (unsigned long) size);
     return ptr;
-bail:
-    die_errno("xmalloc");
 }
 
 void* xmallocz(size_t size) {
 
-    CHECK_INPUT(size);
+    void *ptr;
 
-    void *ptr = malloc(size);
-    CHECK(ptr);
+    CHECK_INPUT(size, "xmallocz");
+
+    ptr = malloc(size);
+    if (!ptr)
+        die_errno("xmallocz");
     memset(ptr, 0, size);
     return ptr;
-bail:
-    die_errno("xmallocz");
 }
 
 void* xrealloc(void *ptr, size_t size) {
 
-    CHECK_INPUT(size);
+    void *new;
+    CHECK_INPUT(size, "xrealloc");
     
-    ptr = realloc(ptr, size);
-    CHECK(ptr);
-    return ptr;
-bail:
-    die_errno("xrealloc");
+    new = realloc(ptr, size);
+    if (!new)
+        die("xrealloc: Can't resize memory block (%s) on '%p' with size '%lu'",
+            strerror(errno), ptr, (unsigned long) size);
+    return new;
 }
 
 char* xstrdup(const char *s) {
 
-    CHECK_INPUT(s);
+    size_t len;
+    char *dest;
 
-    size_t len = strlen(s) + 1;
-    char *dest = xmalloc(len);
+    CHECK_INPUT(s, "xstrdup");
 
-    CHECK(dest);
+    len = strlen(s) + 1;
+    dest = xmalloc(len);
     memcpy(dest, s, len);
     return dest;
-bail:
-    die_errno("xstrdup");
 }
 
 void* xmemdup(const void *src, size_t size) {
 
-    CHECK_INPUT(src);
+    void *dest;
 
-    void *dest = malloc(size);
-    CHECK(dest);
+    CHECK_INPUT(src, "xmemdup");
+
+    dest = xmalloc(size);
     memcpy(dest, src, size);
     return dest;
-bail:
-    die_errno("xmemdup");
 }
 
 void xfree(void *ptr) {
 
-    CHECK_INPUT(ptr);
+    CHECK_INPUT(ptr, "xfree");
     free(ptr);
-    return;
-bail:
-    die_errno("xfree");
 }

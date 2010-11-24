@@ -25,9 +25,9 @@
 #include "path.h"
 
 static const char *archived_usage_str =
-    "Usage: archived [-c <config>] <Root Directory>\n"
-    "       config - path to the configuration file\n"
-    "       Root Directory - Path to indexroot. All subdirectories will be indexed.\n";
+    "Usage: archived [-c <config>] <root>\n"
+    "       config - Path to the configuration file (default ./config.ini)\n"
+    "       root   - Path to indexroot. All subdirectories will be indexed.\n";
 
 static dictionary *config = NULL;
 

@@ -24,6 +24,11 @@
 #include "log.h"
 #include "path.h"
 
+static const char *archived_usage_str =
+    "Usage: archived [-c <config>] <Root Directory>\n"
+    "       config - path to the configuration file\n"
+    "       Root Directory - Path to indexroot. All subdirectories will be indexed.\n";
+
 static dictionary *config = NULL;
 
 static int load_config(const char *file) {
@@ -116,10 +121,7 @@ int main(int argc, char **argv) {
     } else if (argc > 1 && strcmp(argv[1], "-c")) {
         rootdir = argv[1];
     } else {
-        fprintf(stderr, "Usage: archived [-c <config>] <Root Directory>\n"
-        "config - path to the configuration file\n"
-        "Root Directory - Path to indexroot. All subdirectories will be indexed.\n");
-
+        fputs(archived_usage_str, stderr);
         return EXIT_FAILURE;
     }
 

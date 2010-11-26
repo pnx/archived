@@ -1,68 +1,31 @@
 # Test makefile
-CC=gcc
-CFLAGS=-g -D__DEBUG__ $(shell getconf LFS_CFLAGS)
-LDFLAGS=-L/usr/lib64/mysql -lmysqlclient $(shell getconf LFS_LDFLAGS)
 
-all : raw_inotify strbuf path rbtree inotify fscrawl queue
+CC		= gcc
+CFLAGS  = -g -D__DEBUG__
+LD      = $(CC)
+LDFLAGS =
 
-raw_inotify :
-	$(CC) -linotifytools t_raw_inotify.c -o test_raw_inotify
+include ../Makefile.include
 
-strbuf :
-	$(CC) $(CFLAGS) \
-		../src/strbuf.c \
-		../src/xalloc.c \
-		../src/die.c \
-	t_strbuf.c -o test_strbuf
-	
-path :
-	$(CC) $(CFLAGS) \
-		unit.c \
-		../src/xalloc.c \
-		../src/die.c \
-		../src/strbuf.c \
-		../src/path.c \
-	t_path.c -o test_path
+ROOT = ../
+TESTS = $(patsubst t_%.c,%,$(wildcard t_*.c))
 
-rbtree : 
-	$(CC) $(CFLAGS) \
-		unit.c \
-		../src/die.c \
-		../src/xalloc.c \
-		../src/rbtree.c \
-	t_rbtree.c -o test_rbtree
+.PHONY : clean
+all : $(TESTS)
 
-inotify :
-	$(CC) -lpthread -D INOTIFY_DEBUG -D RB_DEBUG $(CFLAGS) \
-	    ../src/rbtree.c \
-	    ../src/log.c \
-	    ../src/log-file.c \
-	    ../src/xalloc.c \
-		../src/die.c \
-		../src/strbuf.c \
-	    ../src/path.c \
-	    ../src/event.c \
-		../src/fscrawl.c \
-	    ../src/queue.c \
-	    ../src/inotify.c \
-	t_notify.c -o test_inotify
-
-fscrawl :
-	$(CC) $(CFLAGS) \
-		../src/path.c \
-		../src/fscrawl.c \
-		../src/log.c \
-	    ../src/log-file.c \
-		../src/xalloc.c \
-		../src/die.c \
-		../src/strbuf.c \
-	t_fscrawl.c -o test_fscrawl
-
-queue :
-	$(CC) $(CFLAGS) ../src/queue.c t_queue.c -o test_queue
-
-log :
-	$(CC) $(CFLAGS) ../src/die.c ../src/strbuf.c ../src/xalloc.c ../src/log.c t_log.c -o test_log
+strbuf : $(addprefix $(ROOT),$(obj-strbuf))
+rbtree : unit.c $(addprefix $(ROOT),$(obj-rbtree))
+queue : $(ROOT)src/queue.o $(addprefix $(ROOT),$(obj-xalloc))
+path : unit.c $(ROOT)src/path.o $(addprefix $(ROOT),$(obj-strbuf))
+fscrawl : $(ROOT)src/fscrawl.o $(addprefix $(ROOT),$(obj-fscrawl))
+notify : $(addprefix $(ROOT),$(obj-notify))
+log : $(addprefix $(ROOT),$(obj-log))
 
 clean :
-	rm -f test_*
+	$(RM) $(patsubst t_%.c,test_%,$(wildcard t_*.c))
+
+% : t_%.c
+	$(QUIET_LD)$(LD) $(LDFLAGS) $(sort $(^)) -o test_$@
+
+%.o : %.c
+	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@

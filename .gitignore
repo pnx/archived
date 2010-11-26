@@ -1,6 +1,6 @@
 *.o
+archived
 Makefile.local.mk
-build/
 test/test_*
 nbproject
 docs/*.html

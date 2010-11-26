@@ -1,71 +1,50 @@
+
 #
 # Archived Makefile
 #
 
 CC       = gcc
-CFLAGS   = -O2 -Werror -Ilib $(shell getconf LFS_CFLAGS)
+CFLAGS	 = -O2 -Werror -Ilib
 LD		 = $(CC)
-LDFLAGS  = $(shell getconf LFS_LDFLAGS)
-
-FINDOBJ = find . -name "*.o" -type f -printf "%P\n"
-
 PROGRAM  := archived
 
 -include Makefile.local.mk
+include Makefile.include
 
 ifdef DEBUG
 	CFLAGS += -g -D__DEBUG__
 endif
 
-ifndef VERBOSE
-	QUIET_CC = @echo '   ' CC $@;
-	QUIET_LD = @echo '   ' LD $@;
-endif
-ifeq ($(VERBOSE), 2)
-	CFLAGS  += -v
-endif
-
-obj =
-
-obj += lib/ini/iniparser.o
-obj += lib/ini/dictionary.o
+obj := $(obj-ini) $(obj-log) $(obj-notify) $(obj-path) \
+	   $(obj-strbuf) $($obj-xalloc)
 
 ifeq ($(database), mongo)
 	LDFLAGS += -lmongoc -lbson
-	obj += src/database/mongo.o
+	obj += $(obj-mongo)
 else
 	CFLAGS += $(shell mysql_config --cflags)
 	LDFLAGS += $(shell mysql_config --libs)
-	obj += src/database/mysql.o
+	obj += $(obj-mysql)
 endif
 
-obj += src/rbtree.o
-obj += src/path.o
-obj += src/strbuf.o
-obj += src/xalloc.o
-obj += src/die.o
-obj += src/log.o
+.SUFFIXES: .c .o
+.PHONY : $(PROGRAM) clean distclean
 
-obj += src/inotify.o
-obj += src/event.o
-obj += src/fscrawl.o
-obj += src/queue.o
-
-obj += src/archived.o
-
-.PHONY : all clean cleaner
 all : $(PROGRAM)
 
-$(PROGRAM) : $(obj)
-	$(QUIET_LD)$(LD) $^ -o $@ $(LDFLAGS)
+$(PROGRAM) : src/archived.o $(obj)
+	$(QUIET_LD)$(LD) $(sort $(^)) -o $@ $(LDFLAGS)
 
 clean :
-	@for obj in `$(FINDOBJ)`; do \
+	@for obj in $(shell find . -name "*.o" -type f -printf "%P\n"); do \
 		echo $(RM) $$obj;$(RM) $$obj; \
 	done
+	@make -C test clean
+	@make -C docs clean
 
-cleaner : clean
+distclean : clean
 	$(RM) $(PROGRAM)
+	$(RM) Makefile.local.mk
 
 %.o : %.c
 	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@

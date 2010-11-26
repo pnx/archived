@@ -1,0 +1,27 @@
+#
+# Common Makefile configuration for Archived
+#
+
+CFLAGS   += $(shell getconf LFS_CFLAGS) -D_GNU_SOURCE=1 
+LDFLAGS  += $(shell getconf LFS_LDFLAGS)
+
+# output tuning
+ifndef VERBOSE
+	QUIET_CC = @echo '   ' CC $@;
+	QUIET_LD = @echo '   ' LD $@;
+endif
+ifeq ($(VERBOSE), 2)
+	CFLAGS  += -v
+endif
+
+# modules definitions
+obj-xalloc = src/xalloc.o src/die.o
+obj-strbuf = src/strbuf.o $(obj-xalloc)
+obj-path = src/path.o $(obj-strbuf)
+obj-rbtree = src/rbtree.o $(obj-xalloc)
+obj-fscrawl = src/fscrawl.o $(obj-strbuf) $(obj-path) $(obj-log)
+obj-log = src/log.o $(obj-strbuf) $(obj-xalloc)
+obj-notify = src/event.o src/queue.o src/inotify.o $(obj-xalloc) $(obj-fscrawl) $(obj-rbtree)
+obj-ini = lib/ini/iniparser.o lib/ini/dictionary.o
+obj-mongo = src/database/mongo.o $(obj-path) $(obj-ini)
+obj-mysql = src/database/mysql.o $(obj-ini) $(obj-xalloc)

@@ -15,6 +15,9 @@ ifeq ($(VERBOSE), 2)
 endif
 
 # modules definitions
+ifdef NO_MEMRCHR
+	obj-compat = src/compat/memrchr.o
+endif
 obj-xalloc = src/xalloc.o src/die.o
 obj-strbuf = src/strbuf.o $(obj-xalloc)
 obj-path = src/path.o $(obj-strbuf)

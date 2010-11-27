@@ -16,7 +16,7 @@ ifdef DEBUG
 endif
 
 obj := $(obj-ini) $(obj-log) $(obj-notify) $(obj-path) \
-	   $(obj-strbuf) $($obj-xalloc)
+	   $(obj-strbuf) $($obj-xalloc) $(obj-compat)
 
 ifeq ($(database), mongo)
 	LDFLAGS += -lmongoc -lbson

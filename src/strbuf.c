@@ -9,7 +9,7 @@
  */
 
 #include <ctype.h>
-#include <string.h>
+#include "compat/string.h"
 #include "xalloc.h"
 #include "strbuf.h"
 
@@ -111,15 +111,11 @@ void strbuf_append_repeat(strbuf_t *s, char ch, size_t len) {
 
 void strbuf_rchop(strbuf_t *s, char ch) {
 
-    int i;
-    
-    for(i=s->len-1; i >= 0; i--) {
+    char *n = memrchr(s->buf, ch, s->len);
 
-        if (s->buf[i] == ch) {
-            s->buf[i] = '\0';
-            s->len = i;
-            break;
-        }
+    if (n) {
+        *n = '\0';
+        s->len = n - s->buf;
     }
 }
 

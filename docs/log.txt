@@ -1,0 +1,59 @@
+Log - Message logging API
+-------------------------
+
+This interface is designed in such way that code that wants to logg a massage can do so with one call and don't worry
+about where it may turn up and what format it should use etc. +
+All this is setup trough one function call idealy in the beginning of a process.
+
+Macros
+~~~~~~
+
+`LOG_INFO`::
+    Information, Someone thinks you may find this important.
+    
+`LOG_WARN`::
+    Warning, just a warning. can be ignored if you simply just don't care about it.
+    
+`LOG_CRIT`::
+    Critical condition, some things may not work as supposed to.
+    
+`LOG_DEBUG`::
+    Debug level, messages that is usefull when debugging.
+    
+`LOG_ALL`::
+    All of the above.
+
+Functions
+~~~~~~~~~
+
+`init_log()`::
+Initialize the logging functionality, 'level' is a bitmask of the LOG_* contansts defining what types of messages should be logged. +
+if 'path' is a writeable directory, output will be written to files in that directory otherwise `stderr` is used.
++
+----
+init_log(LOG_INFO | LOG_WARN, NULL);
+----
++
+Will log info and warning messages to `stderr`.
+
+`logstrtolvl()`::
+    returns the LOG_* equivalent of a string representation.
+
+`loglvltostr()`::
+    returns the string representation of a LOG_* constant.
+
+`logmsg()`::
+logs a message, 'level' should be a LOG_* constant for what level the message is for. +
+the rest of the arguments is a variable argument list and behaves like `printf()`
++
+----
+logmsg(LOG_INFO, "this is an integer: %i", 12);
+logmsg(LOG_INFO, "this is just a message");
+----
++
+
+NOTE: No newline at the end of the message is needed.
+
+`logerrno`::
+like `perror()`, logs an message by the 'errno' number. +
+if 'prefix' is not `NULL` and points to a string that is not zero length, the message will be prepended whit 'prefix' followed by a colon and a space.

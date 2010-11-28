@@ -23,6 +23,7 @@
 #include "database.h"
 #include "log.h"
 #include "path.h"
+#include "strbuf.h"
 
 static const char *archived_usage_str =
     "Usage: archived [-c <config>] <root>\n"
@@ -140,11 +141,35 @@ int main(int argc, char **argv) {
     init_log(LOG_ALL, NULL);
 #else
     if (iniparser_getboolean(config, "general:uselog", 0)) {
+        char *strlevel = iniparser_getstring(config, "general:loglevel", NULL);
         char *path = iniparser_getstring(config, "general:logdir", NULL);
-        init_log(LOG_INFO | LOG_WARN | LOG_CRIT, path);
+        unsigned level = 0;
+
+        if (strlevel) {
+            strbuf_t sb = STRBUF_INIT;
+            strbuf_t **list, **ptr;
+
+            strbuf_append_str(&sb, strlevel);
+            list = strbuf_explode(&sb, ',');
+
+            for(ptr = list; *ptr; ptr++) {
+                unsigned l;
+                strbuf_trim(*ptr);
+                l = logstrtolvl((*ptr)->buf);
+                if (l == 0)
+                    die("config (general:loglevel): unknown log level: %s\n", (*ptr)->buf);
+                level += l;
+            }
+            strbuf_free_list(list);
+            strbuf_free(&sb);
+        } else {
+            die("config (general:loglevel): no levels defined\n");
+        }
+        
+        init_log(level, path);
     }
 #endif
-    
+
     ret = database_init(config);
     if (ret == -1)
         return EXIT_FAILURE;

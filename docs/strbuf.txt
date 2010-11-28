@@ -70,6 +70,15 @@ NOTE: This doesn't shrink the memory block
 
     ensure that ->buf is terminated with 'ch'. Will not change ->buf if it is already terminated.
 
+`strbuf_explode()`::
+
+Returns a NULL terminated list of string buffers, each containing a substring of 'str' splitted by delimiter'. +
+Returns `NULL` if 'delimiter' does not exists in 'str'.
++
+TIP: use `strbuf_free_list()` to free the entire list.
++
+NOTE: 'delimiter' is not included in the list.
+
 `strbuf_release()`::
 
     This function should be used to detach the ->buf member from the `strbuf_t` structure. +
@@ -78,3 +87,7 @@ NOTE: This doesn't shrink the memory block
 `strbuf_free()`::
 
     Free's all the memory (allocated on the heap) associted with the `strbuf_t` structure.
+
+`strbuf_free_list()`::
+
+    Free's all the memory from an NULL terminated list of string buffers.

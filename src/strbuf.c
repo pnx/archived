@@ -71,6 +71,18 @@ void strbuf_free(strbuf_t *s) {
     strbuf_init(s);
 }
 
+void strbuf_free_list(strbuf_t **s) {
+
+    strbuf_t **list = s;
+
+    while(*s) {
+        if ((*s)->alloc_size)
+            xfree((*s)->buf);
+        xfree(*s++);
+    }
+    xfree(list);
+}
+
 void strbuf_attach(strbuf_t *s, void *buf, size_t len, size_t alloc_size) {
 
     strbuf_free(s);
@@ -183,4 +195,29 @@ void strbuf_squeeze(strbuf_t *s, char ch) {
                 s->buf[np] = s->buf[np + of];
         }
     }
+}
+
+strbuf_t** strbuf_explode(const strbuf_t *s, char sep) {
+
+    int i = 0, count = 2;
+    char *p;
+    strbuf_t *tmp, **list;
+
+    list = xmallocz(sizeof(strbuf_t *) * count);
+    
+    p = s->buf;
+    while(p < s->buf + s->len) {
+        char *d = memchr(p, sep, s->len - (p - s->buf));
+        if (!d)
+            d = s->buf + s->len;
+        if (i + 1 >= count)
+            list = xrealloc(list, sizeof(strbuf_t *) * (count += 4));
+        tmp = xmalloc(sizeof(strbuf_t));
+        strbuf_init(tmp);
+        strbuf_append(tmp, p, d - p);
+        list[i] = tmp;
+        list[++i] = NULL;
+        p = ++d;
+    }
+    return list;
 }

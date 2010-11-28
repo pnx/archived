@@ -33,6 +33,8 @@ char* strbuf_release(strbuf_t *s);
 
 void strbuf_free(strbuf_t *s);
 
+void strbuf_free_list(strbuf_t **s);
+
 void strbuf_attach(strbuf_t *s, void *str, size_t len, size_t alloc_size);
 
 void strbuf_append(strbuf_t *s, const void *ptr, size_t len);
@@ -56,5 +58,7 @@ void strbuf_ltrim(strbuf_t *s);
 void strbuf_rev(strbuf_t *s);
 
 void strbuf_squeeze(strbuf_t *s, char ch);
+
+strbuf_t **strbuf_explode(const strbuf_t *s, char sep);
 
 #endif /* __STRBUF_H */

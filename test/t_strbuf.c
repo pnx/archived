@@ -161,6 +161,27 @@ void test_reduce() {
     strbuf_free(&b);
 }
 
+void test_explode() {
+
+    strbuf_t **list, **ptr;
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_append_str(&b, "item1,item2,item3,item4");
+
+    list = ptr = strbuf_explode(&b, ',');
+    while(*ptr)
+        print_strbuf(*ptr++);
+    strbuf_free_list(list);
+
+    strbuf_free(&b);
+
+    list = strbuf_explode(&b, ',');
+
+    assert(*list == NULL);
+
+    strbuf_free_list(list);
+}
+
 void test_free_empty() {
 
     strbuf_t b = STRBUF_INIT;
@@ -178,6 +199,7 @@ int main() {
     test_trim();
     test_term();
     test_chop();
+    test_explode();
     test_free_empty();
     
     return 0;

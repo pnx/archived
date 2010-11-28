@@ -1,6 +1,6 @@
 
 #include "unit.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <time.h>
 
 static inline char ranchr() {

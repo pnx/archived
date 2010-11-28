@@ -11,9 +11,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
 #include <stdint.h>
-#include <malloc.h>
+#include "xalloc.h"
 #include "queue.h"
 
 #define BLOCK_SIZE (1<<7)
@@ -42,8 +41,7 @@ struct __queue {
 
 static void alloc_node(struct ref *head) {
 
-	struct node *n = malloc(sizeof(struct node));
-    assert(n != NULL);
+	struct node *n = xmalloc(sizeof(struct node));
 
     n->next = NULL;
 	head->n = head->n->next = n;
@@ -53,34 +51,31 @@ static void alloc_node(struct ref *head) {
 static void dealloc_node(struct ref *tail) {
 
 	struct node *next = tail->n->next;
-    assert(next != NULL);
 
-    free(tail->n);
-	
-	tail->n = next;
-	tail->i = 0;
+    if (next) {
+        xfree(tail->n);
+        tail->n = next;
+        tail->i = 0;
+    }
 }
 
 queue_t queue_init() {
 
-    queue_t q = malloc(sizeof(struct __queue));
+    queue_t q = xmalloc(sizeof(struct __queue));
 
-    if (q)
-        init(q);
+    init(q);
     return q;
 }
 
 void queue_destroy(queue_t q) {
 
-    if (q)
-        free(q);
+    xfree(q);
 }
 
 void queue_enqueue(queue_t q, void *obj) {
 
 	if (q->head.n == NULL) {
-		q->tail.n = q->head.n = malloc(sizeof(struct node));
-        assert(q->tail.n != NULL);
+		q->tail.n = q->head.n = xmalloc(sizeof(struct node));
 	} else if (q->head.i + 1 >= BLOCK_SIZE) {
 		alloc_node(&q->head);
     } else {
@@ -100,7 +95,7 @@ void* queue_dequeue(queue_t q) {
     obj = q->tail.n->block[q->tail.i++];
 
     if (q->tail.n == q->head.n && q->tail.i > q->head.i) {
-        free(q->head.n);
+        xfree(q->head.n);
         init(q);
     } else if (q->tail.i >= BLOCK_SIZE) {
         dealloc_node(&q->tail);

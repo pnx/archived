@@ -21,6 +21,8 @@
 
 void init_log(unsigned level, const char *path);
 
+unsigned logstrtolvl(const char *str);
+
 const char* loglvltostr(unsigned level);
 
 void logmsg(unsigned level, const char *fmt, ...);

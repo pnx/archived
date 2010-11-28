@@ -120,6 +120,21 @@ const char* loglvltostr(unsigned level) {
     return "UNKNOWN";
 }
 
+unsigned logstrtolvl(const char *str) {
+
+    int i;
+
+    if (strcmp(str, "ALL") == 0)
+        return LOG_ALL;
+
+    for(i=0; levels[i].name; i++) {
+
+        if (strcmp(str, levels[i].name) == 0)
+            return levels[i].mask;
+    }
+    return 0;
+}
+
 void logmsg(unsigned level, const char *fmt, ...) {
 
 	va_list vl;

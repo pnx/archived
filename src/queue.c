@@ -11,7 +11,6 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
 #include "xalloc.h"
 #include "queue.h"
 
@@ -30,7 +29,7 @@ struct node {
 };
 
 struct ref {
-    uint16_t i;
+    unsigned int i;
     struct node *n;
 };
 
@@ -73,6 +72,9 @@ void queue_destroy(queue_t q) {
 }
 
 void queue_enqueue(queue_t q, void *obj) {
+
+    if (q == NULL)
+        return;
 
 	if (q->head.n == NULL) {
 		q->tail.n = q->head.n = xmalloc(sizeof(struct node));

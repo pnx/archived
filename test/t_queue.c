@@ -16,9 +16,6 @@ int main() {
     for(i=0; i < 4; i++) {
         int *c = queue_dequeue(q);
         
-        if (c == NULL)
-            continue;
-            
         assert(c == &map[i]);
     }
 

@@ -16,12 +16,6 @@
 
 #define BLOCK_SIZE (1<<7)
 
-#define init(q) \
-    do { \
-        q->tail.n = q->head.n = NULL; \
-        q->tail.i = q->head.i = 0; \
-    } while(0)
-    
 /* linked list node holding a chunk of queue elements */
 struct node {
     void *block[BLOCK_SIZE];
@@ -61,14 +55,24 @@ static void dealloc_node(struct ref *tail) {
 queue_t queue_init() {
 
     queue_t q = xmalloc(sizeof(struct __queue));
-
-    init(q);
+    q->tail.n = q->head.n = xmalloc(sizeof(struct node));
+    q->tail.n->next = q->head.n->next = NULL;
+    q->tail.i = q->head.i = 0;
+    
     return q;
 }
 
 void queue_destroy(queue_t q) {
 
-    xfree(q);
+    if (q) {
+        struct node *n = q->tail.n;
+        while(n) {
+            struct node *next = n->next;
+            xfree(n);
+            n = next;
+        }
+        xfree(q);
+    }
 }
 
 void queue_enqueue(queue_t q, void *obj) {
@@ -76,15 +80,11 @@ void queue_enqueue(queue_t q, void *obj) {
     if (q == NULL)
         return;
 
-	if (q->head.n == NULL) {
-		q->tail.n = q->head.n = xmalloc(sizeof(struct node));
-	} else if (q->head.i + 1 >= BLOCK_SIZE) {
+    if (q->head.i >= BLOCK_SIZE) {
 		alloc_node(&q->head);
-    } else {
-        q->head.i++;
     }
 
-	q->head.n->block[q->head.i] = obj;
+	q->head.n->block[q->head.i++] = obj;
 }
 
 void* queue_dequeue(queue_t q) {
@@ -97,8 +97,7 @@ void* queue_dequeue(queue_t q) {
     obj = q->tail.n->block[q->tail.i++];
 
     if (q->tail.n == q->head.n && q->tail.i > q->head.i) {
-        xfree(q->head.n);
-        init(q);
+        q->tail.i = q->head.i = 0;
     } else if (q->tail.i >= BLOCK_SIZE) {
         dealloc_node(&q->tail);
     }
@@ -111,22 +110,22 @@ int queue_isempty(queue_t q) {
     if (q == NULL)
         return -1;
 
-    return q->head.n == NULL && q->head.n == q->tail.n;
+    return q->head.n == q->tail.n && q->head.i == q->tail.i;
 }
 
 size_t queue_num_items(queue_t q) {
 
+    size_t len;
+    struct node *n;
+
     if (queue_isempty(q))
         return 0;
     if (q->head.n == q->tail.n)
-        return (q->head.i + 1) - q->tail.i;
+        return q->head.i - q->tail.i;
 
-    size_t len = (BLOCK_SIZE - q->tail.i) + (q->head.i + 1);
-    struct node *n = q->tail.n->next;
-
-    for(; n != q->head.n; n = n->next)
+    len = (BLOCK_SIZE - q->tail.i) + q->head.i;
+    for(n = q->tail.n->next; n != q->head.n; n = n->next)
         len += BLOCK_SIZE;
-
     return len;
 }
 

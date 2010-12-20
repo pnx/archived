@@ -56,6 +56,7 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
 	wd = inotify_add_watch(fd, npath, WATCH_MASK);
 	
 	if (wd < 0) {
+        logerrno(LOG_CRIT, "inotify_add_watch", errno);
         free(npath);
 		return -1;
 	}
@@ -115,7 +116,11 @@ static int rmwatch(const char *path, const char *name) {
 	
 	logmsg(LOG_DEBUG, "remove watch: %i %s", node->key, (char*) node->data);
 
-    return inotify_rm_watch(fd, node->key);
+    if (inotify_rm_watch(fd, node->key) < 0) {
+        logerrno(LOG_CRIT, "intotify_rm_watch", errno);
+        return -1;
+    }
+    return 0;
 }
 
 static void proc_event(inoev *iev) {

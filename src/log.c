@@ -71,7 +71,7 @@ static void writeinfo(unsigned level) {
     fputs(buf, logfd);
 }
 
-static int validmask(unsigned x, char unique) {
+static int validmask(unsigned x, unsigned unique) {
 
     /* check if only one bit is set */
     if (unique && (x & (x - 1)) != 0)
@@ -138,7 +138,6 @@ unsigned logstrtolvl(const char *str) {
 void logmsg(unsigned level, const char *fmt, ...) {
 
 	va_list vl;
-    FILE *fd;
 
     if (!validmask(level, 1))
         die("log: invalid level: %x\n", level);

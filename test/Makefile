@@ -20,6 +20,7 @@ path : unit.c $(ROOT)src/path.o $(addprefix $(ROOT),$(obj-strbuf))
 fscrawl : $(ROOT)src/fscrawl.o $(addprefix $(ROOT),$(obj-fscrawl))
 notify : $(addprefix $(ROOT),$(obj-notify))
 log : $(addprefix $(ROOT),$(obj-log))
+str-list : unit.c $(addprefix $(ROOT),$(obj-str-list))
 
 clean :
 	$(RM) $(patsubst t_%.c,test_%,$(wildcard t_*.c))

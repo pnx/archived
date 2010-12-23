@@ -19,6 +19,7 @@ ifdef NO_MEMRCHR
 	obj-compat = src/compat/memrchr.o
 endif
 obj-xalloc = src/xalloc.o src/die.o
+obj-str-list = src/str-list.o $(obj-xalloc)
 obj-strbuf = src/strbuf.o $(obj-xalloc)
 obj-path = src/path.o $(obj-strbuf)
 obj-rbtree = src/rbtree.o $(obj-xalloc)

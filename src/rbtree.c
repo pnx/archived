@@ -18,12 +18,11 @@
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 #define swap(n,d,q) ((n)->child[(n)->child[d] == (q)])
 
-static rbnode* node_alloc(unsigned key, void *data) {
+static rbnode* node_alloc(const void *key) {
 	
 	rbnode *n = xmalloc(sizeof(rbnode));
 	
 	n->key      = key;
-	n->data     = data;
 	n->color    = RB_RED;
 	n->child[0] = NULL;
 	n->child[1] = NULL;
@@ -40,11 +39,11 @@ static void node_dealloc(rbnode *n, void (*dealloc)(void *)) {
 		return;
 
     if (dealloc)
-        dealloc(n->data);
-	
+        dealloc((void *)n->key);
+
 	node_dealloc(n->child[0], dealloc);
 	node_dealloc(n->child[1], dealloc);
-	
+
 	free(n);
 }
 
@@ -59,22 +58,6 @@ static void rbwalk(rbnode *n, void (*action)(rbnode *)) {
 	rbwalk(n->child[0], action);
     action(n);
 	rbwalk(n->child[1], action);
-}
-
-static rbnode* rbcmp(rbnode *n, int (*cmp_fn)(const char *, const char *), const void *cmpdata) {
-
-    if (!n)
-        return NULL;
-
-    if (cmp_fn(n->data, cmpdata) == 0)
-        return n;
-
-    rbnode *r = rbcmp(n->child[0], cmp_fn, cmpdata);
-	
-	if (!r)
-		r = rbcmp(n->child[1], cmp_fn, cmpdata);
-	
-	return r;
 }
 
 static inline rbnode* rotate_single(rbnode *root, unsigned char dir) {
@@ -103,32 +86,25 @@ inline int rbtree_is_empty(rbtree *tree) {
 /*
  * Searches a tree by key.
  */
-rbnode* rbtree_search(rbtree *tree, unsigned key) {
+rbnode* rbtree_search(rbtree *tree, const void *key) {
 	
 	rbnode *n;
 	
-	if (tree == NULL || tree->root == NULL)
+	if (tree == NULL || tree->root == NULL || tree->cmp_fn == NULL)
 		return NULL;
 	
 	n = tree->root;
 	
 	while(n) {
-		
-		if (n->key == key)
+        int cmp = tree->cmp_fn(n->key, key);
+        
+		if (cmp == 0)
 			break;
-		
-		n = n->child[n->key < key];
+
+        n = n->child[cmp < 0];
 	}
 	
 	return n;
-}
-
-rbnode* rbtree_cmp_search(rbtree *tree, const void *cmpdata) {
-	
-	if (tree == NULL || tree->cmp_fn == NULL)
-		return NULL;
-				
-	return rbcmp(tree->root, tree->cmp_fn, cmpdata);
 }
 
 void rbtree_walk(rbtree *tree, void (*action)(rbnode *)) {
@@ -148,7 +124,7 @@ void rbtree_free(rbtree *tree) {
 	tree->root = NULL;
 }
 
-int rbtree_insert(rbtree *tree, unsigned key, void *data) {
+int rbtree_insert(rbtree *tree, const void *key) {
 	
 	rbnode head = {0};
 	
@@ -159,9 +135,12 @@ int rbtree_insert(rbtree *tree, unsigned key, void *data) {
 	rbnode *p, *q;
 	
 	unsigned char dir = 0, dir2, last, inserted = 0;
-	
+
+    if (!tree || !tree->cmp_fn)
+        return 0;
+
 	if (tree->root == NULL) {
-		tree->root = node_alloc(key, data);
+		tree->root = node_alloc(key);
         inserted = 1;
         goto done;
 	}
@@ -173,8 +152,10 @@ int rbtree_insert(rbtree *tree, unsigned key, void *data) {
     /* somewhere in here, there should be dragons */
 		
 	for(;;) {
+        int cmp;
+        
 		if (q == NULL) {
-			p->child[dir] = q = node_alloc(key, data);
+			p->child[dir] = q = node_alloc(key);
             inserted = 1;
 		} else if (is_red(q->child[0]) && is_red(q->child[1])) {
 			/* color flip case */
@@ -191,12 +172,14 @@ int rbtree_insert(rbtree *tree, unsigned key, void *data) {
 			else
 				t->child[dir2] = rotate_double(g, !last);
 		}
+
+        cmp = tree->cmp_fn(q->key, key);
 			
-		if (q->key == key)
+		if (cmp == 0)
 			break;
 			
 		last = dir;
-		dir = q->key < key;
+        dir = cmp < 0;
 			
 		if (g)
 			t = g;
@@ -205,11 +188,9 @@ int rbtree_insert(rbtree *tree, unsigned key, void *data) {
 	}
 
     if (!inserted) {
-        if (tree->update_fn)
-            tree->update_fn(q->data, data);
         if (tree->delete_fn)
-            tree->delete_fn(q->data);
-        q->data = data;
+            tree->delete_fn((void*)q->key);
+        q->key = key;
     }
 
 	tree->root = head.child[1];
@@ -221,7 +202,7 @@ done:
     return inserted;
 }
 
-int rbtree_delete(rbtree *tree, unsigned key) {
+int rbtree_delete(rbtree *tree, const void *key) {
 	
 	rbnode head = {0};
 	
@@ -233,7 +214,7 @@ int rbtree_delete(rbtree *tree, unsigned key) {
 	
 	unsigned char dir = 1, dir2, last;
 	
-	if (rbtree_is_empty(tree))
+	if (rbtree_is_empty(tree) || !tree->cmp_fn)
 		return 0;
 	
 	q = &head;
@@ -243,13 +224,15 @@ int rbtree_delete(rbtree *tree, unsigned key) {
 	/* more dragons (killed some of them though) */
 	
 	while(q->child[dir]) {
-		last = dir;
+        int cmp;
 		
 		g = p, p = q;
-		q = q->child[dir];
-		dir = q->key < key;
-		
-		if (q->key == key)
+        q = q->child[dir];
+        last = dir;
+        
+        cmp = tree->cmp_fn(q->key, key);
+		dir = cmp < 0;
+		if (cmp == 0)
 			f = q;
 		
 		if (is_red(q) || is_red(q->child[dir]))
@@ -288,12 +271,10 @@ int rbtree_delete(rbtree *tree, unsigned key) {
 	/* remove if found */
 	if (f) {
         if (tree->delete_fn)
-            tree->delete_fn(f->data);
+            tree->delete_fn((void*)f->key);
 
-        if (f != q) {
-            f->key  = q->key;
-            f->data = q->data;
-        }
+        if (f != q)
+            f->key = q->key;
         swap(p, 1, q) = swap(q, 0, NULL);
         xfree(q);
         return 1;

@@ -29,9 +29,6 @@ The binary tree node.
 `key`::
     The key of this node
 
-`data`::
-    pointer to the data associated with the key
-
 `child`::
     pointers to the left and right child to this node
 
@@ -51,16 +48,16 @@ Structure that holds a tree of nodes
     Pointer to the node that is the root of the tree.
 
 `delete_fn`::
-    Pointer to the function that should handle the delete routines for the `rbnode->data` pointer.
+    Pointer to the function that should handle the delete routines for the `rbnode->key` pointer.
 
 `update_fn`::
-    Pointer to the function that is called when the implementation performs an update of an `rbnode->data` pointer. +
+    Pointer to the function that is called when the implementation performs an update of an `rbnode->key` pointer. +
     The function gets the following information passed in order: old pointer, new pointer.
 
 NOTE: You may only need this if you store the data in another structure and has to keep it synchronized with the RB-tree.
 
 `cmp_fn`::
-    Pointer to the function that is used to compare `rbnode->data` pointers. +
+    Pointer to the function that is used to compare two `rbnode->key` pointers. +
     Shall return a value greater than zero if 'ptr1' > 'ptr2', a value less than zero if 'ptr1' < 'ptr2' and zero if 'ptr1' == 'ptr2'.
 --
 
@@ -73,7 +70,7 @@ Functions
     If provided, calls `rbtree->update_fn` and `rbtree->delete_fn` if a node should be updated. +
     Returns a nonzero value if a new node was inserted, zero if 'key' already existed and that node was updated.
 
-NOTE: The memory pointed to by the 'data' pointer is *not* copied so you must ensure that it has a infinite lifetime.
+NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ensure that it has a infinite lifetime.
 
 `rbtree_delete()`::
 
@@ -92,11 +89,8 @@ NOTE: The memory pointed to by the 'data' pointer is *not* copied so you must en
 
     Searches the tree for 'key'. +
     Returns a pointer to the node if found else `NULL`.
-    
-`rbtree_cmp_search()`::
 
-    Searches the tree by compareing 'cmpdata' and `rbnode->data` to find a match. +
-    Returns the node if found, `NULL` otherwise.
+NOTE: the function uses the `rbtree->cmp_fn` function to compare 'key' with a `rbnode->key`.
 
 `rbtree_is_empty()`::
 

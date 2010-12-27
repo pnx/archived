@@ -18,8 +18,7 @@
 
 /* node definition */
 typedef struct _rbn {
-	unsigned      key;
-    void         *data;
+    const void   *key;
 	struct _rbn  *child[2];
 	unsigned char color;
 } rbnode;
@@ -29,24 +28,21 @@ typedef struct {
     /* user defined operations */
     void (*delete_fn)(void *);
     void (*update_fn)(void *, void *);
-    /* note: char* is used here to make dereference easier inside the function */
-    int  (*cmp_fn)(const char *, const char *);
+    int  (*cmp_fn)(const void *, const void *);
 } rbtree;
 
 #define RBTREE_INIT(delete, update, cmp) { NULL, delete, update, cmp}
 
 int rbtree_is_empty(rbtree *tree);
 
-rbnode* rbtree_search(rbtree *tree, unsigned key);
-
-rbnode* rbtree_cmp_search(rbtree *tree, const void *data);
+rbnode* rbtree_search(rbtree *tree, const void *key);
 
 void rbtree_walk(rbtree *tree, void (*action)(rbnode *));
 
 void rbtree_free(rbtree *tree);
 
-int rbtree_insert(rbtree *tree, unsigned key, void *data);
+int rbtree_insert(rbtree *tree, const void *key);
 
-int rbtree_delete(rbtree *tree, unsigned key);
+int rbtree_delete(rbtree *tree, const void *key);
 
 #endif /* __RBTREE_H */

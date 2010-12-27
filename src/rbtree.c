@@ -86,7 +86,7 @@ inline int rbtree_is_empty(rbtree *tree) {
 /*
  * Searches a tree by key.
  */
-rbnode* rbtree_search(rbtree *tree, const void *key) {
+void* rbtree_search(rbtree *tree, const void *key) {
 	
 	rbnode *n;
 	
@@ -99,12 +99,11 @@ rbnode* rbtree_search(rbtree *tree, const void *key) {
         int cmp = tree->cmp_fn(n->key, key);
         
 		if (cmp == 0)
-			break;
+			return (void *) n->key;
 
         n = n->child[cmp < 0];
 	}
-	
-	return n;
+	return NULL;
 }
 
 void rbtree_walk(rbtree *tree, void (*action)(rbnode *)) {

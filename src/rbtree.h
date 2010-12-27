@@ -35,7 +35,7 @@ typedef struct {
 
 int rbtree_is_empty(rbtree *tree);
 
-rbnode* rbtree_search(rbtree *tree, const void *key);
+void* rbtree_search(rbtree *tree, const void *key);
 
 void rbtree_walk(rbtree *tree, void (*action)(rbnode *));
 

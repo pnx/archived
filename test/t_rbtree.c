@@ -150,7 +150,7 @@ void test_search() {
 
     int index;
 
-    rbnode *n;
+    int *n;
 
     do
         index = rand() % NODES;
@@ -162,8 +162,7 @@ void test_search() {
     n = rbtree_search(&tree, &keyref[index]);
     rb_assert(tree.root);
 
-    assert(n != NULL);
-    assert(n->key == &keyref[index]);
+    assert(n == &keyref[index]);
 
     index = MAX_VAL + 512;
     

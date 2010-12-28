@@ -262,11 +262,7 @@ int rbtree_delete(rbtree *tree, const void *key) {
             }
 		}
 	}
-	
-	tree->root = head.child[1];
-	if (tree->root)
-		tree->root->color = RB_BLACK;
-	
+
 	/* remove if found */
 	if (f) {
         if (tree->delete_fn)
@@ -276,7 +272,11 @@ int rbtree_delete(rbtree *tree, const void *key) {
             f->key = q->key;
         swap(p, 1, q) = swap(q, 0, NULL);
         xfree(q);
-        return 1;
 	}
-	return 0;
+
+    tree->root = head.child[1];
+	if (tree->root)
+		tree->root->color = RB_BLACK;
+
+	return f != NULL;
 }

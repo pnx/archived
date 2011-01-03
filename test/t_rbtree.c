@@ -11,13 +11,17 @@
 #include "unit.h"
 #include "../src/rbtree.h"
 
-#define MAX_VAL 500
-#define NODES   20
+#define NODES   3000
+#define MAX_VAL (3*(NODES/4))
 
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 
 static int vcmp(const void *a, const void *b);
 static void vdelete(void *ptr);
+
+/* data */
+static rbtree tree = RBTREE_INIT(vdelete, NULL, vcmp);
+static int   keyref[NODES];
 
 static int rb_assert(rbnode *node) {
 	
@@ -61,10 +65,6 @@ static int rb_assert(rbnode *node) {
 	return 0;
 }
 
-/* data */
-static rbtree tree = RBTREE_INIT(vdelete, NULL, vcmp);
-static int   keyref[NODES];
-
 static int vcmp(const void *a, const void *b) {
 
     return *((int*)a) - *((int*)b);
@@ -72,141 +72,166 @@ static int vcmp(const void *a, const void *b) {
 
 static void vdelete(void *ptr) {
 
-    int i;
+    int i, exists = 0;
 
-    printf("delete: %i\n", *((int*)ptr));
- 
     for(i=0; i < NODES; i++) {
-
-        if (keyref[i] == -1)
-            continue;
 
         if (ptr == &keyref[i]) {
-            keyref[i] = -1;
+            exists = 1;
             break;
         }
     }
+    
+    assert(exists);
 }
 
-static void vwalk(rbnode *node) {
+/* Helper, will check keyref to see if 'value' exist in the range */
+static int keyref_exists(int low, int high, int value) {
 
-    int i, found = 0;
-    
-    /* check if this node exist in the reference list */
-    for(i=0; i < NODES; i++) {
-        
-        if (node->key == &keyref[i]) {
-            found = 1;
-            break;
-        }
-    }
-    assert(found);
+    for(; low <= high; low++)
+        if (keyref[low] == value)
+            return 1;
+    return 0;
 }
 
-void test_insert() {
+static void walk_fn(rbnode *n) {
 
-    int i = 0;
-    
-    /* insert values */
-	while(i < NODES) {
+    static int i = 0;
 
-        rbnode *node;
-        
-		keyref[i] = (uint) (rand() % MAX_VAL);
-		
-        /* insert into rbtree and assert it */
-		node = rbtree_insert(&tree, &keyref[i]);
-        rb_assert(tree.root);
-
-        assert(node);
-
-        printf("insert: %i\n", *((int*)node->key));
-        
+    while(keyref_exists(0, i-1, keyref[i]))
         i++;
-	}
 
-    rb_assert(tree.root);
+    assert(keyref[i] == *((int*)n->key));
+
+    if (++i > NODES)
+        i = 0;
 }
 
-void test_delete() {
+static void setup(int sorted) {
 
-    int i, key;
-
-    /* remove some values */
-	for(i=0; i < 10; i++) {
-
-        do
-            key = keyref[rand() % NODES];
-        while(key < 0);
-
-	    rbtree_delete(&tree, &key);
-        rb_assert(tree.root);
-
-        keyref[key] = -1;
-	}
-}
-
-void test_search() {
-
-    int index;
-
-    int *n;
-
-    do
-        index = rand() % NODES;
-    while(keyref[index] < 0);
-
-    printf("search: expecting to find key %i\n", keyref[index]);
-
-    /* search for a key we know exists */
-    n = rbtree_search(&tree, &keyref[index]);
-    rb_assert(tree.root);
-
-    assert(n == &keyref[index]);
-
-    index = MAX_VAL + 512;
-    
-    printf("search: expecting to not find key: %i\n", index);
-
-    /* search for a key we now don't exist */
-    n = rbtree_search(&tree, &index);
-    rb_assert(tree.root);
-
-    assert(n == NULL);
-}
-
-void test_walk() {
-
-    rbtree_walk(&tree, vwalk);
-    rb_assert(tree.root);
-}
-
-int main(int argc, char **argv) {
-	
-	tree.root = NULL;
+    int i;
 
     utest_init_RNG();
-	
-    /* a new tree is empty */
-	assert(rbtree_is_empty(&tree));
 
-    test_insert();
-    
-    test_search();
-    test_walk();
-    
-    test_delete();
-    
-    test_search();
-    test_walk();
+    for(i=0; i < NODES; i++)
+        keyref[i] = rand() % MAX_VAL;
 
-    /* free the tree */
+    if (sorted)
+        qsort(keyref, NODES, sizeof(keyref[0]), vcmp);
+        
+    for(i=0; i < NODES; i++) {
+        rbtree_insert(&tree, &keyref[i]);
+        rb_assert(tree.root);
+    }
+}
+
+static void teardown() {
+
+    int i;
+
     rbtree_free(&tree);
-    
-	/* tree is now empty again */
-	assert(rbtree_is_empty(&tree));
+    rb_assert(tree.root);
 
-    printf("-- TEST PASS --\n");
+    for(i=0; i < NODES; i++)
+        keyref[i] = -1;
+}
 
-	return 0;
+void test_rbtree_is_empty() {
+
+    setup(0);
+
+    assert(rbtree_is_empty(&tree) == 0);
+    rb_assert(tree.root);
+
+    rbtree_free(&tree);
+    rb_assert(tree.root);
+
+    assert(rbtree_is_empty(&tree));
+    rb_assert(tree.root);
+
+    teardown();
+}
+
+void test_rbtree_delete() {
+
+    int i;
+
+    setup(0);
+
+    for(i=NODES/2; i < 3*(NODES/4); i++) {
+
+        if (keyref_exists(NODES/2, i-1, keyref[i]))
+            continue;
+        
+        assert(rbtree_delete(&tree, &keyref[i]));
+        rb_assert(tree.root);
+    }
+
+    /* delete a key that does not exist */
+    i = MAX_VAL + 512;
+    assert(rbtree_delete(&tree, &i) == 0);
+    rb_assert(tree.root);
+
+    teardown();
+}
+
+void test_rbtree_delete_all() {
+
+    int i;
+
+    setup(0);
+
+    for(i=0; i < NODES; i++) {
+
+        if (keyref_exists(0, i-1, keyref[i]))
+            continue;
+        
+        assert(rbtree_delete(&tree, &keyref[i]));
+        rb_assert(tree.root);
+    }
+
+    assert(rbtree_is_empty(&tree));
+    rb_assert(tree.root);
+
+    teardown();
+}
+
+void test_rbtree_walk() {
+
+    setup(1);
+
+    rbtree_walk(&tree, walk_fn);
+    rb_assert(tree.root);
+
+    teardown();
+}
+
+void test_rbtree_search() {
+
+    int s, *f;
+
+    setup(0);
+
+    s = keyref[NODES/2];
+    f = rbtree_search(&tree, &s);
+    rb_assert(tree.root);
+    assert(f && *f == s);
+
+    s = MAX_VAL + 512;
+    f = rbtree_search(&tree, &s);
+    rb_assert(tree.root);
+    assert(f == NULL);
+
+    teardown();
+}
+
+int main() {
+
+    test_rbtree_delete();
+    test_rbtree_delete_all();
+    test_rbtree_search();
+    test_rbtree_is_empty();
+    test_rbtree_walk();
+
+    return 0;
 }

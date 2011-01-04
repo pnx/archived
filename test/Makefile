@@ -23,6 +23,7 @@ inotify-map : $(addprefix $(ROOT),$(obj-inotify-map))
 inotify-watch : $(addprefix $(ROOT), $(obj-xalloc)) $(addprefix $(ROOT), $(obj-path)) $(ROOT)src/tree.o ../src/inotify-watch.o
 log : $(addprefix $(ROOT),$(obj-log))
 tree : $(addprefix $(ROOT),$(obj-xalloc)) $(ROOT)src/tree.o
+list : $(addprefix $(ROOT),$(obj-list))
 str-list : unit.c $(addprefix $(ROOT),$(obj-str-list))
 
 clean :

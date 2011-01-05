@@ -133,14 +133,13 @@ int rbtree_insert(rbtree *tree, const void *key) {
 	/* iterator and parent */
 	rbnode *p, *q;
 	
-	unsigned char dir = 0, dir2, last, inserted = 0;
+	unsigned char dir = 0, dir2, last;
 
     if (!tree || !tree->cmp_fn)
         return 0;
 
 	if (tree->root == NULL) {
 		tree->root = node_alloc(key);
-        inserted = 1;
         goto done;
 	}
 		
@@ -155,7 +154,6 @@ int rbtree_insert(rbtree *tree, const void *key) {
         
 		if (q == NULL) {
 			p->child[dir] = q = node_alloc(key);
-            inserted = 1;
 		} else if (is_red(q->child[0]) && is_red(q->child[1])) {
 			/* color flip case */
 			q->color = RB_RED;
@@ -186,7 +184,7 @@ int rbtree_insert(rbtree *tree, const void *key) {
 		q = q->child[dir];
 	}
 
-    if (!inserted) {
+    if (q->key != key) {
         if (tree->delete_fn)
             tree->delete_fn((void*)q->key);
         q->key = key;
@@ -198,7 +196,7 @@ done:
 	/* root should be black */
 	tree->root->color = RB_BLACK;
 
-    return inserted;
+    return 1;
 }
 
 int rbtree_delete(rbtree *tree, const void *key) {
@@ -212,7 +210,7 @@ int rbtree_delete(rbtree *tree, const void *key) {
 	rbnode *f = NULL;
 	
 	unsigned char dir = 1, dir2, last;
-	
+
 	if (rbtree_is_empty(tree) || !tree->cmp_fn)
 		return 0;
 	

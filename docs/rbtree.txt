@@ -68,14 +68,14 @@ Functions
 
     Creates and inserts a new node in the tree. +
     If provided, calls `rbtree->update_fn` and `rbtree->delete_fn` if a node should be updated. +
-    Returns a nonzero value if a new node was inserted, zero if 'key' already existed and that node was updated.
+    Returns nonzero if a new node was inserted or updated, zero otherwise.
 
 NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ensure that it has a infinite lifetime.
 
 `rbtree_delete()`::
 
     Deletes a node from the tree. if provided, calls `rbtree->delete_fn` for the node. +
-    Returns non zero if a node was removed. zero otherwise.
+    Returns nonzero if a node was removed, zero otherwise.
     
 `rbtree_free()`::
 

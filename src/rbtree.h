@@ -37,7 +37,7 @@ int rbtree_is_empty(rbtree *tree);
 
 void* rbtree_search(rbtree *tree, const void *key);
 
-void rbtree_walk(rbtree *tree, void (*action)(rbnode *));
+void rbtree_walk(rbtree *tree, void (*action)(const void *));
 
 void rbtree_free(rbtree *tree);
 

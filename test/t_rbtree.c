@@ -94,14 +94,14 @@ static int keyref_exists(int low, int high, int value) {
     return 0;
 }
 
-static void walk_fn(rbnode *n) {
+static void walk_fn(const void *key) {
 
     static int i = 0;
 
     while(keyref_exists(0, i-1, keyref[i]))
         i++;
 
-    assert(keyref[i] == *((int*)n->key));
+    assert(keyref[i] == *((int*)key));
 
     if (++i > NODES)
         i = 0;

@@ -50,13 +50,13 @@ static void node_dealloc(rbnode *n, void (*dealloc)(void *)) {
 /*
  * Recursivly walks a tree, applying action function on every node
  */
-static void rbwalk(rbnode *n, void (*action)(rbnode *)) {
+static void rbwalk(rbnode *n, void (*action)(const void *)) {
 	
 	if (n == NULL)
 		return;
 	
 	rbwalk(n->child[0], action);
-    action(n);
+    action(n->key);
 	rbwalk(n->child[1], action);
 }
 
@@ -106,7 +106,7 @@ void* rbtree_search(rbtree *tree, const void *key) {
 	return NULL;
 }
 
-void rbtree_walk(rbtree *tree, void (*action)(rbnode *)) {
+void rbtree_walk(rbtree *tree, void (*action)(const void *)) {
 	
 	if (tree == NULL || action == NULL)
 		return;

@@ -83,7 +83,8 @@ NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ens
     
 `rbtree_walk()`::
 
-    Walks the tree in in-order and calls the 'action' callback function for every node.
+    Walks the tree in-order and passes a pointer to `rbnode->key`
+    for the given node to the 'action' callback function.
 
 `rbtree_search()`::
 

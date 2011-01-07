@@ -52,7 +52,7 @@ static void node_dealloc(rbnode *n, void (*dealloc)(void *)) {
  */
 static void rbwalk(rbnode *n, void (*action)(const void *)) {
 	
-	if (n == NULL)
+	if (!n)
 		return;
 	
 	rbwalk(n->child[0], action);
@@ -60,7 +60,7 @@ static void rbwalk(rbnode *n, void (*action)(const void *)) {
 	rbwalk(n->child[1], action);
 }
 
-static inline rbnode* rotate_single(rbnode *root, unsigned char dir) {
+static rbnode* rotate_single(rbnode *root, int dir) {
 	
 	rbnode *save = root->child[!dir];
 	
@@ -73,12 +73,12 @@ static inline rbnode* rotate_single(rbnode *root, unsigned char dir) {
 	return save;
 }
 
-static inline rbnode* rotate_double(rbnode *root, unsigned char dir) {
+static rbnode* rotate_double(rbnode *root, int dir) {
 	root->child[!dir] = rotate_single(root->child[!dir], !dir);
 	return rotate_single(root, dir);
 }
 
-inline int rbtree_is_empty(rbtree *tree) {
+int rbtree_is_empty(rbtree *tree) {
 
 	return tree == NULL || tree->root == NULL;
 }
@@ -90,7 +90,7 @@ void* rbtree_search(rbtree *tree, const void *key) {
 	
 	rbnode *n;
 	
-	if (tree == NULL || tree->root == NULL || tree->cmp_fn == NULL)
+	if (!tree || !tree->cmp_fn)
 		return NULL;
 	
 	n = tree->root;
@@ -108,7 +108,7 @@ void* rbtree_search(rbtree *tree, const void *key) {
 
 void rbtree_walk(rbtree *tree, void (*action)(const void *)) {
 	
-	if (tree == NULL || action == NULL)
+	if (!tree || !action)
 		return;
 			
 	rbwalk(tree->root, action);
@@ -116,7 +116,7 @@ void rbtree_walk(rbtree *tree, void (*action)(const void *)) {
 
 void rbtree_free(rbtree *tree) {
 		
-	if (tree == NULL)
+	if (!tree)
 		return;
 	
 	node_dealloc(tree->root, tree->delete_fn);
@@ -133,12 +133,12 @@ int rbtree_insert(rbtree *tree, const void *key) {
 	/* iterator and parent */
 	rbnode *p, *q;
 	
-	unsigned char dir = 0, dir2, last;
+	int dir = 0, last;
 
     if (!tree || !tree->cmp_fn)
         return 0;
 
-	if (tree->root == NULL) {
+	if (!tree->root) {
 		tree->root = node_alloc(key);
         goto done;
 	}
@@ -163,7 +163,7 @@ int rbtree_insert(rbtree *tree, const void *key) {
 			
 		/* fix red validation */
 		if (is_red(q) && is_red(p)) {
-			dir2 = (t->child[1] == g);
+			int dir2 = (t->child[1] == g);
 			if (q == p->child[last])
 				t->child[dir2] = rotate_single(g, !last);
 			else
@@ -209,7 +209,7 @@ int rbtree_delete(rbtree *tree, const void *key) {
 	/* found item */
 	rbnode *f = NULL;
 	
-	unsigned char dir = 1, dir2, last;
+	int dir = 1, dir2, last;
 
 	if (rbtree_is_empty(tree) || !tree->cmp_fn)
 		return 0;

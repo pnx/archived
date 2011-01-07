@@ -12,6 +12,10 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#ifdef __DEBUG__
+#include <assert.h>
+#include <stdio.h>
+#endif
 #include "xalloc.h"
 #include "rbtree.h"
 
@@ -46,6 +50,60 @@ static void node_dealloc(rbnode *n, void (*dealloc)(void *)) {
 
 	free(n);
 }
+
+#ifdef __DEBUG__
+#define rb_err(msg) fputs("rbtree error: " msg, stderr)
+    
+static int rb_assert_r(rbnode *node, int (*cmp)(const void *, const void *)) {
+	
+	int rh, lh;
+	rbnode *ln, *rn;
+	
+	if (node == NULL)
+		return 1;
+	
+	ln = node->child[0];
+	rn = node->child[1];
+		
+	if (is_red(node)) {
+        /* double red violation */
+		if (is_red(ln) || is_red(rn)) {
+			rb_err("Double red violation");
+			return 0;
+		}
+	}
+		
+	lh = rb_assert_r(ln, cmp);
+	rh = rb_assert_r(rn, cmp);
+
+    if ( (ln && cmp(ln->key, node->key) >= 0) &&
+         (rn && cmp(rn->key, node->key) <= 0) ) {
+		rb_err("Binary tree violation");
+		return 0;
+	}
+	
+	if (rh != 0 && lh != 0) {
+		
+		if (rh != lh) {
+            rb_err("Black height violation");
+			return 0;
+		}
+		
+		return is_red(node) ? lh : lh+1;
+	}
+	
+	return 0;
+}
+#undef rb_err
+
+static void rb_assert(rbtree *tree) {
+
+    if (!tree || !tree->cmp_fn)
+        return;
+
+    assert(rb_assert_r(tree->root, tree->cmp_fn));
+}
+#endif /* __DEBUG__ */
 
 /*
  * Recursivly walks a tree, applying action function on every node
@@ -112,6 +170,10 @@ void rbtree_walk(rbtree *tree, void (*action)(const void *)) {
 		return;
 			
 	rbwalk(tree->root, action);
+
+#ifdef __DEBUG__
+    rb_assert(tree);
+#endif
 }
 
 void rbtree_free(rbtree *tree) {
@@ -121,6 +183,10 @@ void rbtree_free(rbtree *tree) {
 	
 	node_dealloc(tree->root, tree->delete_fn);
 	tree->root = NULL;
+
+#ifdef __DEBUG__
+    rb_assert(tree);
+#endif
 }
 
 int rbtree_insert(rbtree *tree, const void *key) {
@@ -195,6 +261,10 @@ int rbtree_insert(rbtree *tree, const void *key) {
 done:
 	/* root should be black */
 	tree->root->color = RB_BLACK;
+
+#ifdef __DEBUG__
+    rb_assert(tree);
+#endif
 
     return 1;
 }
@@ -275,6 +345,10 @@ int rbtree_delete(rbtree *tree, const void *key) {
     tree->root = head.child[1];
 	if (tree->root)
 		tree->root->color = RB_BLACK;
+
+#ifdef __DEBUG__
+    rb_assert(tree);
+#endif
 
 	return f != NULL;
 }

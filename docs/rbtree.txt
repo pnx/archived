@@ -4,10 +4,6 @@ Red-Black Tree
 Macros
 ~~~~~~
 
-`RB_RED`::
-`RB_BLACK`::
-    Used to mark the color of a `rbnode`.
-
 `RBTREE_INIT`::
 Initialize a `rbtree` structure. +
 should only be used with the declaration like:
@@ -21,24 +17,6 @@ the arguments are pointers to callback functions, in order: `delete_fn`, `update
 Data structures
 ~~~~~~~~~~~~~~~
 
-* `rbnode`
-+
---
-The binary tree node.
-
-`key`::
-    The key of this node
-
-`child`::
-    pointers to the left and right child to this node
-
-`color`::
-    the color, should be a value of `RB_BLACK` or `RB_RED`
---
-
-++++
-++++
-
 * `rbtree`
 +
 --
@@ -48,16 +26,16 @@ Structure that holds a tree of nodes
     Pointer to the node that is the root of the tree.
 
 `delete_fn`::
-    Pointer to the function that should handle the delete routines for the `rbnode->key` pointer.
+    Pointer to the function that should handle the delete routines for the `key` pointer.
 
 `update_fn`::
-    Pointer to the function that is called when the implementation performs an update of an `rbnode->key` pointer. +
+    Pointer to the function that is called when the implementation performs an update of an `key` pointer. +
     The function gets the following information passed in order: old pointer, new pointer.
 
 NOTE: You may only need this if you store the data in another structure and has to keep it synchronized with the RB-tree.
 
 `cmp_fn`::
-    Pointer to the function that is used to compare two `rbnode->key` pointers. +
+    Pointer to the function that is used to compare two `key` pointers. +
     Shall return a value greater than zero if 'ptr1' > 'ptr2', a value less than zero if 'ptr1' < 'ptr2' and zero if 'ptr1' == 'ptr2'.
 --
 
@@ -83,15 +61,13 @@ NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ens
     
 `rbtree_walk()`::
 
-    Walks the tree in-order and passes a pointer to `rbnode->key`
+    Walks the tree in-order and passes a pointer to `key`
     for the given node to the 'action' callback function.
 
 `rbtree_search()`::
 
     Searches the tree for 'key'. +
     Returns a pointer to the node if found else `NULL`.
-
-NOTE: the function uses the `rbtree->cmp_fn` function to compare 'key' with a `rbnode->key`.
 
 `rbtree_is_empty()`::
 

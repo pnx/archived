@@ -19,6 +19,16 @@
 #include "xalloc.h"
 #include "rbtree.h"
 
+#define RB_RED   0
+#define RB_BLACK 1
+
+/* node definition */
+typedef struct _rbn {
+    const void   *key;
+	struct _rbn  *child[2];
+	unsigned char color;
+} rbnode;
+
 #define is_red(n) ((n) != NULL && (n)->color == RB_RED)
 #define swap(n,d,q) ((n)->child[(n)->child[d] == (q)])
 

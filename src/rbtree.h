@@ -11,20 +11,10 @@
 #ifndef __RBTREE_H
 #define __RBTREE_H
 
-#define RB_RED   0
-#define RB_BLACK 1
-
 #include <stddef.h>
 
-/* node definition */
-typedef struct _rbn {
-    const void   *key;
-	struct _rbn  *child[2];
-	unsigned char color;
-} rbnode;
-
 typedef struct {
-	rbnode *root;
+	struct _rbn *root;
     /* user defined operations */
     void (*delete_fn)(void *);
     void (*update_fn)(void *, void *);

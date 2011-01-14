@@ -23,7 +23,7 @@ static void resize(struct str_list *list) {
     list->items = xrealloc(list->items, sizeof(list->items) * list->nr);
 }
 
-static int get_index(struct str_list *list, const char *str, int *match) {
+static int get_index(const struct str_list *list, const char *str, int *match) {
 
     int min = -1, max = list->nr;
 
@@ -134,13 +134,13 @@ char* str_list_reduce(struct str_list *list) {
     return item;
 }
 
-int str_list_indexof(struct str_list *list, const char *str) {
+int str_list_indexof(const struct str_list *list, const char *str) {
 
     int match, index = get_index(list, str, &match);
     return match ? index : -1;
 }
 
-char* str_list_lookup(struct str_list *list, const char *str) {
+char* str_list_lookup(const struct str_list *list, const char *str) {
 
     int match, index = get_index(list, str, &match);
 
@@ -149,7 +149,7 @@ char* str_list_lookup(struct str_list *list, const char *str) {
     return list->items[index];
 }
 
-int str_list_has(struct str_list *list, const char *str) {
+int str_list_has(const struct str_list *list, const char *str) {
 
     int rc;
     get_index(list, str, &rc);

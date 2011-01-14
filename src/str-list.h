@@ -34,11 +34,11 @@ char* str_list_remove(struct str_list *list, const char *str);
 
 char* str_list_reduce(struct str_list *list);
 
-int str_list_indexof(struct str_list *list, const char *str);
+int str_list_indexof(const struct str_list *list, const char *str);
 
-char* str_list_lookup(struct str_list *list, const char *str);
+char* str_list_lookup(const struct str_list *list, const char *str);
 
-int str_list_has(struct str_list *list, const char *str);
+int str_list_has(const struct str_list *list, const char *str);
 
 #define str_list_foreach(i, l) \
     for(i = (l)->items; i < (l)->items + (l)->nr; ++i)

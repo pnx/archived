@@ -19,6 +19,7 @@ queue : $(ROOT)src/queue.o $(addprefix $(ROOT),$(obj-xalloc))
 path : unit.c $(ROOT)src/path.o $(addprefix $(ROOT),$(obj-strbuf))
 fscrawl : $(ROOT)src/fscrawl.o $(addprefix $(ROOT),$(obj-fscrawl))
 notify : $(addprefix $(ROOT),$(obj-notify))
+inotify-map : $(addprefix $(ROOT),$(obj-inotify-map))
 log : $(addprefix $(ROOT),$(obj-log))
 str-list : unit.c $(addprefix $(ROOT),$(obj-str-list))
 

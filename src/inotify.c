@@ -18,9 +18,8 @@
 #include <sys/ioctl.h>
 #include <sys/inotify.h>
 
+#include "inotify-map.h"
 #include "util.h"
-/* red black tree for watch descriptors */
-#include "rbtree.h"
 #include "log.h"
 #include "path.h"
 #include "queue.h"
@@ -37,9 +36,6 @@ static int init = 0;
 
 /* Inotify file descriptor */
 static int fd;
-
-/* redblack tree */
-static rbtree tree = RBTREE_INIT(free, NULL, strcmp);
 
 static queue_t event_queue;
 
@@ -61,7 +57,7 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
 		return -1;
 	}
 
-    rbtree_insert(&tree, wd, npath);
+    inotify_map(wd, npath);
 
     logmsg(LOG_DEBUG, "added wd = %i on %s", wd, npath);
 
@@ -98,25 +94,25 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
 static int rmwatch(const char *path, const char *name) {
 
     char *fpath;
-    rbnode *node;
+    int wd;
 
     fpath = path_normalize(path, name, 1);
 
     if (!fpath)
         return -1;
 
-    node = rbtree_cmp_search(&tree, fpath);
-	
-	if (node == NULL) {
+    wd = inotify_map_get_wd(fpath);
+    
+	if (wd <= 0) {
 		logmsg(LOG_DEBUG, "remove watch: can't find %s", fpath);
         free(fpath);
 		return -1;
 	}
+    
+	logmsg(LOG_DEBUG, "remove watch: %i %s", wd, fpath);
     free(fpath);
-	
-	logmsg(LOG_DEBUG, "remove watch: %i %s", node->key, (char*) node->data);
 
-    if (inotify_rm_watch(fd, node->key) < 0) {
+    if (inotify_rm_watch(fd, wd) < 0) {
         logerrno(LOG_CRIT, "intotify_rm_watch", errno);
         return -1;
     }
@@ -125,68 +121,67 @@ static int rmwatch(const char *path, const char *name) {
 
 static void proc_event(inoev *iev) {
 
-	rbnode *node;
-    notify_event *event;
-	uint8_t type = NOTIFY_UNKNOWN;
-	
+	const struct str_list *paths;
+    char **path;
+    int isdir;
+    
     logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
 
-    /* this event is triggered when a watch descriptor is removed.
-       so we can do a binary search instead of useing the IN_DELETE
-       event (that may be triggered on a parent wd) to do a traverse search */
     if (iev->mask & IN_IGNORED) {
-        rbtree_delete(&tree, iev->wd);
+        inotify_unmap_wd(iev->wd);
         return;
     }
     
 	/* lookup the watch descriptor in rbtree */
-	node = rbtree_search(&tree, iev->wd);
+	paths = inotify_map_lookup(iev->wd);
 	
-	if (!node) {
+	if (!paths) {
 		logmsg(LOG_WARN, "-- IGNORING EVENT -- invalid watchdescriptor %i", iev->wd);
 		return;
 	}
 
-	event = notify_event_new();
-	
-	if (!event)
-		return;
-	
-	/* set dir and drop that bit off (so its not in the way) */
-	event->dir = (iev->mask & IN_ISDIR) != 0;
-	iev->mask &= ~IN_ISDIR;
-	
-	notify_event_set_path(event, node->data);
-	notify_event_set_filename(event, iev->name);
+    /* set dir and drop that bit off (so its not in the way) */
+    isdir = (iev->mask & IN_ISDIR) != 0;
+    iev->mask &= ~IN_ISDIR;
 
-    /* queue event before doing any fscrawl on a subdirectory
-       to prevent messing up the order */
-    queue_enqueue(event_queue, event);
+    str_list_foreach(path, paths) {
+        
+        uint8_t type = NOTIFY_UNKNOWN;
+        notify_event *event = notify_event_new();
+
+        notify_event_set_path(event, *path);
+        notify_event_set_filename(event, iev->name);
+        event->dir = isdir;
+
+        /* queue event before doing any fscrawl on a subdirectory
+           to prevent messing up the order */
+        queue_enqueue(event_queue, event);
     
-	switch(iev->mask) {
-    case IN_CREATE :			
-        if (event->dir) {
-            logmsg(LOG_DEBUG, "IN_CREATE on directory, adding");
-            addwatch(event->path, event->filename, 0);
+        switch(iev->mask) {
+        case IN_CREATE :			
+            if (event->dir) {
+                logmsg(LOG_DEBUG, "IN_CREATE on directory, adding");
+                addwatch(event->path, event->filename, 0);
+            }
+            type = NOTIFY_CREATE;
+            break;
+        case IN_MOVED_TO :
+            if (event->dir) {
+                logmsg(LOG_DEBUG, "IN_MOVED_TO on directory, adding");
+                addwatch(event->path, event->filename, 1);
+            }
+            type = NOTIFY_CREATE;
+            break;
+        case IN_MOVED_FROM :
+            if (event->dir)
+                rmwatch(event->path, event->filename);
+        case IN_DELETE :
+            type = NOTIFY_DELETE;
+            break;
         }
-        type = NOTIFY_CREATE;
-        break;
-    case IN_MOVED_TO :
-        if (event->dir) {
-            logmsg(LOG_DEBUG, "IN_MOVED_TO on directory, adding");
-            addwatch(event->path, event->filename, 1);
-        }
-        type = NOTIFY_CREATE;
-        break;
-    case IN_MOVED_FROM :
-        if (event->dir)
-            rmwatch(event->path, event->filename);
-    case IN_DELETE :
-        type = NOTIFY_DELETE;
-        break;
-	}
 	
-	event->type = type;
+        event->type = type;
+    }
 }
 
 int notify_init() {
@@ -214,8 +209,8 @@ void notify_exit() {
         return;
         
     close(fd);
-    
-	rbtree_free(&tree);
+
+    inotify_unmap_all();
 	
 	if (event_queue) {
         notify_event *e;
@@ -302,14 +297,8 @@ notify_event* notify_read() {
     return queue_dequeue(event_queue);
 }
 
-static void print_node(rbnode *node) {
-	printf("%i: %s\n", node->key, (char*) node->data);
-}
-
 void notify_stat() {
 
     if (!init)
         die("inotify is not instantiated.");
-
-	rbtree_walk(&tree, print_node);
 }

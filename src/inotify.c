@@ -86,6 +86,7 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
             if (ent->dir)
                 addwatch(ent->base, ent->name, 0);
         }
+        fsc_close(f);
     }
 	
 	return 1;

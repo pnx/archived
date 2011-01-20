@@ -12,121 +12,104 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include <dirent.h>
+#include <fts.h>
 
 #include "log.h"
-#include "strbuf.h"
 #include "path.h"
 #include "fscrawl.h"
 
-#define MAX_DEPTH 0x20
-
-#define isrefdir(x) (!strcmp((x)->d_name, ".") || !strcmp((x)->d_name, ".."))
+#define FTSENT_VALID_TYPE(x)        \
+    ((x)->fts_info == FTS_D   ||    \
+     (x)->fts_info == FTS_DC  ||    \
+     (x)->fts_info == FTS_F   ||    \
+     (x)->fts_info == FTS_SL  ||    \
+     (x)->fts_info == FTS_SLNONE)
 
 struct __fscrawl {
-	strbuf_t path;
-	DIR  *dirs[MAX_DEPTH];
-	unsigned char depth;
+	FTS *fts;
     fs_entry ent;
 };
 
-static int mvup(struct __fscrawl *f) {
-	
-	if (closedir(f->dirs[f->depth]) == -1) {
-		logerrno(LOG_WARN, "ftc: closedir", errno);
-        errno = 0;
-		return -1;
-	}
-	
-	if (f->depth == 0)
-		return 0;
+static FTS* _fts_open(char *path, int opts) {
 
-	f->depth--;
+    char *npath[2] = { path, NULL };
 
-    if (f->path.buf[f->path.len-1] == '/')
-        strbuf_reduce(&f->path, 1);
-    strbuf_rchop(&f->path, '/');
-    strbuf_term(&f->path, '/');
-
-	return 1;
+    return fts_open(npath, opts, NULL);
 }
 
-static int mvdown(struct __fscrawl *f, const char *dir) {
+static fs_entry* ftsentcpy(fs_entry *dest, FTSENT *src) {
 
-	DIR  *ds = NULL;
-	
-	if (f->depth >= MAX_DEPTH-1)
-		return 0;
+    int len = src->fts_pathlen - src->fts_namelen;
 
-    strbuf_term(&f->path, '/');
-    strbuf_append_str(&f->path, dir);
-    strbuf_term(&f->path, '/');
-
-    ds = opendir(f->path.buf);
-
-	if (!ds) {
-        if (errno != EACCES)
-            logerrno(LOG_WARN, "ftc: opendir", errno);
-        errno = 0;
+    if (len > 0) {
+        char *newbase = realloc(dest->base, len + 1);
         
-		strbuf_reduce(&f->path, 1);
-        strbuf_rchop(&f->path, '/');
-        strbuf_term(&f->path, '/');
-        return 0;
-	}
-	
-	f->dirs[++f->depth] = ds;
-	
-	return 1;
+        if (newbase) {
+            memcpy(newbase, src->fts_path, len);
+            newbase[len] = '\0';
+        
+            dest->base = newbase;
+            dest->name = src->fts_name;
+            dest->dir = src->fts_info == FTS_D;
+            return dest;
+        }
+    }
+
+    return NULL;
+}
+
+static int update_base(fs_entry *ent, const char *base, unsigned len) {
+
+    char *p = realloc(ent->base, len + 1);
+    if (p) {
+        memcpy(p, base, len);
+        p[len] = '\0';
+        ent->base = p;
+        return 1;
+    }
+    return 0;
 }
 
 fscrawl_t fsc_open(const char *path) {
 	
-	struct __fscrawl *f = malloc(sizeof(struct __fscrawl));
-	
-	if (f == NULL)
+	struct __fscrawl *f;
+    char *npath;
+
+    f = malloc(sizeof(struct __fscrawl));
+	if (!f)
 		return NULL;
 
-    strbuf_init(&f->path);
-
-    char *npath = path_normalize(path, NULL, 1);
-
+    npath = path_normalize(path, NULL, 1);
     if (!npath)
-        return NULL;
+        goto free;
 
-    /* set the normalized path as the string buffer */
-    strbuf_attach(&f->path, npath, strlen(npath), strlen(npath));
+    f->fts = _fts_open(npath, FTS_LOGICAL);
+    free(npath);
 
-	f->depth = 0;
+    if (!f->fts) {
+        logerrno(LOG_WARN, "ftc_open", errno);
+        goto free;
+    }
 
-	f->dirs[f->depth] = opendir(f->path.buf);
-	
-	if (!f->dirs[f->depth]) {
-        
-        logerrno(LOG_WARN, "fsc_open", errno);
-        errno = 0;
-        
-        strbuf_free(&f->path);
-		free(f);
-		return NULL;
-	}
-	
-	f->ent.name = NULL;
-	f->ent.base = NULL;
-	f->ent.dir  = 0;
-	
+    f->ent.base = NULL;
+    f->ent.name = NULL;
+    f->ent.dir = 0;
 	return f;
+free:
+    if (f)
+        free(f);
+    return NULL;
 }
 
 void fsc_close(fscrawl_t f) {
-	
-	int i;
-	
-	for(i=0; i < f->depth; i++)
-		closedir(f->dirs[i]);
-	
-    strbuf_free(&f->path);
-	free(f);
+
+    if (f) {
+        if (f->ent.base)
+            free(f->ent.base);
+        if (fts_close(f->fts) < 0)
+            logerrno(LOG_WARN, "ftc_close", errno);
+        free(f);
+    }
 }
 
 fs_entry* fsc_cpy(fs_entry *ent) {
@@ -143,48 +126,28 @@ fs_entry* fsc_cpy(fs_entry *ent) {
 
 fs_entry* fsc_read(fscrawl_t f) {
 
-	struct dirent *ent = NULL;
+	FTSENT *ent;
 
 	if (!f)
 		return NULL;
 
-    if (f->ent.dir)
-        mvdown(f, f->ent.name);
+    for(;;) {
+        ent = fts_read(f->fts);
 
-    errno = 0;
-	for(;;) {
-		ent = readdir(f->dirs[f->depth]);
-
-        if (ent) {
-            if (isrefdir(ent))
+        if (ent == NULL) {
+            if (errno) {
+                logerrno(LOG_DEBUG, "fsc_read", errno);
                 continue;
+            }
             break;
         }
 
-        if (errno) {
-            if (errno != EACCES)
-                logerrno(LOG_WARN, "fsc_read", errno);
-            continue;
-        }
+        if (ent->fts_namelen > 0 && FTSENT_VALID_TYPE(ent))
+            return ftsentcpy(&f->ent, ent);
 
-        if (mvup(f))
-            continue;
-
-        fsc_close(f);
-        return NULL;
-	}
-
-    f->ent.base = f->path.buf;
-	f->ent.name = &ent->d_name[0];
-
-    if (ent->d_type == DT_UNKNOWN) {
-        size_t tmp = strlen(f->ent.name);
-        strbuf_append(&f->path, f->ent.name, tmp);
-        f->ent.dir = is_dir(f->path.buf);
-        strbuf_reduce(&f->path, tmp);
-    } else {
-        f->ent.dir = ent->d_type == DT_DIR;
+        if (ent->fts_info == FTS_ERR)
+            logerrno(LOG_DEBUG, "fsc_read", ent->fts_errno);
     }
 
-    return &f->ent;
+    return NULL;
 }

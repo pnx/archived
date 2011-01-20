@@ -42,7 +42,7 @@ Functions
 `fsc_read()`::
 
 Reads one entry from `fscrawl_t` and returns it. +
-If the traversal is completed. the function closes `fscrawl_t` and returns `NULL`.
+If the traversal is completed `NULL` is returned.
 +
 NOTE: if you need to safe the `fs_entry` structure this function returns, make a call to `fsc_cpy()` +
       otherwise you data will be overwritten by further calls to `fsc_read()`.

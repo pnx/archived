@@ -3,5 +3,3 @@ archived
 Makefile.local.mk
 test/test_*
 nbproject
-docs/*.html
-docs/index.txt

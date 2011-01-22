@@ -1,9 +1,8 @@
 
 ASCIIDOC = asciidoc
 
-SOURCE_DOCS = $(subst index.txt,,$(wildcard *.txt))
-
-HTML_DOCS = index.html $(patsubst %.txt,%.html,$(SOURCE_DOCS))
+DOCS = $(filter-out index.txt, $(wildcard *.txt))
+TECH_DOCS = $(filter-out technical/index.txt, $(wildcard technical/*.txt))
 
 ifndef VERBOSE
 	QUIET_ASCIIDOC = @echo '   ' GEN $@;
@@ -12,13 +11,17 @@ endif
 
 .PHONY : clean
 all : html
-html : $(HTML_DOCS)
+html : index.html
+technical : technical/index.html
 
 %.html : %.txt
 	$(QUIET_ASCIIDOC)$(ASCIIDOC) -b xhtml11 -o $@ $<
 
-index.txt : $(SOURCE_DOCS)
+index.txt : $(patsubst %.txt,%.html,$(DOCS))
 	$(QUIET_SCRIPT)$(shell ./genindex.sh index.txt)
 
+technical/index.txt : $(patsubst %.txt,%.html,$(TECH_DOCS))
+	$(QUIET_SCRIPT)cd technical && ./genindex.sh index.txt
+
 clean :
-	$(RM) index.txt *.html
+	$(RM) index.txt *.html technical/index.txt technical/*.html

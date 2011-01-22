@@ -1,0 +1,51 @@
+Configuration
+--------------
+
+Archive uses a .ini style configuration. The following options are
+available. 
+
+Value types
+~~~~~~~~~~~
+
+Boolean ;;
+    True:  Y, T, 1 +
+    False: N, F, 0
+    
+String ;;
+    Anything else.
+
+Options
+~~~~~~
+
+General
+^^^^^^
+Options available in the general section
+
+uselog (Boolean);;
+    Turn logging on/off (values are: Y, N, T, F, 1, 0)
+loglevel (String List);;
+    Set the logging level
+    Options available are: DEBUG, INFO, WARNING, CRITCAL, ALL
++
+NOTE: A comma separated list can be used to specify more than one level.
++
+
+logdir (String);;
+    Specify a logging directory
+
+
+Mysql
+^^^^^^^
+Options available in the mysql section
+
+host (String);;
+    Database hostname
+username (String);;
+    Username
+password (String);;
+    Password
+database (String);;
+    Database to use
+table (String);;
+    Tablename to use
+    

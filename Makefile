@@ -28,7 +28,7 @@ else
 endif
 
 .SUFFIXES: .c .o
-.PHONY : $(PROGRAM) clean distclean
+.PHONY : clean distclean
 
 all : $(PROGRAM)
 

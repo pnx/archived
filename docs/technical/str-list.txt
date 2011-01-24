@@ -1,0 +1,99 @@
+String List
+-----------
+
+
+Data structures
+~~~~~~~~~~~~~~~
+
+* `struct str_list`
++
+--
+Structure that holds the list
+
+`items`::
+    Array of strings in the list
+
+`nr`::
+    Number of items in the list
+--
+
+Functions
+~~~~~~~~~
+
+`str_list_init`::
+
+    Initialize the list
+
+`str_list_create`::
+
+    allocates and initializes a new list.
+
+`str_list_destroy`::
+
+    deallocates the list. +
+    Returns zero if the list is not empty, non-zero otherwise.
+
+`str_list_clear`::
+
+    clears the list by calling `free` for every item.
+
+`str_list_clear_fn`::
+
+    clears the list by calling the callback function 'fn' for every item. +
+    If `NULL` is passed as 'fn' to this function the items are still cleared without any deallocation.
+
+`str_list_insert`::
+
+    Inserts a new string into the list. The string passed is not copied. +
+    If 'str' exist in the list, a negative value is returned. otherwise the index where 'str' is inserted.
+
+`str_list_remove`::
+
+    Removes 'str' from the list and returns it.
+    If the string does not exist in the list, `NULL` is returned.
+
+`str_list_reduce`::
+
+    Removes the last string in the list and returns it. +
+    If the list is empty, `NULL` is returned.
+
+`str_list_indexof`::
+
+    Returns the index where 'str' is located in the array. +
+    Returns a negative value if 'str' does not exist in the list.
+
+`str_list_lookup`::
+
+    looks up 'str' in the list and returns it.
+    If 'str' does not exist in the list, `NULL` is returned.
+
+`str_list_has`::
+
+    Returns non-zero if 'str' exist in the list, zero otherwise.
+
+`str_list_foreach`::
+
+    Macro to iterate over the list. +
+    Arguments are (in order): 'iterator', 'list'.
++
+----
+struct str_list *list;
+char **item;
+
+str_list_foreach(item, list) {
+
+    printf("%s\n", *item);
+}
+----
+
+`str_list_size`::
+
+    Returns the number of items in the list
++
+NOTE: this function may be implemented as a macro, so don't pass arguments with side-effects
+
+`str_list_isempty`::
+
+    Returns non zero if the list is empty. zero otherwise.
++
+NOTE: this function may be implemented as a macro, so don't pass arguments with side-effects

@@ -1,6 +1,6 @@
 /* rbtree.c - red black tree implementation
  * 
- *   Copyright (C) 2010  Henrik Hautakoski <henrik@fiktivkod.org>
+ *   Copyright (C) 2010-2011  Henrik Hautakoski <henrik@fiktivkod.org>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by

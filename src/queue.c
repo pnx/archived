@@ -96,7 +96,7 @@ void* queue_dequeue(queue_t q) {
 
     obj = q->tail.n->block[q->tail.i++];
 
-    if (q->tail.n == q->head.n && q->tail.i > q->head.i) {
+    if (q->tail.n == q->head.n && q->tail.i >= q->head.i) {
         q->tail.i = q->head.i = 0;
     } else if (q->tail.i >= BLOCK_SIZE) {
         dealloc_node(&q->tail);
@@ -110,7 +110,8 @@ int queue_isempty(queue_t q) {
     if (q == NULL)
         return -1;
 
-    return q->head.n == q->tail.n && q->head.i == q->tail.i;
+    return q->head.n == q->tail.n
+        && q->head.i == 0 && q->tail.i == 0;
 }
 
 size_t queue_num_items(queue_t q) {

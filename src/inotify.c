@@ -52,7 +52,8 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
 	wd = inotify_add_watch(fd, npath, WATCH_MASK);
 	
 	if (wd < 0) {
-        logerrno(LOG_CRIT, "inotify_add_watch", errno);
+        if (errno != EACCES)
+            logerrno(LOG_CRIT, "inotify_add_watch", errno);
         free(npath);
 		return -1;
 	}

@@ -208,7 +208,7 @@ int rbtree_insert(rbtree *tree, const void *key) {
 	/* iterator and parent */
 	rbnode *p, *q;
 	
-	int dir = 0, last;
+	int dir = 0, last = 0;
 
     if (!tree || !tree->cmp_fn)
         return 0;

@@ -4,7 +4,7 @@
 #
 
 CC       = gcc
-CFLAGS	 = -O2 -Werror -Ilib
+CFLAGS	 = -O2 -Wall -Ilib
 LD		 = $(CC)
 PROGRAM  := archived
 

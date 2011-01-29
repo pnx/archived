@@ -8,6 +8,7 @@
  *  (at your option) any later version.
  */
 
+#include <string.h>
 #include "xalloc.h"
 #include "rbtree.h"
 #include "inotify-map.h"

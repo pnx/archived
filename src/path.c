@@ -22,14 +22,6 @@
 
 static char path_null = '\0';
 
-static const char* path_clear(const char *path) {
-	
-	while(*path == '/')
-		path++;
-	
-	return path;
-}
-
 static inline int has_delim(const char *str) {
 	
 	if (str == NULL)

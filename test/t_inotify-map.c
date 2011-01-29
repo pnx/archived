@@ -100,7 +100,7 @@ void test_inotify_map_lookup_by_path() {
     for(i=0; i < 4; i++)
         validate_list(i, inotify_map_lookup_by_path(pathref[i]));
 
-    assert(inotify_map_lookup(33) == NULL);
+    assert(inotify_map_lookup_by_path("do not exist") == NULL);
     
     teardown();
 }

@@ -58,18 +58,6 @@ static fs_entry* ftsentcpy(fs_entry *dest, FTSENT *src) {
     return NULL;
 }
 
-static int update_base(fs_entry *ent, const char *base, unsigned len) {
-
-    char *p = realloc(ent->base, len + 1);
-    if (p) {
-        memcpy(p, base, len);
-        p[len] = '\0';
-        ent->base = p;
-        return 1;
-    }
-    return 0;
-}
-
 fscrawl_t fsc_open(const char *path) {
 	
 	struct __fscrawl *f;

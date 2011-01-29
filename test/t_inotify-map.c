@@ -77,6 +77,18 @@ void test_inotify_unmap_all() {
     teardown();
 }
 
+void test_inotify_map_get_wd() {
+
+    int i;
+
+    setup();
+    
+    for(i=0; i < 4; i++)
+        assert(inotify_map_get_wd(pathref[i]) == wdref[i]);
+
+    teardown();
+}
+
 void test_inotify_map_lookup() {
 
     int i;
@@ -110,6 +122,7 @@ int main() {
     test_inotify_unmap_wd();
     test_inotify_unmap_path();
     test_inotify_unmap_all();
+    test_inotify_map_get_wd();
     test_inotify_map_lookup();
     test_inotify_map_lookup_by_path();
     

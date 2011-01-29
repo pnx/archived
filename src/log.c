@@ -11,6 +11,8 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include "util.h"
+#include "xalloc.h"
 #include "strbuf.h"
 #include "log.h"
 

@@ -148,13 +148,13 @@ int inotify_map_get_wd(const char *path) {
     return 0;
 }
 
-const struct str_list* inotify_map_lookup(int wd) {
-
+char** inotify_map_lookup(int wd) {
+    
     struct map_wd *m = rbtree_search(&tree_wd_paths, &wd);
-    return m ? &m->paths : NULL;
+    return m ? str_list_export(&m->paths) : NULL;
 }
 
-const struct str_list* inotify_map_lookup_by_path(const char *path) {
+char** inotify_map_lookup_by_path(const char *path) {
 
     struct map_path *p = rbtree_search(&tree_path_wd, &path);
     return p ? inotify_map_lookup(p->wd) : NULL;

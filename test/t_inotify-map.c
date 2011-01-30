@@ -22,18 +22,23 @@ static void teardown() {
     inotify_unmap_all();
 }
 
-static void validate_list(int refindex, const struct str_list *l) {
+static void validate_list(int index, char **list) {
 
     int i;
 
-    assert(l);
+    assert(list);
 
     for(i=0; i < 4; i++) {
-            
-        if (i != wdref[refindex])
+        char **path, found = 0;
+
+        if (i != wdref[index])
             continue;
 
-        assert(str_list_has(l, pathref[refindex]));
+        for(path=list; !found && *path; path++) {
+            if (!strcmp(*path, pathref[index]))
+                found = 1;
+        }
+        assert(found);
     }
 }
 

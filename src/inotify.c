@@ -58,8 +58,6 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
 		return -1;
 	}
 
-    inotify_map(wd, npath);
-
     logmsg(LOG_DEBUG, "added wd = %i on %s", wd, npath);
 
     if (recursive) {
@@ -89,6 +87,7 @@ static int addwatch(const char *path, const char *name, unsigned recursive) {
         }
         fsc_close(f);
     }
+    inotify_map(wd, npath);
 	
 	return 1;
 }
@@ -123,8 +122,7 @@ static int rmwatch(const char *path, const char *name) {
 
 static void proc_event(inoev *iev) {
 
-	const struct str_list *paths;
-    char **path;
+    char **paths, **path;
     int isdir;
     
     logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
@@ -146,7 +144,7 @@ static void proc_event(inoev *iev) {
     isdir = (iev->mask & IN_ISDIR) != 0;
     iev->mask &= ~IN_ISDIR;
 
-    str_list_foreach(path, paths) {
+    for(path = paths; *path; path++) {
         
         uint8_t type = NOTIFY_UNKNOWN;
         notify_event *event = notify_event_new();
@@ -163,7 +161,7 @@ static void proc_event(inoev *iev) {
         case IN_CREATE :			
             if (event->dir) {
                 logmsg(LOG_DEBUG, "IN_CREATE on directory, adding");
-                addwatch(event->path, event->filename, 0);
+                addwatch(event->path, event->filename, 1);
             }
             type = NOTIFY_CREATE;
             break;
@@ -184,6 +182,8 @@ static void proc_event(inoev *iev) {
 	
         event->type = type;
     }
+
+    free(paths);
 }
 
 int notify_init() {

@@ -23,9 +23,9 @@ void inotify_unmap_all();
 
 int inotify_map_get_wd(const char *path);
 
-const struct str_list* inotify_map_lookup(int wd);
+char** inotify_map_lookup(int wd);
 
-const struct str_list* inotify_map_lookup_by_path(const char *path);
+char** inotify_map_lookup_by_path(const char *path);
 
 int inotify_map_isempty();
 

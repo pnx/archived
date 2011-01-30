@@ -140,6 +140,31 @@ void test_lookup() {
     str_list_destroy(l);
 }
 
+void test_export() {
+
+    int i = 0;
+    char **export;
+    struct str_list *l = str_list_create();
+
+    export = str_list_export(l);
+    assert(export && *export == NULL);
+    free(export);
+
+    str_list_insert(l, "a");
+    str_list_insert(l, "b");
+    str_list_insert(l, "c");
+
+    export = str_list_export(l);
+
+    for(i=0; export[i]; i++);
+
+    assert(i == 3);
+    free(export);
+    
+    str_list_clear_fn(l, NULL);
+    str_list_destroy(l);
+}
+
 int main() {
 
     test_insert();
@@ -150,6 +175,7 @@ int main() {
     test_foreach();
     test_has();
     test_lookup();
+    test_export();
 
     return 0;
 }

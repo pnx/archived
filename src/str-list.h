@@ -40,6 +40,8 @@ char* str_list_lookup(const struct str_list *list, const char *str);
 
 int str_list_has(const struct str_list *list, const char *str);
 
+char** str_list_export(struct str_list *list);
+
 #define str_list_foreach(i, l) \
     for(i = (l)->items; i < (l)->items + (l)->nr; ++i)
 

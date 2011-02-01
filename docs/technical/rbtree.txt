@@ -52,8 +52,8 @@ NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ens
 
 `rbtree_delete()`::
 
-    Deletes a node from the tree. if provided, calls `rbtree->delete_fn` for the node. +
-    Returns nonzero if a node was removed, zero otherwise.
+    Deletes a node from the tree. +
+    Returns the node's key if a node was removed, `NULL` otherwise.
     
 `rbtree_free()`::
 

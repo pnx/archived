@@ -33,6 +33,6 @@ void rbtree_free(rbtree *tree);
 
 int rbtree_insert(rbtree *tree, const void *key);
 
-int rbtree_delete(rbtree *tree, const void *key);
+void* rbtree_delete(rbtree *tree, const void *key);
 
 #endif /* __RBTREE_H */

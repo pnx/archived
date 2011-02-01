@@ -278,7 +278,7 @@ done:
     return 1;
 }
 
-int rbtree_delete(rbtree *tree, const void *key) {
+void* rbtree_delete(rbtree *tree, const void *key) {
 	
 	rbnode head = {0};
 	
@@ -286,7 +286,7 @@ int rbtree_delete(rbtree *tree, const void *key) {
 	rbnode *q, *p, *g, *s;
 	
 	/* found item */
-	rbnode *f = NULL;
+	rbnode *f = NULL, *ret = NULL;
 	
 	int dir = 1, dir2, last;
 
@@ -342,9 +342,7 @@ int rbtree_delete(rbtree *tree, const void *key) {
 
 	/* remove if found */
 	if (f) {
-        if (tree->delete_fn)
-            tree->delete_fn((void*)f->key);
-
+        ret = (void*)f->key;
         if (f != q)
             f->key = q->key;
         swap(p, 1, q) = swap(q, 0, NULL);
@@ -359,5 +357,5 @@ int rbtree_delete(rbtree *tree, const void *key) {
     rb_assert(tree);
 #endif
 
-	return f != NULL;
+	return ret;
 }

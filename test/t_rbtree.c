@@ -12,7 +12,7 @@ static int vcmp(const void *a, const void *b);
 static void vdelete(void *ptr);
 
 /* data */
-static rbtree tree = RBTREE_INIT(NULL, NULL, vcmp);
+static rbtree tree = RBTREE_INIT(vcmp);
 static int   keyref[NODES];
 
 static int vcmp(const void *a, const void *b) {

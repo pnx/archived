@@ -31,8 +31,8 @@ static void wd_free(void *ptr);
 static int wd_cmp(const void *a, const void *b);
 static int path_cmp(const void *a, const void *b);
 
-static rbtree tree_wd_paths = RBTREE_INIT(wd_free, NULL, wd_cmp);
-static rbtree tree_path_wd = RBTREE_INIT(xfree, NULL, path_cmp);
+static rbtree tree_wd_paths = RBTREE_INIT(wd_cmp);
+static rbtree tree_path_wd = RBTREE_INIT(path_cmp);
 
 static int wd_cmp(const void *a, const void *b) {
 

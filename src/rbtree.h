@@ -19,7 +19,7 @@ typedef struct {
     int  (*cmp_fn)(const void *, const void *);
 } rbtree;
 
-#define RBTREE_INIT(delete, update, cmp) { NULL, cmp }
+#define RBTREE_INIT(cmp) { NULL, cmp }
 
 int rbtree_is_empty(rbtree *tree);
 

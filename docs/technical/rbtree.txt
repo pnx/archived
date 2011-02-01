@@ -9,10 +9,10 @@ Initialize a `rbtree` structure. +
 should only be used with the declaration like:
 +
 ----
-rbtree tree = RBTREE_INIT(...);
+rbtree tree = RBTREE_INIT(cmp);
 ----
 +
-the arguments are pointers to callback functions, in order: `delete_fn`, `update_fn`, `cmp_fn`
+will expand to set the compare function 'cmp' to the `cmp_fn` member.
 
 Data structures
 ~~~~~~~~~~~~~~~

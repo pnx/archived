@@ -59,6 +59,6 @@ void strbuf_rev(strbuf_t *s);
 
 void strbuf_squeeze(strbuf_t *s, char ch);
 
-strbuf_t **strbuf_explode(const strbuf_t *s, char sep);
+strbuf_t** strbuf_explode(const strbuf_t *s, char sep);
 
 #endif /* __STRBUF_H */

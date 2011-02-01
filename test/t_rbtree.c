@@ -12,7 +12,7 @@ static int vcmp(const void *a, const void *b);
 static void vdelete(void *ptr);
 
 /* data */
-static rbtree tree = RBTREE_INIT(vdelete, NULL, vcmp);
+static rbtree tree = RBTREE_INIT(NULL, NULL, vcmp);
 static int   keyref[NODES];
 
 static int vcmp(const void *a, const void *b) {
@@ -77,7 +77,7 @@ static void teardown() {
 
     int i;
 
-    rbtree_free(&tree);
+    rbtree_free(&tree, vdelete);
 
     for(i=0; i < NODES; i++)
         keyref[i] = -1;
@@ -89,7 +89,7 @@ void test_rbtree_is_empty() {
 
     assert(rbtree_is_empty(&tree) == 0);
 
-    rbtree_free(&tree);
+    rbtree_free(&tree, vdelete);
 
     assert(rbtree_is_empty(&tree));
 

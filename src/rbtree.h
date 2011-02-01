@@ -16,11 +16,10 @@
 typedef struct {
 	struct _rbn *root;
     /* user defined operations */
-    void (*delete_fn)(void *);
     int  (*cmp_fn)(const void *, const void *);
 } rbtree;
 
-#define RBTREE_INIT(delete, update, cmp) { NULL, delete, cmp}
+#define RBTREE_INIT(delete, update, cmp) { NULL, cmp }
 
 int rbtree_is_empty(rbtree *tree);
 
@@ -28,7 +27,7 @@ void* rbtree_search(rbtree *tree, const void *key);
 
 void rbtree_walk(rbtree *tree, void (*action)(const void *));
 
-void rbtree_free(rbtree *tree);
+void rbtree_free(rbtree *tree, void (*free_fn)(void *));
 
 int rbtree_insert(rbtree *tree, const void *key);
 

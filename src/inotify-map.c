@@ -136,8 +136,8 @@ int inotify_unmap_path(const char *path) {
 
 void inotify_unmap_all() {
 
-    rbtree_free(&tree_path_wd);
-    rbtree_free(&tree_wd_paths);
+    rbtree_free(&tree_path_wd, xfree);
+    rbtree_free(&tree_wd_paths, wd_free);
 }
 
 int inotify_map_get_wd(const char *path) {

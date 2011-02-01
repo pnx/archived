@@ -185,12 +185,12 @@ void rbtree_walk(rbtree *tree, void (*action)(const void *)) {
 #endif
 }
 
-void rbtree_free(rbtree *tree) {
+void rbtree_free(rbtree *tree, void (*free_fn)(void *)) {
 		
 	if (!tree)
 		return;
 	
-	node_dealloc(tree->root, tree->delete_fn);
+	node_dealloc(tree->root, free_fn);
 	tree->root = NULL;
 
 #ifdef __DEBUG__

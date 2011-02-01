@@ -25,9 +25,6 @@ Structure that holds a tree of nodes
 `root`::
     Pointer to the node that is the root of the tree.
 
-`delete_fn`::
-    Pointer to the function that should handle the delete routines for the `key` pointer.
-
 `cmp_fn`::
     Pointer to the function that is used to compare two `key` pointers. +
     Shall return a value greater than zero if 'ptr1' > 'ptr2', a value less than zero if 'ptr1' < 'ptr2' and zero if 'ptr1' == 'ptr2'.
@@ -50,7 +47,7 @@ NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ens
     
 `rbtree_free()`::
 
-    Deletes the whole tree. if provided, calls `rbtree->delete_fn` for every node.
+    Deletes the whole tree. if provided, calls 'free_fn' for every node.
     
 `rbtree_walk()`::
 

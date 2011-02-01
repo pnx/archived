@@ -28,12 +28,6 @@ Structure that holds a tree of nodes
 `delete_fn`::
     Pointer to the function that should handle the delete routines for the `key` pointer.
 
-`update_fn`::
-    Pointer to the function that is called when the implementation performs an update of an `key` pointer. +
-    The function gets the following information passed in order: old pointer, new pointer.
-
-NOTE: You may only need this if you store the data in another structure and has to keep it synchronized with the RB-tree.
-
 `cmp_fn`::
     Pointer to the function that is used to compare two `key` pointers. +
     Shall return a value greater than zero if 'ptr1' > 'ptr2', a value less than zero if 'ptr1' < 'ptr2' and zero if 'ptr1' == 'ptr2'.
@@ -45,7 +39,7 @@ Functions
 `rbtree_insert()`::
 
     Creates and inserts a new node in the tree. +
-    If provided, calls `rbtree->update_fn` and `rbtree->delete_fn` if a node should be updated. +
+    If provided, calls `rbtree->delete_fn` if a node should be updated. +
     Returns nonzero if a new node was inserted or updated, zero otherwise.
 
 NOTE: The memory pointed to by the 'key' pointer is *not* copied so you must ensure that it has a infinite lifetime.

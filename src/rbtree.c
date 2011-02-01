@@ -211,10 +211,10 @@ int rbtree_insert(rbtree *tree, const void *key) {
 	int dir = 0, last = 0;
 
     if (!tree || !tree->cmp_fn)
-        return 0;
+        return -1;
 
 	if (!tree->root) {
-		tree->root = node_alloc(key);
+		tree->root = q = node_alloc(key);
         goto done;
 	}
 		
@@ -259,12 +259,6 @@ int rbtree_insert(rbtree *tree, const void *key) {
 		q = q->child[dir];
 	}
 
-    if (q->key != key) {
-        if (tree->delete_fn)
-            tree->delete_fn((void*)q->key);
-        q->key = key;
-    }
-
 	tree->root = head.child[1];
 
 done:
@@ -275,7 +269,7 @@ done:
     rb_assert(tree);
 #endif
 
-    return 1;
+    return q && q->key == key;
 }
 
 void* rbtree_delete(rbtree *tree, const void *key) {

@@ -29,6 +29,8 @@ void strbuf_expand(strbuf_t *s, size_t len);
 
 void strbuf_reduce(strbuf_t *s, size_t len);
 
+void strbuf_setlen(strbuf_t *s, size_t len);
+
 char* strbuf_release(strbuf_t *s);
 
 void strbuf_free(strbuf_t *s);

@@ -46,6 +46,17 @@ void strbuf_reduce(strbuf_t *s, size_t len) {
     s->buf[s->len] = '\0';
 }
 
+void strbuf_setlen(strbuf_t *s, size_t len) {
+
+    if (!s->alloc_size)
+        return;
+
+    if (len >= s->alloc_size)
+        len = s->alloc_size - 1;
+    s->len = len;
+    s->buf[s->len] = '\0';
+}
+
 char* strbuf_release(strbuf_t *s) {
 
 	char *ret;

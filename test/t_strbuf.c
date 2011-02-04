@@ -14,6 +14,31 @@ void print_strbuf(strbuf_t *s) {
     printf("block: %u, len: %u |%s|\n", (uint)s->alloc_size, (uint)s->len, s->buf);
 }
 
+void test_setlen() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_setlen(&b, 25);
+    assert(b.len == 0);
+    
+    strbuf_expand(&b, 25);
+    strbuf_setlen(&b, b.alloc_size);
+    assert(b.len == b.alloc_size-1);
+
+    strbuf_setlen(&b, 0);
+    assert(b.len == 0);
+
+    strbuf_append_str(&b, "testing...");
+    print_strbuf(&b);
+
+    strbuf_setlen(&b, 7);
+    assert(b.len == 7);
+
+    print_strbuf(&b);
+
+    strbuf_free(&b);
+}
+
 void test_release() {
 
     strbuf_t b = STRBUF_INIT;
@@ -193,6 +218,7 @@ int main() {
 
     test_release_empty();
     test_release();
+    test_setlen();
     test_reduce();
     test_rev();
     test_squeeze();

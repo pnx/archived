@@ -20,6 +20,6 @@ int is_file(const char *path);
 
 int is_dir(const char *path);
 
-char* path_normalize(const char *base, const char *name, unsigned char dir);
+char* path_normalize(const char *base, const char *name, unsigned dir);
 
 #endif /* __PATH_H */

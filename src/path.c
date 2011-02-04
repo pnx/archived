@@ -76,7 +76,7 @@ static char* expand_home() {
     return home;
 }
 
-char* path_normalize(const char *base, const char *name, unsigned char dir) {
+char* path_normalize(const char *base, const char *name, unsigned dir) {
 
     strbuf_t sb = STRBUF_INIT;
 

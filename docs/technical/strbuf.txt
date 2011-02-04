@@ -30,10 +30,18 @@ Functions
     This function will not allocate memory, it only sets ->len and
     assure that the string is null-terminated at the new position.
 
+`strbuf_avail()`::
+
+    Returns the number of characters that are allocated but not used in the buffer.
+
 `strbuf_append()`::
 
     This function will append the buffer with the contents of 'ptr'
     and will always copy exactly 'len' bytes. (if memory can be obtained ofcourse)
+
+`strbuf_appendf()`::
+
+    Adds the formated-string 'fmt' to the end of ->buf.
 
 `strbuf_append_str()`::
 

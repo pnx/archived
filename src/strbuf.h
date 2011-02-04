@@ -25,6 +25,8 @@ extern char strbuf_null;
 
 void strbuf_init(strbuf_t *s);
 
+size_t strbuf_avail(strbuf_t *s);
+
 void strbuf_expand(strbuf_t *s, size_t len);
 
 void strbuf_reduce(strbuf_t *s, size_t len);
@@ -40,6 +42,8 @@ void strbuf_free_list(strbuf_t **s);
 void strbuf_attach(strbuf_t *s, void *str, size_t len, size_t alloc_size);
 
 void strbuf_append(strbuf_t *s, const void *ptr, size_t len);
+
+void strbuf_appendf(strbuf_t *s, const char *fmt, ...);
 
 void strbuf_append_str(strbuf_t *s, const char *str);
 

@@ -39,6 +39,17 @@ void test_setlen() {
     strbuf_free(&b);
 }
 
+void test_appendf() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    strbuf_appendf(&b, "%s %i", "string", 32);
+
+    print_strbuf(&b);
+
+    strbuf_free(&b);
+}
+
 void test_release() {
 
     strbuf_t b = STRBUF_INIT;
@@ -216,6 +227,7 @@ void test_free_empty() {
 
 int main() {
 
+    test_appendf();
     test_release_empty();
     test_release();
     test_setlen();

@@ -9,7 +9,10 @@
  */
 
 #include <ctype.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include "compat/string.h"
+#include "util.h"
 #include "xalloc.h"
 #include "strbuf.h"
 
@@ -21,6 +24,11 @@ void strbuf_init(strbuf_t *s) {
 
 	s->buf = &strbuf_null;
 	s->alloc_size = s->len = 0;
+}
+
+size_t strbuf_avail(strbuf_t *s) {
+    
+    return s->alloc_size ? s->alloc_size - (s->len + 1) : 0;
 }
 
 void strbuf_expand(strbuf_t *s, size_t len) {
@@ -110,6 +118,32 @@ void strbuf_append(strbuf_t *s, const void *ptr, size_t len) {
     memcpy(s->buf + s->len, ptr, len);
     s->len += len;
     s->buf[s->len] = '\0';
+}
+
+void strbuf_appendf(strbuf_t *s, const char *fmt, ...) {
+
+    va_list vl;
+    int len;
+
+    if (!strbuf_avail(s))
+        strbuf_expand(s, CHNK_SIZE-1);
+
+    va_start(vl, fmt);
+    len = vsnprintf(s->buf + s->len, s->alloc_size - s->len, fmt, vl);
+    va_end(vl);
+
+    if (len < 0)
+        die_errno("vsnprintf");
+    if (len > strbuf_avail(s)) {
+        strbuf_expand(s, len);
+        va_start(vl, fmt);
+        len = vsnprintf(s->buf + s->len, s->alloc_size - s->len, fmt, vl);
+        va_end(vl);
+        if (len > strbuf_avail(s))
+            die_errno("vsnprintf");
+    }
+    s->len += len;
+    s->buf[len] = '\0';
 }
 
 void strbuf_append_str(strbuf_t *s, const char *str) {

@@ -12,6 +12,7 @@
 #define __STRBUF_H
 
 #include <stddef.h>
+#include <stdarg.h>
 
 typedef struct {
     size_t alloc_size;
@@ -44,6 +45,8 @@ void strbuf_attach(strbuf_t *s, void *str, size_t len, size_t alloc_size);
 void strbuf_append(strbuf_t *s, const void *ptr, size_t len);
 
 void strbuf_appendf(strbuf_t *s, const char *fmt, ...);
+
+int strbuf_append_va(strbuf_t *s, const char *fmt, va_list va);
 
 void strbuf_append_str(strbuf_t *s, const char *str);
 

@@ -20,6 +20,8 @@ int is_file(const char *path);
 
 int is_dir(const char *path);
 
+const char* mkpath(const char *fmt, ...);
+
 char* path_normalize(const char *base, const char *name, unsigned dir);
 
 #endif /* __PATH_H */

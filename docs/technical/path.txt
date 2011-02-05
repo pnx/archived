@@ -17,7 +17,12 @@ Functions
 `is_dir()`::
 
     Returns a non zero value if 'path' is a directory. zero otherwise.
-    
+
+`mkpath()`::
+
+    Formats a "functional correct" path (that works with `open()`, `stat()` etc). +
+    Returns a staticly allocated string.
+
 `path_normalize`::
 
 Returns a string that contains the normalized full path specified by 'base', 'name' and 'dir'. +

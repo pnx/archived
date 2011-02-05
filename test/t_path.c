@@ -36,6 +36,12 @@ void test_normalize() {
     free(ptr);
 }
 
+void test_mkpath() {
+
+    assert_string(mkpath("%s/%s", "/mnt/", "file"), "/mnt//file");
+    assert_string(mkpath("%s/%s%i", "/dev", "tty", 2), "/dev/tty2");
+}
+
 void test_isabspath() {
 
     assert(is_abspath("file") == 0);
@@ -115,6 +121,7 @@ int main(int argc, char *argv[]) {
     test_isfile();
     test_isdir();
     test_normalize();
+    test_mkpath();
     test_basename();
     test_dirname();
 

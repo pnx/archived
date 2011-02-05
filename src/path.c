@@ -67,6 +67,32 @@ int is_dir(const char *path) {
     return 0;
 }
 
+const char *mkpath(const char *fmt, ...) {
+
+    static strbuf_t sb = STRBUF_INIT;
+    va_list va;
+    int len;
+
+    if (strbuf_avail(&sb)) {
+        strbuf_reduce(&sb, sb.len);
+    } else {
+        strbuf_expand(&sb, 1);
+    }
+    
+    va_start(va, fmt);
+    len = strbuf_append_va(&sb, fmt, va);
+    va_end(va);
+
+    if (len > 0) {
+        strbuf_expand(&sb, len);
+        va_start(va, fmt);
+        strbuf_append_va(&sb, fmt, va);
+        va_end(va);
+    }
+
+    return sb.buf;
+}
+
 static char* expand_home() {
 
     char *home = getenv("HOME");

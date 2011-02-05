@@ -50,8 +50,7 @@ void strbuf_reduce(strbuf_t *s, size_t len) {
     if (len > s->len)
         len = s->len;
 
-    s->len -= len;
-    s->buf[s->len] = '\0';
+    strbuf_setlen(s, s->len - len);
 }
 
 void strbuf_setlen(strbuf_t *s, size_t len) {
@@ -116,8 +115,7 @@ void strbuf_append(strbuf_t *s, const void *ptr, size_t len) {
 
     strbuf_expand(s, len);
     memcpy(s->buf + s->len, ptr, len);
-    s->len += len;
-    s->buf[s->len] = '\0';
+    strbuf_setlen(s, s->len + len);
 }
 
 void strbuf_appendf(strbuf_t *s, const char *fmt, ...) {
@@ -168,18 +166,15 @@ void strbuf_append_repeat(strbuf_t *s, char ch, size_t len) {
 
     strbuf_expand(s, len);
     memset(s->buf + s->len, ch, len);
-    s->len += len;
-    s->buf[s->len] = '\0';
+    strbuf_setlen(s, s->len + len);
 }
 
 void strbuf_rchop(strbuf_t *s, char ch) {
 
     char *n = memrchr(s->buf, ch, s->len);
 
-    if (n) {
-        *n = '\0';
-        s->len = n - s->buf;
-    }
+    if (n)
+        strbuf_setlen(s, n - s->buf);
 }
 
 void strbuf_term(strbuf_t *s, char ch) {

@@ -65,7 +65,7 @@ static void map_path_wd(const char *path, int wd) {
 
 static int unmap_path_wd(int wd, const char *path) {
 
-    return rbtree_delete(&tree_path_wd, &path);
+    return rbtree_delete(&tree_path_wd, &path) != NULL;
 }
 
 static void unmap_wd_path(int wd, const char *path) {
@@ -116,7 +116,7 @@ int inotify_unmap_wd(int wd) {
     struct map_wd *m = rbtree_search(&tree_wd_paths, &wd);
     if (m) {
         unmap_all_paths(m);
-        return rbtree_delete(&tree_wd_paths, &wd);
+        return rbtree_delete(&tree_wd_paths, &wd) != NULL;
     }
     return 0;
 }

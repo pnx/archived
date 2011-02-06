@@ -137,9 +137,6 @@ int main(int argc, char **argv) {
     if (load_config(configfile) < 0)
         return EXIT_FAILURE;
 
-#ifdef __DEBUG__
-    init_log(LOG_ALL, NULL);
-#else
     if (iniparser_getboolean(config, "log:use", 0)) {
         char *strlevel = iniparser_getstring(config, "log:level", NULL);
         char *path = iniparser_getstring(config, "log:directory", NULL);
@@ -168,7 +165,6 @@ int main(int argc, char **argv) {
         
         init_log(level, path);
     }
-#endif
 
     ret = database_init(config);
     if (ret == -1)

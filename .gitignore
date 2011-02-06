@@ -3,3 +3,4 @@ archived
 Makefile.local.mk
 test/test_*
 nbproject
+config.ini

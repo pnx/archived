@@ -1,0 +1,11 @@
+[general]
+    uselog = 0
+    loglevel = INFO, WARNING, CRITCAL
+    logdir = logs
+
+[mysql]
+	host = localhost
+	username = user
+	password = password
+	database = dbname
+	table = table

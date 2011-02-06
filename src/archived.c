@@ -24,6 +24,7 @@
 #include "log.h"
 #include "path.h"
 #include "strbuf.h"
+#include "util.h"
 
 static const char *archived_usage_str =
     "Usage: archived [-c <config>] <root>\n"

@@ -1,7 +1,8 @@
-[general]
-    uselog = 0
-    loglevel = INFO, WARNING, CRITCAL
-    logdir = logs
+
+[log]
+    use = 0
+    level = INFO, WARNING, CRITCAL
+    directory = logs
 
 [mysql]
 	host = localhost

@@ -140,9 +140,9 @@ int main(int argc, char **argv) {
 #ifdef __DEBUG__
     init_log(LOG_ALL, NULL);
 #else
-    if (iniparser_getboolean(config, "general:uselog", 0)) {
-        char *strlevel = iniparser_getstring(config, "general:loglevel", NULL);
-        char *path = iniparser_getstring(config, "general:logdir", NULL);
+    if (iniparser_getboolean(config, "log:use", 0)) {
+        char *strlevel = iniparser_getstring(config, "log:level", NULL);
+        char *path = iniparser_getstring(config, "log:directory", NULL);
         unsigned level = 0;
 
         if (strlevel) {
@@ -157,13 +157,13 @@ int main(int argc, char **argv) {
                 strbuf_trim(*ptr);
                 l = logstrtolvl((*ptr)->buf);
                 if (l == 0)
-                    die("config (general:loglevel): unknown log level: %s\n", (*ptr)->buf);
+                    die("config (log:level): unknown level: %s\n", (*ptr)->buf);
                 level += l;
             }
             strbuf_free_list(list);
             strbuf_free(&sb);
         } else {
-            die("config (general:loglevel): no levels defined\n");
+            die("config (log:level): no levels defined\n");
         }
         
         init_log(level, path);

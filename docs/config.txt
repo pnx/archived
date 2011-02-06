@@ -17,20 +17,20 @@ String ;;
 Options
 ~~~~~~
 
-General
+Log
 ^^^^^^
-Options available in the general section
+Options available in the log section
 
-uselog (Boolean);;
+use (Boolean);;
     Turn logging on/off (values are: Y, N, T, F, 1, 0)
-loglevel (String List);;
+level (String List);;
     Set the logging level
     Options available are: DEBUG, INFO, WARNING, CRITCAL, ALL
 +
 NOTE: A comma separated list can be used to specify more than one level.
 +
 
-logdir (String);;
+directory (String);;
     Specify a logging directory
 
 

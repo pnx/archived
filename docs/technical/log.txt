@@ -1,7 +1,7 @@
 Log - Message logging API
 -------------------------
 
-This interface is designed in such way that code that wants to logg a massage can do so with one call and don't worry
+This interface is designed in such way that code that wants to log a massage can do so with one call and don't worry
 about where it may turn up and what format it should use etc. +
 All this is setup trough one function call idealy in the beginning of a process.
 

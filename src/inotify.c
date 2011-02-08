@@ -39,57 +39,67 @@ static int fd;
 
 static queue_t event_queue;
 
-static int addwatch(const char *path, const char *name, unsigned recursive) {
-	
-	char   *npath;
-	int     wd;
-    
-	npath = path_normalize(path, name, 1);
+static int inotify_watch(const char *path) {
 
-    if (!npath)
-        return -1;
-    
-	wd = inotify_add_watch(fd, npath, WATCH_MASK);
+    int wd = inotify_add_watch(fd, path, WATCH_MASK);
 	
 	if (wd < 0) {
         if (errno != EACCES)
-            logerrno(LOG_CRIT, "inotify_add_watch", errno);
-        free(npath);
+            logerrno(LOG_CRIT, "inotify_watch", errno);
 		return -1;
 	}
 
-    logmsg(LOG_DEBUG, "added wd = %i on %s", wd, npath);
+    inotify_map(wd, path);
 
-    if (recursive) {
-        fscrawl_t f = fsc_open(npath);
+    return wd;
+}
 
-        if (!f)
-            return -1;
+static int addwatch(const char *path, const char *name) {
+
+    fscrawl_t f;
+    char *npath = path_normalize(path, name, 1);
+
+    if (!npath)
+        return -1;
+
+    if (inotify_watch(npath) < 0)
+        goto clean;
+
+    f = fsc_open(npath);
+    if (!f)
+        goto clean;
+
+    for(;;) {
+        notify_event *ev;
+        fs_entry *ent = fsc_read(f);
+
+        if (!ent)
+            break;
+
+        ev = notify_event_new();
         
-        for(;;) {
-            notify_event *ev;
-            fs_entry *ent = fsc_read(f);
+        notify_event_set_type(ev, NOTIFY_CREATE);
+        notify_event_set_path(ev, ent->base);
+        notify_event_set_filename(ev, ent->name);
+        notify_event_set_dir(ev, ent->dir);
 
-            if (!ent)
-                break;
-
-            ev = notify_event_new();
-        
-            notify_event_set_type(ev, NOTIFY_CREATE);
-            notify_event_set_path(ev, ent->base);
-            notify_event_set_filename(ev, ent->name);
-            notify_event_set_dir(ev, ent->dir);
-
-            queue_enqueue(event_queue, ev);
-            
-            if (ent->dir)
-                addwatch(ent->base, ent->name, 0);
+        if (ent->dir) {
+            char *fullpath = path_normalize(ev->path, ev->filename, 1);
+            if (fullpath) {
+                if (inotify_watch(fullpath) < 0) {
+                    xfree(fullpath);
+                }
+            }
         }
-        fsc_close(f);
+
+        queue_enqueue(event_queue, ev);
     }
-    inotify_map(wd, npath);
-	
-	return 1;
+    fsc_close(f);
+
+    return 1;
+clean:
+    xfree(npath);
+    return -1;
 }
 
 static int rmwatch(const char *path, const char *name) {
@@ -161,14 +171,14 @@ static void proc_event(inoev *iev) {
         case IN_CREATE :			
             if (event->dir) {
                 logmsg(LOG_DEBUG, "IN_CREATE on directory, adding");
-                addwatch(event->path, event->filename, 1);
+                addwatch(event->path, event->filename);
             }
             type = NOTIFY_CREATE;
             break;
         case IN_MOVED_TO :
             if (event->dir) {
                 logmsg(LOG_DEBUG, "IN_MOVED_TO on directory, adding");
-                addwatch(event->path, event->filename, 1);
+                addwatch(event->path, event->filename);
             }
             type = NOTIFY_CREATE;
             break;
@@ -230,7 +240,7 @@ int notify_add_watch(const char *path) {
 
     if (!init)
         die("inotify is not instantiated.");
-    return (addwatch(path, NULL, 1) > 0) ? 1 : -1;
+    return (addwatch(path, NULL) > 0) ? 1 : -1;
 }
 
 int notify_rm_watch(const char *path) {

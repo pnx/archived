@@ -90,7 +90,8 @@ NOTE: This doesn't shrink the memory block
 
 `strbuf_rchop()`::
 
-    Chops off everything to the right of the rightmost 'ch' encountered in the string.
+    Chops off everything to the right of the rightmost 'ch' encountered in the string. +
+    Returns a pointer to the where the rightmost 'ch' was located (that now is \'\0') or `NULL` if 'ch' does not exists in ->buf.
 
 `strbuf_rev()`::
 

@@ -169,12 +169,13 @@ void strbuf_append_repeat(strbuf_t *s, char ch, size_t len) {
     strbuf_setlen(s, s->len + len);
 }
 
-void strbuf_rchop(strbuf_t *s, char ch) {
+char* strbuf_rchop(strbuf_t *s, char ch) {
 
     char *n = memrchr(s->buf, ch, s->len);
 
     if (n)
         strbuf_setlen(s, n - s->buf);
+    return n;
 }
 
 void strbuf_term(strbuf_t *s, char ch) {

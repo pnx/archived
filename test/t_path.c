@@ -97,22 +97,24 @@ void test_dirname() {
 
     int i;
 
-    char data[11][2][64] = {
+    char data[13][2][64] = {
         { "", "." },
         { "/", "/" },
         { "///", "/" },
         { ".", "."},
         { "..", "." },
+        { "../", "." },
         { "../../rel", "../.." },
         { "./rel", "." },
+        { "x", "." },
         { "justsomestring", "." },
         { "/usr/src/", "/usr" },
         { "/usr/src///", "/usr" },
         { "/usr/src/linux-2.6.30-r5/drivers", "/usr/src/linux-2.6.30-r5" }
     };
 
-    for(i=0; i < 11; i++)
-        assert_string(dirname(data[i][0]), data[i][1]);
+    for(i=0; i < 12; i++)
+        assert_string(dirname_s(data[i][0], 0), data[i][1]);
 }
 
 int main(int argc, char *argv[]) {

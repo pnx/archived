@@ -38,3 +38,11 @@ The function performs this type of checks/manipulation:
 +
 Returns `NULL` if 'base' is not an absolute path or 'name' contains a delimiter.
 
+`dirname_s`::
+
+    Safe dirname implementation. works like POSIX dirname with some modifications: +
++
+--
+    * 'slash' may be used to terminate the string with a \'/' character. +
+    * The function will never modify 'path' instead the function will *always* return a static buffer that will be overwritten by subsequent calls.
+--

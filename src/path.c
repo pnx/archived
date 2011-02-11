@@ -1,6 +1,6 @@
 /* path.c - path handling routines
  * 
- *   Copyright (C) 2010  Henrik Hautakoski <henrik.hautakoski@gmail.com>
+ *   Copyright (C) 2010-2011  Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -12,6 +12,7 @@
  *   so we use funky heap memory based algorithms instead :)
  */
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -65,6 +66,29 @@ int is_dir(const char *path) {
     if (path && stat(path, &st) >= 0)
         return S_ISDIR(st.st_mode);
     return 0;
+}
+
+const char* dirname_s(const char *path, int slash) {
+
+    static strbuf_t sb = STRBUF_INIT;
+    
+    strbuf_reduce(&sb, sb.len);
+    strbuf_append_str(&sb, path);
+    strbuf_squeeze(&sb, '/');
+
+    if (sb.len > 1) {
+        if (sb.buf[sb.len-1] == '/')
+            strbuf_reduce(&sb, 1);
+
+        if (!strbuf_rchop(&sb, '/'))
+            strbuf_reduce(&sb, sb.len-1);
+    }
+
+    if (sb.buf[0] != '/')
+        sb.buf[0] = '.';
+    if (slash)
+        strbuf_term(&sb, '/');
+    return sb.buf;
 }
 
 const char *mkpath(const char *fmt, ...) {

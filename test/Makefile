@@ -21,6 +21,7 @@ fscrawl : $(ROOT)src/fscrawl.o $(addprefix $(ROOT),$(obj-fscrawl))
 notify : $(addprefix $(ROOT),$(obj-notify))
 inotify-map : $(addprefix $(ROOT),$(obj-inotify-map))
 log : $(addprefix $(ROOT),$(obj-log))
+tree : $(addprefix $(ROOT),$(obj-xalloc)) $(ROOT)src/tree.o
 str-list : unit.c $(addprefix $(ROOT),$(obj-str-list))
 
 clean :

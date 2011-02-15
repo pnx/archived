@@ -20,6 +20,7 @@ path : unit.c $(ROOT)src/path.o $(addprefix $(ROOT),$(obj-strbuf))
 fscrawl : $(ROOT)src/fscrawl.o $(addprefix $(ROOT),$(obj-fscrawl))
 notify : $(addprefix $(ROOT),$(obj-notify))
 inotify-map : $(addprefix $(ROOT),$(obj-inotify-map))
+inotify-watch : $(addprefix $(ROOT), $(obj-xalloc)) $(addprefix $(ROOT), $(obj-path)) $(ROOT)src/tree.o ../src/inotify-watch.o
 log : $(addprefix $(ROOT),$(obj-log))
 tree : $(addprefix $(ROOT),$(obj-xalloc)) $(ROOT)src/tree.o
 str-list : unit.c $(addprefix $(ROOT),$(obj-str-list))

@@ -68,6 +68,20 @@ int is_dir(const char *path) {
     return 0;
 }
 
+int path_isparent(const char *path, const char *parent) {
+
+    if (*path++ != '/' || *parent++ != '/')
+        return 0;
+        
+    while(*path) {
+        if (*parent == '\0')
+            return *path == '/' || *(path-1) == '/';
+        if (*path++ != *parent++)
+            break;
+    }
+    return 0;
+}
+
 const char* dirname_s(const char *path, int slash) {
 
     static strbuf_t sb = STRBUF_INIT;

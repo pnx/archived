@@ -20,6 +20,8 @@ int is_file(const char *path);
 
 int is_dir(const char *path);
 
+int path_isparent(const char *path, const char *parent);
+
 const char* dirname_s(const char *path, int slash);
 
 const char* mkpath(const char *fmt, ...);

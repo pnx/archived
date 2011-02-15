@@ -117,6 +117,15 @@ void test_dirname() {
         assert_string(dirname_s(data[i][0], 0), data[i][1]);
 }
 
+void test_path_isparent() {
+
+    assert(path_isparent("/dir1/dir2/", "/dir1/") != 0);
+    assert(path_isparent("/dir1/dir2/", "/dir1") != 0);
+    assert(path_isparent("/dir1/dir2/", "/dir") == 0);
+    assert(path_isparent("/dir1/dir2/", "/dir1/dir2/sub/") == 0);
+    assert(path_isparent("/dir1/dir2/", "/var/") == 0);
+}
+
 int main(int argc, char *argv[]) {
 
     test_isabspath();
@@ -126,6 +135,7 @@ int main(int argc, char *argv[]) {
     test_mkpath();
     test_basename();
     test_dirname();
+    test_path_isparent();
 
     return 0;
 }

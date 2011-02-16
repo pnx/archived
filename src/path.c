@@ -85,9 +85,11 @@ int path_isparent(const char *path, const char *parent) {
 const char* dirname_s(const char *path, int slash) {
 
     static strbuf_t sb = STRBUF_INIT;
-    
-    strbuf_reduce(&sb, sb.len);
-    strbuf_append_str(&sb, path);
+
+    if (sb.buf != path) {
+        strbuf_setlen(&sb, 0);
+        strbuf_append_str(&sb, path);
+    }
     strbuf_squeeze(&sb, '/');
 
     if (sb.len > 1) {

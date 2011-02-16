@@ -96,6 +96,7 @@ void test_basename() {
 void test_dirname() {
 
     int i;
+    const char *path = "/one/two/three/four/";
 
     char data[13][2][64] = {
         { "", "." },
@@ -115,6 +116,9 @@ void test_dirname() {
 
     for(i=0; i < 12; i++)
         assert_string(dirname_s(data[i][0], 0), data[i][1]);
+
+    path = dirname_s(path, 1);
+    assert_string(dirname_s(path, 1), "/one/two/");
 }
 
 void test_path_isparent() {

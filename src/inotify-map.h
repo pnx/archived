@@ -11,8 +11,6 @@
 #ifndef __INOTIFY_MAP_H
 #define __INOTIFY_MAP_H
 
-#include "str-list.h"
-
 void inotify_map(int wd, const char *path);
 
 int inotify_unmap_wd(int wd);

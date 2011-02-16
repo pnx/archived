@@ -4,7 +4,7 @@
 #include "../src/inotify-map.h"
 
 int   wdref[4]   = { 1, 2, 1, 4 };
-char *pathref[4] = { "one", "two", "three", "four" };
+char *pathref[4] = { "/one/", "/two/", "/three/", "/two/subdir/another/" };
 
 static void setup() {
 
@@ -20,6 +20,7 @@ static void setup() {
 static void teardown() {
 
     inotify_unmap_all();
+    assert(inotify_map_isempty());
 }
 
 static void validate_list(int index, char **list) {
@@ -51,7 +52,7 @@ void test_inotify_unmap_wd() {
     assert(inotify_unmap_wd(wdref[0]));
     assert(inotify_unmap_wd(wdref[1]));
     assert(inotify_unmap_wd(wdref[2]) == 0);
-    assert(inotify_unmap_wd(wdref[3]));
+    assert(inotify_unmap_wd(wdref[3]) == 0);
 
     assert(inotify_map_isempty());
 
@@ -64,9 +65,11 @@ void test_inotify_unmap_path() {
 
     setup();
 
-    for(i=0; i < 4; i++)
-        assert(inotify_unmap_path(pathref[i]));
-
+    assert(inotify_unmap_path(pathref[0]));
+    assert(inotify_unmap_path(pathref[1]));
+    assert(inotify_unmap_path(pathref[2]));
+    assert(inotify_unmap_path(pathref[3]) == 0);
+    
     assert(inotify_map_isempty());
 
     teardown();
@@ -124,8 +127,8 @@ void test_inotify_map_lookup_by_path() {
 
 int main() {
 
-    test_inotify_unmap_wd();
     test_inotify_unmap_path();
+    test_inotify_unmap_wd();
     test_inotify_unmap_all();
     test_inotify_map_get_wd();
     test_inotify_map_lookup();

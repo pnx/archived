@@ -23,8 +23,6 @@ int inotify_map_get_wd(const char *path);
 
 char** inotify_map_get_path(int wd);
 
-char** inotify_map_lookup_by_path(const char *path);
-
 int inotify_map_isempty();
 
 #endif /* __INOTIFY_MAP_H */

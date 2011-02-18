@@ -211,14 +211,6 @@ char** inotify_map_get_path(int wd) {
     return out;
 }
 
-char** inotify_map_lookup_by_path(const char *path) {
-
-    int wd = inotify_map_get_wd(path);
-    if (wd)
-        return inotify_map_get_path(wd);
-    return NULL;
-}
-
 int inotify_map_isempty() {
 
     return rbtree_is_empty(&tree_wd_paths)

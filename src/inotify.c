@@ -143,7 +143,7 @@ static void proc_event(inoev *iev) {
     }
     
 	/* lookup the watch descriptor in rbtree */
-	paths = inotify_map_lookup(iev->wd);
+	paths = inotify_map_get_path(iev->wd);
 	
 	if (!paths) {
 		logmsg(LOG_WARN, "-- IGNORING EVENT -- invalid watchdescriptor %i", iev->wd);

@@ -97,30 +97,16 @@ void test_inotify_map_get_wd() {
     teardown();
 }
 
-void test_inotify_map_lookup() {
+void test_inotify_map_get_path() {
 
     int i;
 
     setup();
 
     for(i=0; i < 4; i++)
-        validate_list(i, inotify_map_lookup(wdref[i]));
+        validate_list(i, inotify_map_get_path(wdref[i]));
 
-    assert(inotify_map_lookup(25) == NULL);
-    
-    teardown();
-}
-
-void test_inotify_map_lookup_by_path() {
-
-    int i;
-
-    setup();
-    
-    for(i=0; i < 4; i++)
-        validate_list(i, inotify_map_lookup_by_path(pathref[i]));
-
-    assert(inotify_map_lookup_by_path("do not exist") == NULL);
+    assert(inotify_map_get_path(25) == NULL);
     
     teardown();
 }
@@ -131,8 +117,7 @@ int main() {
     test_inotify_unmap_wd();
     test_inotify_unmap_all();
     test_inotify_map_get_wd();
-    test_inotify_map_lookup();
-    test_inotify_map_lookup_by_path();
+    test_inotify_map_get_path();
     
     return 0;
 }

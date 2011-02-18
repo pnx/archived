@@ -192,7 +192,7 @@ int inotify_map_get_wd(const char *path) {
     return 0;
 }
 
-char** inotify_map_lookup(int wd) {
+char** inotify_map_get_path(int wd) {
 
     char **out = NULL;
     struct list *list;
@@ -215,7 +215,7 @@ char** inotify_map_lookup_by_path(const char *path) {
 
     int wd = inotify_map_get_wd(path);
     if (wd)
-        return inotify_map_lookup(wd);
+        return inotify_map_get_path(wd);
     return NULL;
 }
 

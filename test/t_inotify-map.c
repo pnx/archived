@@ -23,23 +23,25 @@ static void teardown() {
     assert(inotify_map_isempty());
 }
 
-static void validate_list(int index, char **list) {
+static int cmp(const void *a, const void *b) {
+
+    struct watch *w = (struct watch *)a;
+
+    return strcmp(w->path, b);
+}
+
+static void validate_list(int index, struct list *list) {
 
     int i;
 
     assert(list);
 
     for(i=0; i < 4; i++) {
-        char **path, found = 0;
 
         if (i != wdref[index])
             continue;
-
-        for(path=list; !found && *path; path++) {
-            if (!strcmp(*path, pathref[index]))
-                found = 1;
-        }
-        assert(found);
+            
+        assert(list_has(list, pathref[index], cmp));
     }
 }
 

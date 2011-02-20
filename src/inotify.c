@@ -19,6 +19,7 @@
 #include <sys/inotify.h>
 
 #include "inotify-map.h"
+#include "inotify-watch.h"
 #include "util.h"
 #include "log.h"
 #include "path.h"
@@ -132,7 +133,8 @@ static int rmwatch(const char *path, const char *name) {
 
 static void proc_event(inoev *iev) {
 
-    char **paths, **path;
+    int i;
+    struct list *watch_list;
     int isdir;
     
     logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
@@ -142,10 +144,10 @@ static void proc_event(inoev *iev) {
         return;
     }
     
-	/* lookup the watch descriptor in rbtree */
-	paths = inotify_map_get_path(iev->wd);
+	/* lookup watch descriptors */
+	watch_list = inotify_map_get_path(iev->wd);
 	
-	if (!paths) {
+	if (!watch_list) {
 		logmsg(LOG_WARN, "-- IGNORING EVENT -- invalid watchdescriptor %i", iev->wd);
 		return;
 	}
@@ -154,12 +156,13 @@ static void proc_event(inoev *iev) {
     isdir = (iev->mask & IN_ISDIR) != 0;
     iev->mask &= ~IN_ISDIR;
 
-    for(path = paths; *path; path++) {
+    for(i=0; i < watch_list->nr; i++) {
         
         uint8_t type = NOTIFY_UNKNOWN;
+        struct watch *watch = watch_list->items[i];
         notify_event *event = notify_event_new();
 
-        notify_event_set_path(event, *path);
+        notify_event_set_path(event, watch->path);
         notify_event_set_filename(event, iev->name);
         event->dir = isdir;
 
@@ -193,7 +196,7 @@ static void proc_event(inoev *iev) {
         event->type = type;
     }
 
-    free(paths);
+    list_destroy(watch_list);
 }
 
 int notify_init() {

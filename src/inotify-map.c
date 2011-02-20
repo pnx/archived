@@ -12,7 +12,6 @@
 #include <string.h>
 #include "xalloc.h"
 #include "rbtree.h"
-#include "list.h"
 #include "path.h"
 #include "inotify-watch.h"
 #include "inotify-map.h"
@@ -192,23 +191,12 @@ int inotify_map_get_wd(const char *path) {
     return 0;
 }
 
-char** inotify_map_get_path(int wd) {
+struct list* inotify_map_get_path(int wd) {
 
-    char **out = NULL;
-    struct list *list;
-
-    list = wd_lookup(wd);
-    if (list && list->nr) {
-        int i;
-        
-        out = xmalloc(list->nr + 1);
-        for(i=0; i < list->nr; i++) {
-            struct watch *w = list->items[i];
-            out[i] = (char *)w->path;
-        }
-        out[list->nr] = NULL;
-    }
-    return out;
+    struct list *list = wd_lookup(wd);
+    if (list)
+        return list_copy(list);
+    return NULL;
 }
 
 int inotify_map_isempty() {

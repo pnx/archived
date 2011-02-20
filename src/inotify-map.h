@@ -11,6 +11,9 @@
 #ifndef __INOTIFY_MAP_H
 #define __INOTIFY_MAP_H
 
+#include "list.h"
+#include "inotify-watch.h"
+
 void inotify_map(int wd, const char *path);
 
 int inotify_unmap_wd(int wd);
@@ -21,7 +24,7 @@ void inotify_unmap_all();
 
 int inotify_map_get_wd(const char *path);
 
-char** inotify_map_get_path(int wd);
+struct list* inotify_map_get_path(int wd);
 
 int inotify_map_isempty();
 

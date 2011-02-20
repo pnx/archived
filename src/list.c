@@ -30,6 +30,17 @@ struct list* list_create(void) {
 	return list;
 }
 
+struct list* list_copy(struct list *list) {
+
+    if (list && list->nr) {
+        struct list *copy = xmalloc(sizeof(struct list));
+        copy->items = xmemdup(list->items, sizeof(list->items) * list->nr);
+        copy->nr = list->nr;
+        return copy;
+    }
+    return NULL;
+}
+
 int list_destroy(struct list *list) {
 
     list_clear_fn(list, NULL);

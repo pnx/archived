@@ -46,6 +46,25 @@ void test_remove() {
     list_destroy(l);
 }
 
+void test_copy() {
+
+    int i;
+    char ref[4] = { 'a', 'b', 'c', 'd' };
+    struct list *c, *l = list_create();
+
+    for(i=0; i < 4; i++)
+        list_insert(l, &ref[i]);
+
+    c = list_copy(l);
+    assert(list_size(c) == 4);
+    assert(c->items[0] == &ref[0]);
+    assert(c->items[1] == &ref[1]);
+    assert(c->items[2] == &ref[2]);
+    assert(c->items[3] == &ref[3]);
+
+    list_destroy(l);
+    list_destroy(c);
+}
 
 void test_isempty() {
 
@@ -125,6 +144,7 @@ int main() {
 
     test_insert();
     test_remove();
+    test_copy();
     test_isempty();
     test_size();
     test_indexof();

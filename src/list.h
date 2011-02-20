@@ -23,6 +23,8 @@ typedef int (cmp_fn_t)(const void *, const void *b);
 
 struct list* list_create(void);
 
+struct list* list_copy(struct list *list);
+
 int list_destroy(struct list *list);
 
 void list_clear(struct list *list);

@@ -113,24 +113,26 @@ static void unmap_path(struct watch *watch) {
     rbtree_delete(&tree_path_wd, watch);
 }
 
-static void unmap_wd(struct watch *watch) {
+static int unmap_wd(struct watch *watch) {
 
     int index;
     struct list s = { (void**)&watch, 1 }, *list;
 
 	list = rbtree_search(&tree_wd_paths, &s);
-    if (!list)
-        return;
+    if (list) {
 
-    index = list_indexof(list, watch);
-    if (index >= 0) {
-        if (list_size(list) == 1) {
-            list = rbtree_delete(&tree_wd_paths, list);
-            list_destroy(list);
-        } else {
+        index = list_indexof(list, watch);
+        if (index >= 0) {
+            if (list_size(list) == 1) {
+                list = rbtree_delete(&tree_wd_paths, list);
+                list_destroy(list);
+                return 0;
+            }
             list_remove(list, index);
+            return list_size(list);
         }
     }
+    return 0;
 }
 
 static void unmap(struct watch *w) {
@@ -159,17 +161,17 @@ int inotify_unmap_wd(int wd) {
 
 int inotify_unmap_path(const char *path) {
 
+    int ret = 0;
     struct watch *w, s;
 
     s.path = path;
     w = rbtree_search(&tree_path_wd, &s);
     if (w) {
-        unmap_wd(w);
+        ret = unmap_wd(w);
         unmap_path(w);
         inotify_watch_destroy(w, unmap);
-        return 1;
     }
-    return 0;
+    return ret;
 }
 
 void inotify_unmap_all() {

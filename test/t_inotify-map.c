@@ -63,15 +63,13 @@ void test_inotify_unmap_wd() {
 
 void test_inotify_unmap_path() {
 
-    int i;
-
     setup();
 
-    assert(inotify_unmap_path(pathref[0]));
-    assert(inotify_unmap_path(pathref[1]));
-    assert(inotify_unmap_path(pathref[2]));
+    assert(inotify_unmap_path(pathref[0]) == 1);
+    assert(inotify_unmap_path(pathref[1]) == 0);
+    assert(inotify_unmap_path(pathref[2]) == 0);
     assert(inotify_unmap_path(pathref[3]) == 0);
-    
+
     assert(inotify_map_isempty());
 
     teardown();

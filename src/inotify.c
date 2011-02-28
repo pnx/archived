@@ -46,7 +46,7 @@ static int inotify_watch(const char *path) {
     int wd = inotify_add_watch(fd, path, WATCH_MASK);
 	
 	if (wd < 0) {
-        if (errno != EACCES)
+        if (errno != EACCES && errno != ENOTDIR)
             logerrno(LOG_CRIT, "inotify_watch", errno);
 		return -1;
 	}
@@ -122,13 +122,17 @@ static int rmwatch(const char *path, const char *name) {
 		return -1;
 	}
     
-	logmsg(LOG_DEBUG, "remove watch: %i %s", wd, fpath);
-    free(fpath);
+    if (inotify_unmap_path(fpath) == 0) {
 
-    if (inotify_rm_watch(fd, wd) < 0) {
-        logerrno(LOG_CRIT, "intotify_rm_watch", errno);
-        return -1;
+        logmsg(LOG_DEBUG, "remove watch: %i %s", wd, fpath);
+        if (inotify_rm_watch(fd, wd) < 0) {
+            logerrno(LOG_CRIT, "intotify_rm_watch", errno);
+            free(fpath);
+            return -1;
+        }
     }
+    
+    free(fpath);
     return 0;
 }
 
@@ -172,24 +176,14 @@ static void proc_event(inoev *iev) {
         queue_enqueue(event_queue, event);
     
         switch(iev->mask) {
-        case IN_CREATE :			
-            if (event->dir) {
-                logmsg(LOG_DEBUG, "IN_CREATE on directory, adding");
-                addwatch(event->path, event->filename);
-            }
-            type = NOTIFY_CREATE;
-            break;
+        case IN_CREATE :
         case IN_MOVED_TO :
-            if (event->dir) {
-                logmsg(LOG_DEBUG, "IN_MOVED_TO on directory, adding");
-                addwatch(event->path, event->filename);
-            }
+            addwatch(event->path, event->filename);
             type = NOTIFY_CREATE;
             break;
-        case IN_MOVED_FROM :
-            if (event->dir)
-                rmwatch(event->path, event->filename);
         case IN_DELETE :
+        case IN_MOVED_FROM :
+            rmwatch(event->path, event->filename);
             type = NOTIFY_DELETE;
             break;
         }

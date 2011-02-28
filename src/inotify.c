@@ -20,6 +20,7 @@
 
 #include "inotify-map.h"
 #include "inotify-watch.h"
+#include "xalloc.h"
 #include "util.h"
 #include "log.h"
 #include "path.h"

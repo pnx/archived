@@ -14,10 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
-#include <sys/ioctl.h>
-#include <sys/inotify.h>
 
+#include "inotify-backend.h"
 #include "inotify-map.h"
 #include "inotify-watch.h"
 #include "xalloc.h"
@@ -28,12 +26,6 @@
 #include "fscrawl.h"
 #include "notify.h"
 
-typedef struct inotify_event inoev;
-
-#define INOBUFSIZE ((1 << 12) * (sizeof(inoev) + 0x40))
-
-#define WATCH_MASK (IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR)
-
 static int init = 0;
 
 /* Inotify file descriptor */
@@ -41,17 +33,12 @@ static int fd;
 
 static queue_t event_queue;
 
-static int inotify_watch(const char *path) {
+static int watch(const char *path) {
 
-    int wd = inotify_add_watch(fd, path, WATCH_MASK);
-	
-	if (wd < 0) {
-        if (errno != EACCES && errno != ENOTDIR)
-            logerrno(LOG_CRIT, "inotify_watch", errno);
-		return -1;
-	}
+    int wd = inotify_backend_watch(path);
 
-    inotify_map(wd, path);
+    if (wd >= 0)
+        inotify_map(wd, path);
 
     return wd;
 }
@@ -64,7 +51,7 @@ static int addwatch(const char *path, const char *name) {
     if (!npath)
         return -1;
 
-    if (inotify_watch(npath) < 0)
+    if (watch(npath) < 0)
         goto clean;
 
     f = fsc_open(npath);
@@ -88,7 +75,7 @@ static int addwatch(const char *path, const char *name) {
         if (ent->dir) {
             char *fullpath = path_normalize(ev->path, ev->filename, 1);
             if (fullpath) {
-                if (inotify_watch(fullpath) < 0) {
+                if (watch(fullpath) < 0) {
                     xfree(fullpath);
                 }
             }
@@ -136,7 +123,7 @@ static int rmwatch(const char *path, const char *name) {
     return 0;
 }
 
-static void proc_event(inoev *iev) {
+static void proc_event(struct inotify_event *iev) {
 
     int i;
     struct list *watch_list;
@@ -199,10 +186,7 @@ int notify_init() {
 	if (init)
 		return 0;
 	
-	fd = inotify_init();
-    
-	if (fd < 0)
-		return -1;
+	inotify_backend_init();
 
 	event_queue = queue_init();
 	
@@ -217,8 +201,6 @@ void notify_exit() {
 
     if (!init)
         return;
-        
-    close(fd);
 
     inotify_unmap_all();
 	
@@ -248,60 +230,23 @@ int notify_rm_watch(const char *path) {
 	return rmwatch(path, NULL);
 }
 
-notify_event* notify_read() {
+#define BUFSZ (IN_EVENT_SIZE * (1 << 10))
 
-    /* bytes ready on the inotify descriptor */
-    int ioready;
+notify_event* notify_read() {
 
     if (!init)
         die("inotify is not instantiated.");
     
-    /* if we don't have pending events, wait for more data on fd  */
     if (queue_isempty(event_queue)) {
 
-        /* time resolution */
-        struct timespec tres = { 0, 2000000 };
+        char buf[BUFSZ];
+        int offset = 0, read = inotify_backend_read(buf, BUFSZ);
 
-        unsigned short tcount;
-        
-        for(tcount = 0; tcount < 10; tcount++) {
-
-            if (ioctl(fd, FIONREAD, &ioready) == -1)
-                break;
-
-            if (ioready > INOBUFSIZE)
-                break;
-
-            nanosleep(&tres, NULL);
+        while(read > offset) {
+            struct inotify_event *ev = (struct inotify_event*) &buf[offset];
+            proc_event(ev);
+            offset += sizeof(struct inotify_event) + ev->len;
         }
-    }
-    /* otherwise, only read if the data available at
-       this given moment is "large enough" */
-    else {
-        ioctl(fd, FIONREAD, &ioready);
-
-        if (ioready < INOBUFSIZE / 2)
-            ioready = 0;
-    }
-
-    while(ioready > 0) {
-
-        char buf[INOBUFSIZE];
-        int offset = 0, rbytes = read(fd, buf, INOBUFSIZE);
-
-        logmsg(LOG_DEBUG, "%i bytes avail", ioready);
-
-        if (rbytes == -1) {
-            logerrno(LOG_WARN, "INOTIFY", errno);
-            break;
-        }
-
-        while(rbytes > offset) {
-            inoev *rev = (inoev *) &buf[offset];
-            proc_event(rev);
-            offset += sizeof(inoev) + rev->len;
-        }
-        ioready -= rbytes;
     }
 
     return queue_dequeue(event_queue);

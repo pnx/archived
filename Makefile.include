@@ -32,9 +32,10 @@ obj-log = src/log.o $(obj-strbuf) $(obj-xalloc)
 obj-inotify-backend = src/inotify-backend.o $(obj-log)
 obj-inotify-watch = src/inotify-watch.o $(obj-tree)
 obj-inotify-map = src/inotify-map.o $(obj-inotify-watch) $(obj-path) $(obj-rbtree) $(obj-list)
-obj-inotify = src/notify-inotify.o src/queue.o $(obj-inotify-backend) $(obj-inotify-map)
+obj-inotify = src/inotify.o src/queue.o $(obj-inotify-backend) $(obj-inotify-map)
+obj-notify-inotify = src/notify-inotify.o $(obj-inotify)
 
-obj-notify = src/event.o $(obj-inotify) $(obj-xalloc) $(obj-fscrawl)
+obj-notify = src/event.o $(obj-notify-inotify) $(obj-xalloc) $(obj-fscrawl)
 obj-ini = lib/ini/iniparser.o lib/ini/dictionary.o
 obj-mongo = src/database/mongo.o $(obj-path) $(obj-ini)
 obj-mysql = src/database/mysql.o $(obj-ini) $(obj-xalloc)

@@ -24,24 +24,12 @@
 #include "path.h"
 #include "queue.h"
 #include "fscrawl.h"
+#include "inotify.h"
 #include "notify.h"
 
-static int init = 0;
+static int init;
 
-/* Inotify file descriptor */
-static int fd;
-
-static queue_t event_queue;
-
-static int watch(const char *path) {
-
-    int wd = inotify_backend_watch(path);
-
-    if (wd >= 0)
-        inotify_map(wd, path);
-
-    return wd;
-}
+static queue_t init_ev_q;
 
 static int addwatch(const char *path, const char *name) {
 
@@ -51,7 +39,7 @@ static int addwatch(const char *path, const char *name) {
     if (!npath)
         return -1;
 
-    if (watch(npath) < 0)
+    if (inotify_watch(npath) < 0)
         goto clean;
 
     f = fsc_open(npath);
@@ -66,22 +54,19 @@ static int addwatch(const char *path, const char *name) {
             break;
 
         ev = notify_event_new();
-        
+
         notify_event_set_type(ev, NOTIFY_CREATE);
         notify_event_set_path(ev, ent->base);
         notify_event_set_filename(ev, ent->name);
         notify_event_set_dir(ev, ent->dir);
 
-        if (ent->dir) {
-            char *fullpath = path_normalize(ev->path, ev->filename, 1);
-            if (fullpath) {
-                if (watch(fullpath) < 0) {
-                    xfree(fullpath);
-                }
-            }
+        if (ev->dir) {
+            char *fullpath = path_normalize(ev->path, ent->name, 1);
+            if (fullpath && inotify_watch(fullpath) < 0)
+                xfree(fullpath);
         }
 
-        queue_enqueue(event_queue, ev);
+        queue_enqueue(init_ev_q, ev);
     }
     fsc_close(f);
 
@@ -94,122 +79,41 @@ clean:
 static int rmwatch(const char *path, const char *name) {
 
     char *fpath;
-    int wd;
+    int ret;
 
     fpath = path_normalize(path, name, 1);
 
     if (!fpath)
         return -1;
 
-    wd = inotify_map_get_wd(fpath);
-    
-	if (wd <= 0) {
-		logmsg(LOG_DEBUG, "remove watch: can't find %s", fpath);
-        free(fpath);
-		return -1;
-	}
-    
-    if (inotify_unmap_path(fpath) == 0) {
-
-        logmsg(LOG_DEBUG, "remove watch: %i %s", wd, fpath);
-        if (inotify_rm_watch(fd, wd) < 0) {
-            logerrno(LOG_CRIT, "intotify_rm_watch", errno);
-            free(fpath);
-            return -1;
-        }
-    }
-    
+    ret = inotify_ignore(fpath);
     free(fpath);
-    return 0;
-}
-
-static void proc_event(struct inotify_event *iev) {
-
-    int i;
-    struct list *watch_list;
-    int isdir;
-    
-    logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
-
-    if (iev->mask & IN_IGNORED) {
-        inotify_unmap_wd(iev->wd);
-        return;
-    }
-    
-	/* lookup watch descriptors */
-	watch_list = inotify_map_get_path(iev->wd);
-	
-	if (!watch_list) {
-		logmsg(LOG_WARN, "-- IGNORING EVENT -- invalid watchdescriptor %i", iev->wd);
-		return;
-	}
-
-    /* set dir and drop that bit off (so its not in the way) */
-    isdir = (iev->mask & IN_ISDIR) != 0;
-    iev->mask &= ~IN_ISDIR;
-
-    for(i=0; i < watch_list->nr; i++) {
-        
-        uint8_t type = NOTIFY_UNKNOWN;
-        struct watch *watch = watch_list->items[i];
-        notify_event *event = notify_event_new();
-
-        notify_event_set_path(event, watch->path);
-        notify_event_set_filename(event, iev->name);
-        event->dir = isdir;
-
-        /* queue event before doing any fscrawl on a subdirectory
-           to prevent messing up the order */
-        queue_enqueue(event_queue, event);
-    
-        switch(iev->mask) {
-        case IN_CREATE :
-        case IN_MOVED_TO :
-            addwatch(event->path, event->filename);
-            type = NOTIFY_CREATE;
-            break;
-        case IN_DELETE :
-        case IN_MOVED_FROM :
-            rmwatch(event->path, event->filename);
-            type = NOTIFY_DELETE;
-            break;
-        }
-	
-        event->type = type;
-    }
-
-    list_destroy(watch_list);
+    return ret;
 }
 
 int notify_init() {
 
-	if (init)
-		return 0;
-	
-	inotify_backend_init();
-
-	event_queue = queue_init();
-	
-	if (event_queue == NULL)
-		return -1;
-        
-    init = 1;
+	if (!init) {
+        if (inotify_init() < 0)
+            return -1;
+        init_ev_q = queue_init();
+        init = 1;
+    }
 	return 0;
 }
 
 void notify_exit() {
 
-    if (!init)
-        return;
-
-    inotify_unmap_all();
-	
-	if (event_queue) {
+    if (init) {
         notify_event *e;
-        while((e = queue_dequeue(event_queue)))
+        while((e = queue_dequeue(init_ev_q)))
             notify_event_del(e); 
-		queue_destroy(event_queue);
-        event_queue = NULL;
+		queue_destroy(init_ev_q);
+        init_ev_q = NULL;
+
+        inotify_exit();
+        
+        init = 0;
     }
 }
 
@@ -230,26 +134,22 @@ int notify_rm_watch(const char *path) {
 	return rmwatch(path, NULL);
 }
 
-#define BUFSZ (IN_EVENT_SIZE * (1 << 10))
-
 notify_event* notify_read() {
+
+    notify_event *ev;
 
     if (!init)
         die("inotify is not instantiated.");
     
-    if (queue_isempty(event_queue)) {
+    if (!queue_isempty(init_ev_q))
+        return queue_dequeue(init_ev_q);
+        
+    ev = inotify_read();
 
-        char buf[BUFSZ];
-        int offset = 0, read = inotify_backend_read(buf, BUFSZ);
+    if (ev && ev->dir && ev->type == NOTIFY_CREATE)
+        addwatch(ev->path, ev->filename);
 
-        while(read > offset) {
-            struct inotify_event *ev = (struct inotify_event*) &buf[offset];
-            proc_event(ev);
-            offset += sizeof(struct inotify_event) + ev->len;
-        }
-    }
-
-    return queue_dequeue(event_queue);
+    return ev;
 }
 
 void notify_stat() {

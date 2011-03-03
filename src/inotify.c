@@ -3,6 +3,7 @@
 #include "log.h"
 #include "path.h"
 #include "queue.h"
+#include "path.h"
 #include "inotify-backend.h"
 #include "inotify-map.h"
 #include "inotify.h"
@@ -43,7 +44,7 @@ int inotify_ignore(const char *path) {
 
     int wd = inotify_map_get_wd(path);
 
-    if (wd < 0)
+    if (wd <= 0)
         return -1;
 
     /* unmap and remove watch */
@@ -60,7 +61,6 @@ static void proc_event(struct inotify_event *iev) {
 
     int i;
     struct list *watch_list;
-    int isdir;
     
     logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
 
@@ -77,10 +77,6 @@ static void proc_event(struct inotify_event *iev) {
 		return;
 	}
 
-    /* set dir and drop that bit off (so its not in the way) */
-    isdir = (iev->mask & IN_ISDIR) != 0;
-    iev->mask &= ~IN_ISDIR;
-
     for(i=0; i < watch_list->nr; i++) {
         
         struct watch *watch = watch_list->items[i];
@@ -88,19 +84,43 @@ static void proc_event(struct inotify_event *iev) {
 
         notify_event_set_path(event, watch->path);
         notify_event_set_filename(event, iev->name);
-        event->dir = isdir;
 
-        switch(iev->mask) {
-        case IN_CREATE :
-        case IN_MOVED_TO :
+        /*
+         * Because of limitation on the information we get from inotify
+         * We must do something else to find out what type a "file/link" should be.
+         *
+         *   if CREATE or MOVED_TO:
+         *      The file is present on the filesystem, so we
+         *      only need to perform a simple system call.
+         *
+         *   if DELETE or MOVED_FROM:
+         *      The file is no longer present on the filesystem, but
+         *      we will treat the symlink as a directory if we are
+         *      watching the path. since we only watch directories.
+         *      otherwise it may be a symlink we simple do not care about
+         *      or some other file.
+         */
+        if (iev->mask & IN_CREATE || iev->mask & IN_MOVED_TO) {
+            event->dir = (iev->mask & IN_ISDIR) ? 1 : 
+                is_dir(mkpath("%s/%s", event->path, event->filename));
+
             event->type = NOTIFY_CREATE;
-            break;
-        case IN_DELETE :
-        case IN_MOVED_FROM :
+        } else if (iev->mask & IN_DELETE || iev->mask & IN_MOVED_FROM) {
+
+            if (iev->mask & IN_ISDIR) {
+                event->dir = 1;
+            } else {
+                const char *path = mkpath("%s%s/", event->path, event->filename);
+
+                if (inotify_map_get_wd(path) > 0) {
+                    inotify_unmap_path(path);
+                    event->dir = 1;
+                } else {
+                    event->dir = 0;
+                }
+            }
             event->type = NOTIFY_DELETE;
-            inotify_ignore(mkpath("%s%s/", event->path, event->filename));
-            break;
-        default:
+        } else {
             event->type = NOTIFY_UNKNOWN;
         }
 

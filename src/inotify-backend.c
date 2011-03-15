@@ -22,11 +22,15 @@
 
 #define WATCH_MASK (IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR)
 
-#define PROCFS_QSIZE "/proc/sys/fs/inotify/max_queued_events"
+#define PROCFS_PATH "/proc/sys/fs/inotify/"
+
+#define PROCFS_QSIZE PROCFS_PATH "max_queued_events"
+#define PROCFS_MAX_WATCHES PROCFS_PATH "max_user_watches"
 
 static int fd = -1;
 
 static unsigned inotify_qsize = 256;
+static unsigned inotify_max_watches = 8192;
 
 void read_unsigned_int(const char *filename, unsigned *val) {
 
@@ -56,6 +60,14 @@ int inotify_backend_init(void) {
         return -errno;
 
     read_unsigned_int(PROCFS_QSIZE, &inotify_qsize);
+    read_unsigned_int(PROCFS_MAX_WATCHES, &inotify_max_watches);
+
+    if (inotify_max_watches < 16384)
+        logmsg(LOG_WARN,
+            "inotify: the maximum number of inotify"
+            " watches is quite low (%u)."
+            " the application may not be able to track all files",
+            inotify_max_watches);
 
     return fd;
 }

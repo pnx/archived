@@ -9,9 +9,12 @@
  */
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <time.h>
+#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 
 #include "inotify-backend.h"
 #include "inotify-syscalls.h"
@@ -19,9 +22,29 @@
 
 #define WATCH_MASK (IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR)
 
+#define PROCFS_QSIZE "/proc/sys/fs/inotify/max_queued_events"
+
 static int fd = -1;
 
 static unsigned inotify_qsize = 256;
+
+void read_unsigned_int(const char *filename, unsigned *val) {
+
+    int fd;
+    char buf[16];
+
+    fd = open(filename, O_RDONLY);
+    if (fd < 0)
+        return;
+    if (read(fd, buf, 15) > 0 && *buf) {
+        unsigned long tmp;
+        errno = 0;
+        tmp = strtoul(buf, NULL, 10);
+        if (!errno && tmp <= (unsigned)-1)
+            *val = tmp;
+    }
+    close(fd);
+}
 
 int inotify_backend_init(void) {
 
@@ -29,6 +52,11 @@ int inotify_backend_init(void) {
         close(fd);
 
     fd = inotify_init();
+    if (fd < 0)
+        return -errno;
+
+    read_unsigned_int(PROCFS_QSIZE, &inotify_qsize);
+
     return fd;
 }
 

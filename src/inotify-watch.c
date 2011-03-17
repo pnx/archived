@@ -60,7 +60,7 @@ void inotify_watch_rm(struct watch *watch) {
     tree_unlink(&watch->tree);
 }
 
-struct watch* inoitfy_watch_find_child(struct watch *watch, const char *path) {
+struct watch* inotify_watch_find_child(struct watch *watch, const char *path) {
 
     if (watch->tree.child) {
         struct watch *it = (struct watch *) watch->tree.child;

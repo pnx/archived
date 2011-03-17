@@ -18,4 +18,6 @@ struct watch* inotify_watch_add(struct watch *parent, struct watch *watch);
 
 void inotify_watch_rm(struct watch *watch);
 
+struct watch* inotify_watch_find_child(struct watch *watch, const char *path);
+
 #endif

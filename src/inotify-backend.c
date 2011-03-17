@@ -20,6 +20,8 @@
 #include "inotify-syscalls.h"
 #include "log.h"
 
+#define IN_ONLYDIR 0x01000000
+
 #define WATCH_MASK (IN_MOVE | IN_CREATE | IN_DELETE | IN_ONLYDIR)
 
 #define PROCFS_PATH "/proc/sys/fs/inotify/"

@@ -50,20 +50,7 @@ struct inotify_event {
 #define IN_CLOSE	     (IN_CLOSE_WRITE | IN_CLOSE_NOWRITE)	/* Close.  */
 #define IN_MOVE		     (IN_MOVED_FROM | IN_MOVED_TO)		/* Moves.  */
 
-/* Special flags.  */
-#define IN_ONLYDIR	     0x01000000	/* Only watch the path if it is a
-                                directory.  */
-#define IN_DONT_FOLLOW	 0x02000000	/* Do not follow a sym link.  */
-#define IN_MASK_ADD	     0x20000000	/* Add to the mask of an already
-                                existing watch.  */
 #define IN_ISDIR	     0x40000000	/* Event occurred against dir.  */
-#define IN_ONESHOT	     0x80000000	/* Only send event once.  */
-
-/* All events which a program can wait on. */
-#define IN_ALL_EVENTS	 (IN_ACCESS | IN_MODIFY | IN_ATTRIB | IN_CLOSE_WRITE  \
-			  | IN_CLOSE_NOWRITE | IN_OPEN | IN_MOVED_FROM	                  \
-			  | IN_MOVED_TO | IN_CREATE | IN_DELETE		                      \
-			  | IN_DELETE_SELF | IN_MOVE_SELF)
 
 int inotify_backend_init(void);
 

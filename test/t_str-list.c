@@ -15,10 +15,10 @@ void test_insert() {
     str_list_insert(l, "c");
     str_list_insert(l, "b");
     str_list_insert(l, "d");
-    
+
     for(i=0; i < 4; i++)
         assert(strcmp(l->items[i], ref[i]) == 0);
-    
+
     str_list_clear_fn(l, NULL);
     str_list_destroy(l);
 }
@@ -27,36 +27,36 @@ void test_remove() {
 
     char *ref[2] = { "a", "c" };
     struct str_list *l = str_list_create();
-    
+
     str_list_insert(l, "a");
     str_list_insert(l, "c");
     str_list_insert(l, "b");
     str_list_insert(l, "d");
-    
+
     str_list_remove(l, "d");
     str_list_remove(l, "b");
-    
+
     assert(str_list_size(l) == 2);
     assert(strcmp(l->items[0], ref[0]) == 0);
     assert(strcmp(l->items[1], ref[1]) == 0);
-    
+
     str_list_remove(l, "c");
     str_list_remove(l, "a");
-    
+
     assert(str_list_size(l) == 0);
     str_list_destroy(l);
 }
 
 void test_isempty() {
-    
+
     struct str_list *l = NULL;
-    
+
     assert(str_list_isempty(l));
     l = str_list_create();
     assert(str_list_isempty(l));
     str_list_insert(l, "string");
     assert(str_list_isempty(l) == 0);
-    
+
     str_list_clear_fn(l, NULL);
     str_list_destroy(l);
 }
@@ -64,14 +64,14 @@ void test_isempty() {
 void test_size() {
 
     struct str_list *l = NULL;
-    
+
     assert(str_list_size(l) == 0);
     l = str_list_create();
     assert(str_list_size(l) == 0);
     str_list_insert(l, "a");
     str_list_insert(l, "b");
     assert(str_list_size(l) == 2);
-    
+
     str_list_clear_fn(l, NULL);
     str_list_destroy(l);
 }
@@ -105,7 +105,7 @@ void test_foreach() {
 
     str_list_foreach(item, l) {
         assert_string(ref[i], *item);
-        i++; 
+        i++;
     }
 
     str_list_clear_fn(l, NULL);
@@ -115,12 +115,12 @@ void test_foreach() {
 void test_has() {
 
     struct str_list *l = str_list_create();
-    
+
     str_list_insert(l, "something");
     str_list_insert(l, "somethingelse");
     assert(str_list_has(l, l->items[1]));
     assert(str_list_has(l, "don't exists") == 0);
-    
+
     str_list_clear_fn(l, NULL);
     str_list_destroy(l);
 }
@@ -132,10 +132,10 @@ void test_lookup() {
     str_list_insert(l, "something");
     str_list_insert(l, "find me");
     str_list_insert(l, "random");
-    
+
     assert(strcmp(str_list_lookup(l, "find me"), "find me") == 0);
     assert(str_list_lookup(l, "don't exists") == NULL);
-    
+
     str_list_clear_fn(l, NULL);
     str_list_destroy(l);
 }
@@ -160,7 +160,7 @@ void test_export() {
 
     assert(i == 3);
     free(export);
-    
+
     str_list_clear_fn(l, NULL);
     str_list_destroy(l);
 }

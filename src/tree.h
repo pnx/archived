@@ -7,7 +7,7 @@
  *   the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
  */
- 
+
 #ifndef __TREE_H
 #define __TREE_H
 
@@ -37,7 +37,7 @@ struct tree* tree_link(struct tree *parent, struct tree *tree);
 
 void tree_unlink(struct tree *tree);
 
-void tree_move(struct tree *dest, struct tree *src); 
+void tree_move(struct tree *dest, struct tree *src);
 
 void tree_detach(struct tree *tree);
 

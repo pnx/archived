@@ -136,7 +136,7 @@ unsigned logstrtolvl(const char *str) {
 
 void logmsg(unsigned level, const char *fmt, ...) {
 
-	va_list vl;
+    va_list vl;
 
     if (!validmask(level, 1))
         die("log: invalid level: %x\n", level);
@@ -155,9 +155,9 @@ void logmsg(unsigned level, const char *fmt, ...) {
 
 void logerrno(unsigned level, const char *prefix, int err) {
 
-	char *str = strerror(err);
-    
-	if (str && level & mask) {
+    char *str = strerror(err);
+
+    if (str && level & mask) {
 
         if (!validmask(level, 1))
             die("logerrno: invalid level: %x\n", level);
@@ -169,5 +169,5 @@ void logerrno(unsigned level, const char *prefix, int err) {
         fputs(str, logfd);
         fputc('\n', logfd);
         fflush(logfd);
-	}
+    }
 }

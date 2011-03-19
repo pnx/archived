@@ -52,7 +52,7 @@ void test_unlink() {
     assert(nodes[0].parent == NULL);
     assert(nodes[0].next == NULL);
     assert(nodes[0].child == &nodes[1]);
-    
+
     /* move to depth 2 */
     assert(nodes[1].parent == &nodes[0]);
     assert(nodes[2].parent == &nodes[0]);
@@ -71,14 +71,14 @@ void test_unlink() {
     assert(nodes[3].child == NULL);
     assert(nodes[4].child == NULL);
     assert(nodes[5].child == NULL);
-    
+
     tree_unlink(&nodes[1]);
 
     /* check the new tree */
     assert(nodes[0].parent == NULL);
     assert(nodes[0].next == NULL);
     assert(nodes[0].child == &nodes[2]);
-    
+
     /* move to depth 2 */
     assert(nodes[2].parent == &nodes[0]);
     assert(nodes[3].parent == &nodes[0]);
@@ -89,7 +89,7 @@ void test_unlink() {
     assert(nodes[2].child == &nodes[5]);
     assert(nodes[3].child == NULL);
     assert(nodes[4].child == NULL);
-    
+
     /* move to depth 3 */
     assert(nodes[5].parent == &nodes[2]);
     assert(nodes[5].next == NULL);
@@ -111,7 +111,7 @@ void test_detach() {
     assert(nodes[0].parent == NULL);
     assert(nodes[0].next == NULL);
     assert(nodes[0].child == &nodes[1]);
-    
+
     /* move to depth 2 */
     assert(nodes[1].parent == &nodes[0]);
     assert(nodes[2].parent == &nodes[0]);
@@ -137,7 +137,7 @@ void test_detach() {
     assert(nodes[0].parent == NULL);
     assert(nodes[0].next == NULL);
     assert(nodes[0].child == &nodes[2]);
-    
+
     /* move to depth 2 */
     assert(nodes[2].parent == &nodes[0]);
     assert(nodes[2].next == NULL);

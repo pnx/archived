@@ -95,5 +95,4 @@ All API's should be externaly documented in the doc/ directory.
 Things to keep in mind when modify or write code
 ------------------------------------------------
 
-include and change the comment found in TEMPLATE file, at the top of the .c/.h file 
-
+include and change the comment found in TEMPLATE file, at the top of the .c/.h file

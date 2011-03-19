@@ -1,5 +1,5 @@
 /* inotify-map.c
- * 
+ *
  *  (C) Copyright 2011 Henrik Hautakoski <henrik@fiktivkod.org>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -118,7 +118,7 @@ static int unmap_wd(struct watch *watch) {
     int index;
     struct list s = { (void**)&watch, 1 }, *list;
 
-	list = rbtree_search(&tree_wd_paths, &s);
+    list = rbtree_search(&tree_wd_paths, &s);
     if (list) {
 
         index = list_indexof(list, watch);

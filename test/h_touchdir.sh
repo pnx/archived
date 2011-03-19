@@ -3,8 +3,8 @@
 # Helper for touching a number of files in a directory.
 
 if [ $# -lt 1 ]; then
-	echo "usage: $0 <dir> [ <nfiles> ]"
-	exit 1
+    echo "usage: $0 <dir> [ <nfiles> ]"
+    exit 1
 fi
 
 if [ ! -d $1 ]; then
@@ -23,5 +23,5 @@ if [ $# -gt 1 ]; then
 fi
 
 for i in `seq 0 ${NFILES}`; do
-	touch "${1}/file${i}"
+    touch "${1}/file${i}"
 done

@@ -89,7 +89,7 @@ void test_size() {
     list_insert(l, NULL);
     list_insert(l, NULL);
     assert(list_size(l) == 2);
-    
+
     list_destroy(l);
 }
 

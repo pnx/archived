@@ -31,7 +31,7 @@ NOTE: no data is copied, only the address 'obj' is stored in the queue.
 `queue_isempty()`::
 
     Returns non zero if 'q' is empty. zero otherwise.
-    
+
 `queue_num_items`::
 
     Returns the number of items in 'q' at this given moment.

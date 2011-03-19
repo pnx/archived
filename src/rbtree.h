@@ -1,5 +1,5 @@
 /* rbtree.h
- * 
+ *
  *   Copyright (C) 2010-2011  Henrik Hautakoski <henrik@fiktivkod.org>
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 #include <stddef.h>
 
 typedef struct {
-	struct _rbn *root;
+    struct _rbn *root;
     /* user defined operations */
     int  (*cmp_fn)(const void *, const void *);
 } rbtree;

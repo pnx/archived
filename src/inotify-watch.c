@@ -11,7 +11,7 @@ struct watch* inotify_watch_new(int wd, const char *path) {
 
     w->wd = wd;
     w->path = path;
-    
+
     return w;
 }
 
@@ -28,7 +28,7 @@ void inotify_watch_destroy(struct watch *watch, void (*fn)(struct watch *)) {
 
     if (watch) {
         struct tree *tree = (struct tree*) watch;
-        
+
         if (!tree_is_root(tree))
             tree_detach(tree);
 
@@ -40,7 +40,7 @@ struct watch* inotify_watch_add(struct watch *parent, struct watch *watch) {
 
     if (parent->tree.child) {
         struct watch *it = (struct watch*)parent->tree.child;
-        
+
         /* move nodes that are children of this watch alongside watch */
         while(it) {
             if (path_isparent(it->path, watch->path)) {

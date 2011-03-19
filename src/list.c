@@ -24,10 +24,10 @@ static void resize(struct list *l) {
 
 struct list* list_create(void) {
 
-	struct list *list = xmalloc(sizeof(struct list));
-	list->items = NULL;
-	list->nr = 0;
-	return list;
+    struct list *list = xmalloc(sizeof(struct list));
+    list->items = NULL;
+    list->nr = 0;
+    return list;
 }
 
 struct list* list_copy(struct list *list) {
@@ -69,22 +69,22 @@ void list_clear_fn(struct list *list, clear_fn_t *fn) {
 
 int list_insert(struct list *list, const void *item) {
 
-	if (!list)
-		return -1;
+   if (!list)
+             return -1;
 
     list->items = xrealloc(list->items, sizeof(list->items) * (++list->nr));
     list->items[list->nr - 1] = (void *) item;
-	
+
     return list->nr;
 }
 
 void* list_remove(struct list *list, unsigned index) {
 
-	void *item = NULL;
+    void *item = NULL;
 
     if (list && index < list->nr) {
         if (index < --list->nr) {
-            memmove(list->items + index, list->items + index + 1, 
+            memmove(list->items + index, list->items + index + 1,
                 sizeof(list->items) * (list->nr - index));
         }
         resize(list);
@@ -105,29 +105,29 @@ void* list_reduce(struct list *list) {
 
 int list_indexof(struct list *list, const void *item) {
 
-	int i;
-	
-	for(i=0; i < list->nr; i++) {
-	
-		if (list->items[i] == item)
-			return i;
-	}
-	return -1;
+    int i;
+
+    for(i=0; i < list->nr; i++) {
+
+    if (list->items[i] == item)
+        return i;
+    }
+    return -1;
 }
 
 void* list_lookup(struct list *list, const void *item, cmp_fn_t *fn) {
 
-	int i;
-	
-	if (fn) {
-		for(i=0; i < list->nr; i++) {
-			if (fn(list->items[i], item) == 0)
-				return list->items[i];
-		}
-	} else {
-		i = list_indexof(list, item);
-		if (i >= 0)
-			return list->items[i];
-	}
-	return NULL;
+    int i;
+
+    if (fn) {
+        for(i=0; i < list->nr; i++) {
+            if (fn(list->items[i], item) == 0)
+                return list->items[i];
+        }
+    } else {
+        i = list_indexof(list, item);
+        if (i >= 0)
+            return list->items[i];
+    }
+    return NULL;
 }

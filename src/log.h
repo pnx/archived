@@ -14,7 +14,7 @@
 #include <stddef.h>
 
 #define LOG_INFO  (1<<0)
-#define LOG_WARN  (1<<1) 
+#define LOG_WARN  (1<<1)
 #define LOG_CRIT  (1<<2)
 #define LOG_DEBUG (1<<3)
 #define LOG_ALL   (LOG_INFO | LOG_WARN | LOG_CRIT | LOG_DEBUG)

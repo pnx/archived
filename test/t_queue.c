@@ -43,7 +43,7 @@ void test_dequeue() {
 
     for(i=0; i < 512; i++)
         assert(queue_dequeue(q) == &map[i]);
-        
+
     tierdown();
 }
 
@@ -57,7 +57,7 @@ void test_isempty() {
 
     assert(queue_isempty(q));
     assert(queue_isempty(NULL));
-    
+
     tierdown();
 }
 
@@ -94,6 +94,6 @@ int main() {
 
     if (q)
         queue_destroy(q);
-    
-	return 0;
+
+    return 0;
 }

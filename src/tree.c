@@ -110,7 +110,7 @@ void tree_traverse(struct tree *tree, tree_traverse_fn fn, void *data) {
 size_t tree_parent_count(struct tree *tree) {
 
     size_t count = 0;
-    
+
     if (tree) {
         for(; tree->parent; count++)
             tree = tree->parent;

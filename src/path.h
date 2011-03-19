@@ -1,5 +1,5 @@
 /* path.h - path handling routines
- * 
+ *
  *   Copyright (C) 2010-2011  Henrik Hautakoski <henrik@fiktivkod.org>
  *
  *   This program is free software: you can redistribute it and/or modify

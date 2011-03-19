@@ -16,10 +16,10 @@ Holds information about a node on the filesystem
 
 `name`::
     name of the entry (filename, directory name)
-    
+
 `base`::
     The base directory where `name` exists in.
-    
+
 `dir`::
     zero if the entry is a file, non zero otherwise
 

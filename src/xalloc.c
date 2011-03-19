@@ -52,7 +52,7 @@ void* xrealloc(void *ptr, size_t size) {
 
     void *new;
     CHECK_INPUT(size, "xrealloc");
-    
+
     new = realloc(ptr, size);
     if (!new)
         die("xrealloc: Can't resize memory block (%s) on '%p' with size '%lu'",

@@ -31,7 +31,7 @@ static void vdelete(void *ptr) {
             break;
         }
     }
-    
+
     assert(exists);
 }
 
@@ -68,7 +68,7 @@ static void setup(int sorted) {
 
     if (sorted)
         qsort(keyref, NODES, sizeof(keyref[0]), vcmp);
-        
+
     for(i=0; i < NODES; i++)
         rbtree_insert(&tree, &keyref[i]);
 }
@@ -106,7 +106,7 @@ void test_rbtree_delete() {
 
         if (keyref_exists(NODES/2, i-1, keyref[i]))
             continue;
-        
+
         assert(rbtree_delete(&tree, &keyref[i]));
     }
 
@@ -127,7 +127,7 @@ void test_rbtree_delete_all() {
 
         if (keyref_exists(0, i-1, keyref[i]))
             continue;
-        
+
         assert(rbtree_delete(&tree, &keyref[i]));
     }
 

@@ -26,7 +26,7 @@
      (x)->fts_info == FTS_SLNONE)
 
 struct __fscrawl {
-	FTS *fts;
+    FTS *fts;
     fs_entry ent;
 };
 
@@ -43,11 +43,11 @@ static fs_entry* ftsentcpy(fs_entry *dest, FTSENT *src) {
 
     if (len > 0) {
         char *newbase = realloc(dest->base, len + 1);
-        
+
         if (newbase) {
             memcpy(newbase, src->fts_path, len);
             newbase[len] = '\0';
-        
+
             dest->base = newbase;
             dest->name = src->fts_name;
             dest->dir = src->fts_info == FTS_D;
@@ -59,13 +59,13 @@ static fs_entry* ftsentcpy(fs_entry *dest, FTSENT *src) {
 }
 
 fscrawl_t fsc_open(const char *path) {
-	
-	struct __fscrawl *f;
+
+    struct __fscrawl *f;
     char *npath;
 
     f = malloc(sizeof(struct __fscrawl));
-	if (!f)
-		return NULL;
+    if (!f)
+        return NULL;
 
     npath = path_normalize(path, NULL, 1);
     if (!npath)
@@ -82,7 +82,7 @@ fscrawl_t fsc_open(const char *path) {
     f->ent.base = NULL;
     f->ent.name = NULL;
     f->ent.dir = 0;
-	return f;
+    return f;
 free:
     if (f)
         free(f);
@@ -101,23 +101,23 @@ void fsc_close(fscrawl_t f) {
 }
 
 fs_entry* fsc_cpy(fs_entry *ent) {
-	
-	void *ptr = malloc(sizeof(fs_entry));
-	
-	if (ptr == NULL)
-		return NULL;
-	
-	memcpy(ptr, ent, sizeof(fs_entry));
-	
-	return ptr;
+
+    void *ptr = malloc(sizeof(fs_entry));
+
+    if (ptr == NULL)
+        return NULL;
+
+    memcpy(ptr, ent, sizeof(fs_entry));
+
+    return ptr;
 }
 
 fs_entry* fsc_read(fscrawl_t f) {
 
-	FTSENT *ent;
+    FTSENT *ent;
 
-	if (!f)
-		return NULL;
+    if (!f)
+        return NULL;
 
     for(;;) {
         ent = fts_read(f->fts);

@@ -40,7 +40,7 @@ static void validate_list(int index, struct list *list) {
 
         if (i != wdref[index])
             continue;
-            
+
         assert(list_has(list, pathref[index], cmp));
     }
 }
@@ -78,7 +78,7 @@ void test_inotify_unmap_path() {
 void test_inotify_unmap_all() {
 
     setup();
-    
+
     inotify_unmap_all();
     assert(inotify_map_isempty());
 
@@ -90,7 +90,7 @@ void test_inotify_map_get_wd() {
     int i;
 
     setup();
-    
+
     for(i=0; i < 4; i++)
         assert(inotify_map_get_wd(pathref[i]) == wdref[i]);
 
@@ -107,7 +107,7 @@ void test_inotify_map_get_path() {
         validate_list(i, inotify_map_get_path(wdref[i]));
 
     assert(inotify_map_get_path(25) == NULL);
-    
+
     teardown();
 }
 
@@ -118,6 +118,6 @@ int main() {
     test_inotify_unmap_all();
     test_inotify_map_get_wd();
     test_inotify_map_get_path();
-    
+
     return 0;
 }

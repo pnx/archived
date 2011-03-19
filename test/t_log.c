@@ -19,7 +19,7 @@ int main() {
 
     logerrno(LOG_CRIT, "malloc", ENOMEM);
     logerrno(LOG_CRIT, NULL, ENOENT);
-    
+
     logmsg(LOG_DEBUG, "Should not show");
 
     logmsg(LOG_INFO | LOG_CRIT, "Should not work, can only log to one priority");

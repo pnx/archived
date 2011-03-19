@@ -6,7 +6,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,36 +52,36 @@ static int load_config(const char *file) {
    when in main loop is by signal */
 static void clean_exit(int excode) {
 
-	time_t t = time(NULL);
+    time_t t = time(NULL);
 
-	notify_exit();
+    notify_exit();
 
-	database_close();
+    database_close();
 
     iniparser_freedict(config);
 
-	printf("\nprocess exit at: %s", ctime(&t));
-	exit(excode);
+    printf("\nprocess exit at: %s", ctime(&t));
+    exit(excode);
 }
 
 /* Signal handler */
 static void sighandl(int sig) {
 
-	switch(sig) {
-	/* normal exit signals */
-	case SIGTERM :
-	case SIGKILL :
-	case SIGINT  :
-		clean_exit(EXIT_SUCCESS);
-	/* segmentation violation, let user now */
-	case SIGSEGV :
-		fprintf(stderr, "SEGFAULT: o no he didn't\n");
-		clean_exit(EXIT_FAILURE);
-	case SIGUSR1 :
-	case SIGUSR2 :
-		printf("notify stat:\n");
-		notify_stat();
-	}
+    switch(sig) {
+    /* normal exit signals */
+    case SIGTERM :
+    case SIGKILL :
+    case SIGINT  :
+        clean_exit(EXIT_SUCCESS);
+        /* segmentation violation, let user now */
+    case SIGSEGV :
+        fprintf(stderr, "SEGFAULT: o no he didn't\n");
+        clean_exit(EXIT_FAILURE);
+    case SIGUSR1 :
+    case SIGUSR2 :
+        printf("notify stat:\n");
+        notify_stat();
+    }
 }
 
 /*
@@ -97,7 +97,7 @@ static void main_loop() {
 
         if (event == NULL)
             continue;
-            
+
         logmsg(LOG_DEBUG, "%s: (%c) %s%s", notify_event_typetostr(event),
             event->dir ? 'D' : 'F', event->path, event->filename);
 
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
         } else {
             die("config (log:level): no levels defined\n");
         }
-        
+
         init_log(level, path);
     }
 

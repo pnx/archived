@@ -1,5 +1,5 @@
 /* path.c - path handling routines
- * 
+ *
  *   Copyright (C) 2010-2011  Henrik Hautakoski <henrik.hautakoski@gmail.com>
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -7,7 +7,7 @@
  *   the Free Software Foundation, either version 3 of the License, or
  *   (at your option) any later version.
  *
- *   The design goal here is to not use fixed size buffers because 
+ *   The design goal here is to not use fixed size buffers because
  *   path's can be extremely long (slightly overexaggerated but extreme cases are extreme).
  *   so we use funky heap memory based algorithms instead :)
  */
@@ -24,17 +24,17 @@
 static char path_null = '\0';
 
 static inline int has_delim(const char *str) {
-	
-	if (str == NULL)
-		return 0;
-	
-	return strchr(str, '/') != NULL;
+
+    if (str == NULL)
+        return 0;
+
+    return strchr(str, '/') != NULL;
 }
 
 int is_abspath(const char *path) {
 
-	if (path == NULL || *path != '/')
-		return 0;
+    if (path == NULL || *path != '/')
+        return 0;
 
     for(; *path; path++) {
 
@@ -47,7 +47,7 @@ int is_abspath(const char *path) {
         }
     }
 
-	return 1;
+    return 1;
 }
 
 int is_file(const char *path) {
@@ -62,7 +62,7 @@ int is_file(const char *path) {
 int is_dir(const char *path) {
 
     struct stat st;
-    
+
     if (path && stat(path, &st) >= 0)
         return S_ISDIR(st.st_mode);
     return 0;
@@ -72,7 +72,7 @@ int path_isparent(const char *path, const char *parent) {
 
     if (*path++ != '/' || *parent++ != '/')
         return 0;
-        
+
     while(*path) {
         if (*parent == '\0')
             return *path == '/' || *(path-1) == '/';
@@ -118,7 +118,7 @@ const char *mkpath(const char *fmt, ...) {
     } else {
         strbuf_expand(&sb, 1);
     }
-    
+
     va_start(va, fmt);
     len = strbuf_append_va(&sb, fmt, va);
     va_end(va);
@@ -146,8 +146,8 @@ char* path_normalize(const char *base, const char *name, unsigned dir) {
 
     strbuf_t sb = STRBUF_INIT;
 
-    if (base == NULL || has_delim(name)) 
-		return NULL;
+    if (base == NULL || has_delim(name))
+           return NULL;
 
     if (*base == '~') {
         base++;
@@ -163,7 +163,7 @@ char* path_normalize(const char *base, const char *name, unsigned dir) {
 
     if (name) {
         strbuf_append_str(&sb, name);
-    
+
         if (dir)
             strbuf_append_ch(&sb, '/');
     }

@@ -22,26 +22,26 @@ char strbuf_null = '\0';
 
 void strbuf_init(strbuf_t *s) {
 
-	s->buf = &strbuf_null;
-	s->alloc_size = s->len = 0;
+    s->buf = &strbuf_null;
+    s->alloc_size = s->len = 0;
 }
 
 size_t strbuf_avail(strbuf_t *s) {
-    
+
     return s->alloc_size ? s->alloc_size - (s->len + 1) : 0;
 }
 
 void strbuf_expand(strbuf_t *s, size_t len) {
 
     if (s->len + len + 1 < s->alloc_size)
-		return;
+        return;
     if (!s->alloc_size)
         s->buf = NULL;
 
-	do 
-		s->alloc_size += CHNK_SIZE;
-	while(s->len + len + 1 > s->alloc_size);
-	
+    do
+        s->alloc_size += CHNK_SIZE;
+    while(s->len + len + 1 > s->alloc_size);
+
     s->buf = xrealloc(s->buf, s->alloc_size);
 }
 
@@ -66,25 +66,25 @@ void strbuf_setlen(strbuf_t *s, size_t len) {
 
 char* strbuf_release(strbuf_t *s) {
 
-	char *ret;
-	
-	if (!s->alloc_size)
+    char *ret;
+
+    if (!s->alloc_size)
         ret = xmallocz(1);
     else if (s->len + 1 != s->alloc_size)
-		ret = xrealloc(s->buf, s->len + 1);
-	else
-		ret = s->buf;
-	
-	strbuf_init(s);
-	
-	return ret;
+        ret = xrealloc(s->buf, s->len + 1);
+    else
+        ret = s->buf;
+
+    strbuf_init(s);
+
+    return ret;
 }
 
 void strbuf_free(strbuf_t *s) {
 
     if (!s->alloc_size)
         return;
-        
+
     xfree(s->buf);
     strbuf_init(s);
 }
@@ -122,7 +122,7 @@ void strbuf_appendf(strbuf_t *s, const char *fmt, ...) {
 
     va_list va;
     int len;
-    
+
     if (!strbuf_avail(s))
         strbuf_expand(s, CHNK_SIZE-1);
 
@@ -131,10 +131,10 @@ void strbuf_appendf(strbuf_t *s, const char *fmt, ...) {
     va_end(va);
 
     if (len > 0) {
-    	strbuf_expand(s, len);
-    	va_start(va, fmt);
-    	len = strbuf_append_va(s, fmt, va);
-    	va_end(va);
+        strbuf_expand(s, len);
+        va_start(va, fmt);
+        len = strbuf_append_va(s, fmt, va);
+        va_end(va);
     }
 }
 
@@ -186,8 +186,8 @@ void strbuf_term(strbuf_t *s, char ch) {
 
 void strbuf_trim(strbuf_t *s) {
 
-	strbuf_rtrim(s);
-	strbuf_ltrim(s);
+    strbuf_rtrim(s);
+    strbuf_ltrim(s);
 }
 
 void strbuf_rtrim(strbuf_t *s) {
@@ -200,15 +200,15 @@ void strbuf_rtrim(strbuf_t *s) {
 void strbuf_ltrim(strbuf_t *s) {
 
     size_t i, of = 0;
-	
-	for(; of < s->len && isspace(s->buf[of]); of++);
-	
-	if (of < 1)
-		return;
 
-	s->len -= of;
-	for(i=0; i <= s->len; i++)
-		s->buf[i] = s->buf[i + of];
+    for(; of < s->len && isspace(s->buf[of]); of++);
+
+    if (of < 1)
+        return;
+
+    s->len -= of;
+    for(i=0; i <= s->len; i++)
+        s->buf[i] = s->buf[i + of];
 }
 
 void strbuf_rev(strbuf_t *s) {
@@ -251,7 +251,7 @@ strbuf_t** strbuf_explode(const strbuf_t *s, char sep) {
     strbuf_t *tmp, **list;
 
     list = xmallocz(sizeof(strbuf_t *) * count);
-    
+
     p = s->buf;
     while(p < s->buf + s->len) {
         char *d = memchr(p, sep, s->len - (p - s->buf));

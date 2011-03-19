@@ -19,7 +19,7 @@
 /* linked list node holding a chunk of queue elements */
 struct node {
     void *block[BLOCK_SIZE];
-	struct node *next;
+    struct node *next;
 };
 
 struct ref {
@@ -28,22 +28,22 @@ struct ref {
 };
 
 struct __queue {
-	struct ref tail;
-	struct ref head;
+    struct ref tail;
+    struct ref head;
 };
 
 static void alloc_node(struct ref *head) {
 
-	struct node *n = xmalloc(sizeof(struct node));
+    struct node *n = xmalloc(sizeof(struct node));
 
     n->next = NULL;
-	head->n = head->n->next = n;
-	head->i = 0;
+    head->n = head->n->next = n;
+    head->i = 0;
 }
 
 static void dealloc_node(struct ref *tail) {
 
-	struct node *next = tail->n->next;
+    struct node *next = tail->n->next;
 
     if (next) {
         xfree(tail->n);
@@ -58,7 +58,7 @@ queue_t queue_init() {
     q->tail.n = q->head.n = xmalloc(sizeof(struct node));
     q->tail.n->next = q->head.n->next = NULL;
     q->tail.i = q->head.i = 0;
-    
+
     return q;
 }
 
@@ -81,10 +81,10 @@ void queue_enqueue(queue_t q, void *obj) {
         return;
 
     if (q->head.i >= BLOCK_SIZE) {
-		alloc_node(&q->head);
+          alloc_node(&q->head);
     }
 
-	q->head.n->block[q->head.i++] = obj;
+    q->head.n->block[q->head.i++] = obj;
 }
 
 void* queue_dequeue(queue_t q) {
@@ -101,7 +101,7 @@ void* queue_dequeue(queue_t q) {
     } else if (q->tail.i >= BLOCK_SIZE) {
         dealloc_node(&q->tail);
     }
-    
+
     return obj;
 }
 
@@ -129,4 +129,3 @@ size_t queue_num_items(queue_t q) {
         len += BLOCK_SIZE;
     return len;
 }
-

@@ -2,7 +2,7 @@
 # Common Makefile configuration for Archived
 #
 
-CFLAGS   += $(shell getconf LFS_CFLAGS) -D_GNU_SOURCE=1 
+CFLAGS   += $(shell getconf LFS_CFLAGS) -D_GNU_SOURCE=1
 LDFLAGS  += $(shell getconf LFS_LDFLAGS)
 
 # output tuning

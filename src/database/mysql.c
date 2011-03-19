@@ -30,9 +30,9 @@ static char* escape(const char *str) {
 
     size_t len = strlen(str);
     char *esc  = xmalloc(len * 2 + 1);
-    
+
     mysql_real_escape_string(db.connection, esc, str, len);
-    
+
     return esc;
 }
 
@@ -158,13 +158,13 @@ int database_insert(const char *path, const char *filename, const int isdir) {
         fprintf(stderr, "mysql: Lost connection to database. Could not reconnect\n");
         return -1;
     }
-    
+
     /* Escape the strings */
     escaped_path = escape(path);
     escaped_filename = escape(filename);
 
     stmt = xmalloc(strlen(stmt_insert) + strlen(db.table) + strlen(escaped_path) + strlen(escaped_filename) - 6);
-        
+
     /* Create mysql query */
     sprintf(stmt, stmt_insert, db.table, escaped_path, escaped_filename, isdir != 0);
 

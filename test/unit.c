@@ -15,22 +15,21 @@ static inline char ranchr() {
 }
 
 void __assert_str(const char *file, int line, const char *func, const char *a, const char *b) {
-    
+
     if (a == NULL || b == NULL)
         __uexit(file, line, func, "a or b is null\n", NULL);
 
     if (strcmp(a, b) != 0)
         __uexit(file, line, func, "\"%s\" != \"%s\"\n", a, b);
-    
 }
 
 void utest_init_RNG() {
 
     static unsigned char init = 0;
-    
+
     if (init)
         return;
-        
+
     srand(time(NULL));
     init = 1;
 }
@@ -52,7 +51,7 @@ char* utest_ran_string(size_t size) {
         return NULL;
 
     utest_init_RNG();
-    
+
     for(i=0; i < size; i++)
         str[i] = ranchr();
     str[i] = 0;

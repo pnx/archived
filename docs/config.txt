@@ -2,7 +2,7 @@ Configuration
 --------------
 
 Archive uses a .ini style configuration. The following options are
-available. 
+available.
 
 Value types
 ~~~~~~~~~~~
@@ -10,7 +10,7 @@ Value types
 Boolean ;;
     True:  Y, T, 1 +
     False: N, F, 0
-    
+
 String ;;
     Anything else.
 
@@ -48,4 +48,3 @@ database (String);;
     Database to use
 table (String);;
     Tablename to use
-    

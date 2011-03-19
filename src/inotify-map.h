@@ -1,5 +1,5 @@
 /* inotify-map.h
- * 
+ *
  *  (C) Copyright 2011 Henrik Hautakoski <henrik@fiktivkod.org>
  *
  *  This program is free software: you can redistribute it and/or modify

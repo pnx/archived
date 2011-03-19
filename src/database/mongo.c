@@ -55,7 +55,7 @@ int database_init(dictionary *conf) {
 
     char *confdb = iniparser_getstring(conf, "mongo:database", NULL);
     char *confcoll = iniparser_getstring(conf, "mongo:collection", NULL);
-    
+
     if (!confcoll) {
         fprintf(stderr, "mongo: missing 'collection' in configuration\n");
         return -1;
@@ -67,13 +67,13 @@ int database_init(dictionary *conf) {
 
     strncpy(db.opts.host, iniparser_getstring(conf, "mongo:host", "127.0.0.1"), sizeof(db.opts.host));
     db.opts.port = iniparser_getint(conf, "mongo:port", 27017);
-    
+
     mongo_conn_return status = mongo_connect(&db.conn, &db.opts);
 
     if (status != mongo_conn_success) {
 
         char *err;
-        
+
         switch (status) {
         case mongo_conn_bad_arg :
             err = "Bad arguments";
@@ -90,7 +90,7 @@ int database_init(dictionary *conf) {
         default:
             err = "Unkown error";
         }
-        
+
         fprintf(stderr, "mongo: %s (%s:%i)\n", err, db.opts.host, db.opts.port);
         return -1;
     }
@@ -115,7 +115,7 @@ int database_init(dictionary *conf) {
     /* prepare collection */
     coll_clear();
     coll_create_index();
-    
+
     return 0;
 }
 
@@ -159,7 +159,7 @@ int database_delete(const char *path, const char *filename) {
     bson_buffer_init(&buf);
     bson_append_regex(&buf, "Path", fpath, "");
     bson_from_buffer(&cond, &buf);
-    
+
     mongo_remove(&db.conn, db.ns, &cond);
 
     bson_destroy(&cond);

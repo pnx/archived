@@ -95,13 +95,13 @@ int str_list_insert(struct str_list *list, const char *str) {
 
     list->items = xrealloc(list->items, sizeof(list->items) * (list->nr + 1));
     if (index < list->nr) {
-        memmove(list->items + index + 1, list->items + index, 
+        memmove(list->items + index + 1, list->items + index,
             sizeof(list->items) * (list->nr - index));
     }
-    
+
     list->items[index] = (char *) str;
     list->nr++;
-    
+
     return index;
 }
 
@@ -114,7 +114,7 @@ char* str_list_remove(struct str_list *list, const char *str) {
         if (match && index < list->nr) {
             item = list->items[index];
             if (index < --list->nr) {
-                memmove(list->items + index, list->items + index + 1, 
+                memmove(list->items + index, list->items + index + 1,
                     sizeof(list->items) * (list->nr - index));
             }
             resize(list);
@@ -160,12 +160,10 @@ char** str_list_export(struct str_list *list) {
 
     int i;
     char **out = xmalloc(sizeof(char*) * (list->nr + 1));
-    
+
     for(i=0; i < list->nr; i++)
         out[i] = list->items[i];
     out[list->nr] = NULL;
 
     return out;
 }
-
-

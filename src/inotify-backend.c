@@ -84,12 +84,12 @@ void inotify_backend_exit(void) {
 int inotify_backend_watch(const char *path) {
 
     int wd = inotify_add_watch(fd, path, WATCH_MASK);
-    
-	if (wd < 0) {
+
+    if (wd < 0) {
         if (errno != EACCES && errno != ENOTDIR)
             logerrno(LOG_CRIT, "inotify_watch", errno);
-		return -errno;
-	}
+        return -errno;
+    }
     return wd;
 }
 

@@ -93,13 +93,13 @@ static int rmwatch(const char *path, const char *name) {
 
 int notify_init() {
 
-	if (!init) {
+    if (!init) {
         if (inotify_init() < 0)
             return -1;
         init_ev_q = queue_init();
         init = 1;
     }
-	return 0;
+    return 0;
 }
 
 void notify_exit() {
@@ -107,12 +107,12 @@ void notify_exit() {
     if (init) {
         notify_event *e;
         while((e = queue_dequeue(init_ev_q)))
-            notify_event_del(e); 
-		queue_destroy(init_ev_q);
+            notify_event_del(e);
+             queue_destroy(init_ev_q);
         init_ev_q = NULL;
 
         inotify_exit();
-        
+
         init = 0;
     }
 }
@@ -128,10 +128,10 @@ int notify_add_watch(const char *path) {
 }
 
 int notify_rm_watch(const char *path) {
-    
-	if (!init)
+
+    if (!init)
         die("inotify is not instantiated.");
-	return rmwatch(path, NULL);
+    return rmwatch(path, NULL);
 }
 
 notify_event* notify_read() {
@@ -140,10 +140,10 @@ notify_event* notify_read() {
 
     if (!init)
         die("inotify is not instantiated.");
-    
+
     if (!queue_isempty(init_ev_q))
         return queue_dequeue(init_ev_q);
-        
+
     ev = inotify_read();
 
     if (ev && ev->dir && ev->type == NOTIFY_CREATE)

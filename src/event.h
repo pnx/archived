@@ -1,5 +1,5 @@
 /* event.h - event data structure and operation's for notify API
- * 
+ *
  *  (C) Copyright 2010 Henrik Hautakoski <henrik@fiktivkod.org>
  *  (C) Copyright 2010 Fredric Nilsson <fredric@fiktivkod.org>
  *
@@ -15,17 +15,17 @@
 #include <stdint.h>
 
 /* event types */
-#define NOTIFY_UNKNOWN 	   (1 << 0)
-#define NOTIFY_CREATE 	   (1 << 1)
-#define NOTIFY_DELETE 	   (1 << 2)
-#define NOTIFY_MOVE_FROM   (1 << 3)
-#define NOTIFY_MOVE_TO     (1 << 4)
+#define NOTIFY_UNKNOWN      (1 << 0)
+#define NOTIFY_CREATE       (1 << 1)
+#define NOTIFY_DELETE       (1 << 2)
+#define NOTIFY_MOVE_FROM    (1 << 3)
+#define NOTIFY_MOVE_TO      (1 << 4)
 
 typedef struct {
-	uint8_t type; 	/* type of event */
-	uint8_t dir; 	/* non zero if event is triggered on a directory */
-	char *path; 	/* path of the triggered event */
-	char *filename; /* the filename event was triggered on */
+    uint8_t type;   /* type of event */
+    uint8_t dir;    /* non zero if event is triggered on a directory */
+    char *path;     /* path of the triggered event */
+    char *filename; /* the filename event was triggered on */
 } notify_event;
 
 notify_event* notify_event_new();

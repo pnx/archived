@@ -20,7 +20,7 @@ void test_setlen() {
 
     strbuf_setlen(&b, 25);
     assert(b.len == 0);
-    
+
     strbuf_expand(&b, 25);
     strbuf_setlen(&b, b.alloc_size);
     assert(b.len == b.alloc_size-1);
@@ -60,10 +60,10 @@ void test_release() {
     print_strbuf(&b);
 
     str = strbuf_release(&b);
-	
-	printf("released |%s|\n", str);
-	
-	free(str);
+
+    printf("released |%s|\n", str);
+
+    free(str);
 }
 
 void test_release_empty() {
@@ -107,7 +107,7 @@ void test_chop() {
     print_strbuf(&b);
 
     strbuf_append_str(&b, "X");
-    
+
     strbuf_rchop(&b, 'X');
     print_strbuf(&b);
 
@@ -118,7 +118,7 @@ void test_chop() {
 
     strbuf_rchop(&b, 'X');
     print_strbuf(&b);
-    
+
     strbuf_free(&b);
 }
 
@@ -138,16 +138,16 @@ void test_term() {
 void test_trim() {
 
     strbuf_t b = STRBUF_INIT;
-	
+
     print_strbuf(&b);
 
     strbuf_append_repeat(&b, ' ', 4);
     strbuf_append(&b, "abcdef", 6);
-	
-	print_strbuf(&b);
-	
+
+    print_strbuf(&b);
+
     strbuf_append(&b, "012345678901234567890123456789", 30);
-    strbuf_append_ch(&b, 'a'); 
+    strbuf_append_ch(&b, 'a');
     strbuf_append_repeat(&b, ' ', 6);
 
     print_strbuf(&b);
@@ -155,10 +155,10 @@ void test_trim() {
     strbuf_rtrim(&b);
 
     print_strbuf(&b);
-	
-	strbuf_ltrim(&b);
-	
-	print_strbuf(&b);
+
+    strbuf_ltrim(&b);
+
+    print_strbuf(&b);
 
     strbuf_free(&b);
 }
@@ -171,9 +171,9 @@ void test_rev() {
 
     print_strbuf(&b);
 
-	strbuf_rev(&b);
-	
-	print_strbuf(&b);
+    strbuf_rev(&b);
+
+    print_strbuf(&b);
 
     strbuf_free(&b);
 }
@@ -239,6 +239,6 @@ int main() {
     test_chop();
     test_explode();
     test_free_empty();
-    
+
     return 0;
 }

@@ -42,7 +42,7 @@ int main() {
 
     printf("---\n");
     tree_traverse((struct tree*)root, print_node, NULL);
-    
+
     inotify_watch_destroy(root, NULL);
 
     return 0;

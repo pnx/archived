@@ -2,6 +2,11 @@
 Coding-style
 --------------
 
+Indentation
+-----------
+
+This project uses soft tabs that is 4 spaces wide.
+
 Statements
 ----------
 If only one statement exist in a statement body. Braces should be skipped,

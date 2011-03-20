@@ -1,10 +1,10 @@
 fscrawl - Filesystem traversal
-------------------------------
+==============================
 
 API for traversing a filesystem tree/subtree.
 
 Data Structures
-~~~~~~~~~~~~~~~
+---------------
 
 * `fscrawl_t`
 
@@ -24,7 +24,7 @@ Holds information about a node on the filesystem
     zero if the entry is a file, non zero otherwise
 
 Functions
-~~~~~~~~~
+---------
 
 `fsc_open()`::
 

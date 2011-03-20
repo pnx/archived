@@ -1,12 +1,12 @@
 Log - Message logging API
--------------------------
+=========================
 
 This interface is designed in such way that code that wants to log a massage can do so with one call and don't worry
 about where it may turn up and what format it should use etc. +
 All this is setup trough one function call idealy in the beginning of a process.
 
 Macros
-~~~~~~
+------
 
 `LOG_INFO`::
     Information, Someone thinks you may find this important.
@@ -24,7 +24,7 @@ Macros
     All of the above.
 
 Functions
-~~~~~~~~~
+---------
 
 `init_log()`::
 Initialize the logging functionality, 'level' is a bitmask of the LOG_* contansts defining what types of messages should be logged. +

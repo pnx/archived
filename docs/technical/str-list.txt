@@ -1,9 +1,9 @@
 String List
------------
+===========
 
 
 Data structures
-~~~~~~~~~~~~~~~
+---------------
 
 * `struct str_list`
 +
@@ -18,7 +18,7 @@ Structure that holds the list
 --
 
 Functions
-~~~~~~~~~
+---------
 
 `str_list_init`::
 

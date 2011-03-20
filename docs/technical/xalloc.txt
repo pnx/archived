@@ -1,5 +1,5 @@
 xalloc - safe memory allocation
--------------------------------
+===============================
 
 This module implements malloc and friends + some extensions.
 If `__DEBUG__` symbol is defined. The functions will provide extended
@@ -10,7 +10,7 @@ some reason, this makes the need for client-code to check for `NULL` pointers re
 by these functions redundant.
 
 Functions
-~~~~~~~~~
+---------
 
 `xmalloc()`::
 

@@ -1,18 +1,18 @@
 Queue
------
+=====
 
 Simple FIFO queue allowing enqueueing and dequeing from the start and end. +
 This implementation only stores generic pointers to objects.
 So you must take care of the objects lifetime, size etc by yourself.
 
 Data structures
-~~~~~~~~~~~~~~~
+---------------
 
 * `queue_t`
     An abstract datatype holding the queue, used by queue_* functions.
 
 Functions
-~~~~~~~~~
+---------
 
 `queue_init()`::
 

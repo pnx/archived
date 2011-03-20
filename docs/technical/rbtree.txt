@@ -1,8 +1,8 @@
 Red-Black Tree
---------------
+==============
 
 Macros
-~~~~~~
+------
 
 `RBTREE_INIT`::
 Initialize a `rbtree` structure. +
@@ -15,7 +15,7 @@ rbtree tree = RBTREE_INIT(cmp);
 will expand to set the compare function 'cmp' to the `cmp_fn` member.
 
 Data structures
-~~~~~~~~~~~~~~~
+---------------
 
 * `rbtree`
 +
@@ -31,7 +31,7 @@ Structure that holds a tree of nodes
 --
 
 Functions
-~~~~~~~~~
+---------
 
 `rbtree_insert()`::
 

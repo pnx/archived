@@ -1,10 +1,10 @@
 Path - Path handling routines
------------------------------
+=============================
 
 This module implements common routines for dealing with paths.
 
 Functions
-~~~~~~~~~
+---------
 
 `is_abspath()`::
 

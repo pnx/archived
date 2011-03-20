@@ -1,5 +1,5 @@
 String buffer API
------------------
+=================
 
 First off, the major design choices. the most important thing to keep in mind
 when using the API is that it is designed for low-level usage, The basic error checking
@@ -10,7 +10,7 @@ Other types of skipped error checking is for example if the ->len member is in r
 the allocated block. (obviously this is checked in functions that may need to expand the memory)
 
 Data structures
-~~~~~~~~~~~~~~~
+---------------
 
 * `strbuf_t`
 
@@ -22,7 +22,7 @@ and it's possible to have embedded `NULL`'s because of that.
 NOTE: ->alloc_size and ->len should *not* be messed with, only `strbuf_*` functions will know how to handle those properly.
 
 Functions
-~~~~~~~~~
+---------
 
 `strbuf_setlen()`::
 

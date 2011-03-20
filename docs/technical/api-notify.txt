@@ -1,5 +1,5 @@
 Notify API
-----------
+==========
 
 This API is here to provide an abstraction to the underlaying low-level filesystem notification mechanism
 to try to make applications portable but also throw away detail from client-code.
@@ -8,7 +8,7 @@ IMPORTANT: The design is only tested with inotify and the API may
 need to change in the future to support more subsystems that may have some limitations.
 
 Data structures
-~~~~~~~~~~~~~~~
+---------------
 
 * `notify_event`
 
@@ -47,7 +47,7 @@ NOTIFY_MOVE_TO;;
     the filename the event was triggered on
 
 Functions
-~~~~~~~~~
+---------
 
 `notify_init()`::
 

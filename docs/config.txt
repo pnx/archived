@@ -1,11 +1,11 @@
 Configuration
---------------
+=============
 
 Archive uses a .ini style configuration. The following options are
 available.
 
 Value types
-~~~~~~~~~~~
+-----------
 
 Boolean ;;
     True:  Y, T, 1 +
@@ -15,10 +15,10 @@ String ;;
     Anything else.
 
 Options
-~~~~~~~
+-------
 
 Log
-^^^
+~~~
 Options available in the log section
 
 use (Boolean);;
@@ -35,7 +35,7 @@ directory (String);;
 
 
 Mysql
-^^^^^
+~~~
 Options available in the mysql section
 
 host (String);;

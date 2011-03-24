@@ -25,7 +25,7 @@ else if (b) {
 } else
     baz();
 
-instead you should write the above code as:
+instead the above code should be written as:
 
 for(i=0; i < 10; i++) {
     for(j=0; i < 10; j++) {

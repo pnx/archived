@@ -2,13 +2,12 @@
 Coding-style
 --------------
 
-Indentation
------------
+            1. Indentation
 
 This project uses soft tabs that is 4 spaces wide.
 
-Statements
-----------
+            2. Statements
+
 If only one statement exist in a statement body. Braces should be skipped,
 but not if the structure is nested or followed by multiple if/else, ex:
 
@@ -45,8 +44,8 @@ if (a) {
 
 Avoid using assignment in if()
 
-Functions
----------
+            3. Functions
+
 We use an extended K&R style, the extension is for functions that can have both there opening bracer on the same line and
 directly under it but please don't mix em. We allow both but you should chose one and stick with it.
 You should mimic the syntax used around your code, don't mix both formats in one c file.
@@ -62,8 +61,8 @@ void bar()
 }
 
 
-Pointer declaration
--------------------
+            4. Pointer declaration
+
 this should be done in 2 different ways depending on where it's declared:
 
     1: variables are declared like `char *str`, not `char * str` or `char* str`.
@@ -76,8 +75,7 @@ this syntax forces the most readable code. ex:
 this format cleary states that name is a pointer of type char and the function returns
 a pointer to a struct list
 
-Naming
-------
+            5. Naming
 
  - Never use CamelCase. UPPERCASE for constants and lowercase for variables,functions,macros. words is separated by underscore.
 
@@ -87,12 +85,10 @@ Naming
 
  - Headerguard defines is written like __PATH_TO_THIS_HEADER_H
 
-Documentation
--------------
+            6. Documentation
 
 All API's should be externaly documented in the doc/ directory.
 
-Things to keep in mind when modify or write code
-------------------------------------------------
+            7. Things to keep in mind when modify or write code
 
 include and change the comment found in TEMPLATE file, at the top of the .c/.h file

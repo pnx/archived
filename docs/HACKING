@@ -79,13 +79,13 @@ a pointer to a struct list
 Naming
 ------
 
- * Never use CamelCase. UPPERCASE for constants and lowercase for variables,functions,macros. words is separated by underscore.
+ - Never use CamelCase. UPPERCASE for constants and lowercase for variables,functions,macros. words is separated by underscore.
 
- * API functions (that have a prototype in a header file) should be prefixed with the header filename.
+ - API functions (that have a prototype in a header file) should be prefixed with the header filename.
    One exception exist and that is when the functionality is realy lowlevel and/or generic enough that it
    would be redundant to include a prefix. an example of this is a fatal() or die() function that may be prototyped in misc.h.
 
- * Headerguard defines is written like __PATH_TO_THIS_HEADER_H
+ - Headerguard defines is written like __PATH_TO_THIS_HEADER_H
 
 Documentation
 -------------

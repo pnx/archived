@@ -133,7 +133,7 @@ void strbuf_appendf(strbuf_t *s, const char *fmt, ...) {
     if (len > 0) {
         strbuf_expand(s, len);
         va_start(va, fmt);
-        len = strbuf_append_va(s, fmt, va);
+        strbuf_append_va(s, fmt, va);
         va_end(va);
     }
 }

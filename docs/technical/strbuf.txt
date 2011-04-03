@@ -59,7 +59,7 @@ va_end(va);
 if (len > 0) {
     strbuf_expand(s, len);
     va_start(va, fmt);
-    len = strbuf_append_va(s, fmt, va);
+    strbuf_append_va(s, fmt, va);
     va_end(va);
 }
 ----

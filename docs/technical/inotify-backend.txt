@@ -1,0 +1,155 @@
+Inotify backend
+===============
+
+Extended API for the inotify subsystem. +
+Original documentation about inotify can be found here http://linux.die.net/man/7/inotify
+and is valid in this API unless stated otherwise.
+
+Data structures
+---------------
+
+* `struct inotify_event`
++
+--
+Represents an inotify event.
+
+`wd`::
+    Identifies the watch for which this event occurs. +
+    It is one of the watch descriptors returned by a previous call to `inotify_backend_watch()`
+
+`mask`::
+    Contains a bitmask value that describe the event that occurred (See event macros below)
+
+`cookie`::
+    Cookie to synchronize two (`IN_MOVED_FROM`, `IN_MOVED_TO`) events.
+
+`len`::
+    Length (including NULs) of name.
+
+`name`::
+    The name field is only present when an event is returned for a file inside a watched directory
+    it identifies the file pathname relative to the watched directory. +
+    This pathname is null-terminated, and may include further null bytes to align subsequent reads to a suitable address boundary.
+--
+
+Macros
+------
+
+`IN_EVENT_SIZE`::
+
+    Avarange size of the `inotify_event` structure. +
+    Usefull when allocating the buffer used for `inotify_read()`
+
+Events
+~~~~~~
+
+`IN_ACCESS`::
+
+    file/directory was accessed in some way.
+
+`IN_MODIFY`::
+
+    file/directory was modified.
+
+`IN_ATTRIB`::
+
+    The file/directory's metadata was changed.
+
+`IN_CLOSE_WRITE`::
+
+    The file was closed and written to.
+
+`IN_CLOSE_NOWRITE`::
+
+    The file was closed but unchanged.
+
+`IN_OPEN`::
+
+    The file was opened.
+
+`IN_MOVED_FROM`::
+
+    File/Directory was moved from this location.
+
+`IN_MOVED_TO`::
+
+    File/Directory was moved to this location.
+
+`IN_CREATE`::
+
+    A file/directory was created.
+
+`IN_DELETE`::
+
+    A file/directory was deleted.
+
+`IN_DELETE_SELF`::
+
+    The watch itself was deleted.
+
+`IN_MOVE_SELF`::
+
+    The watch itself was moved.
+
+`IN_UNMOUNT`::
+
+    Backing filesystem was unmounted.
+
+`IN_Q_OVERFLOW`::
+
+    Event queued overflowed.
++
+NOTE: there is no watch descriptor for this event.
+
+`IN_IGNORED`::
+
+    Watch has been ignored.
+
+Helper events
+~~~~~~~~~~~~~
+
+`IN_MOVE`::
+
+    File/Directory was moved. (will match both `IN_MOVED_FROM` and `IN_MOVED_TO`)
+
+`IN_CLOSE`::
+
+    The file was closed. (will match both `IN_CLOSE_WRITE` and `IN_CLOSE_NOWRITE`).
+
+Flags
+~~~~~
+
+`IN_ISDIR`::
+
+    Event was triggered on a directory.
+
+Functions
+---------
+
+`inotify_backend_init()`::
+
+    Initialize inotify. +
+    On success a valid inotify file descriptor is returned, otherwise
+    a negative value is returned and 'errno' is set to indicate the error.
+
+`inotify_backend_exit()`::
+
+    Cleans up and closes the inotify file descriptor.
+
+`inotify_backend_watch()`::
+
+    Begin watching 'path' for events. +
+    On success the watch descriptor that has been asigned to this path is returned, otherwise
+    a negative value is returned and 'errno' is set to indicate the error.
+
+`inotify_backend_ignore()`::
+
+    Stop watching 'path'. +
+    On success zero is returned, otherwise a negative value is returned and 'errno' is
+    set to indicate the error.
+
+`inotify_backend_read()`::
+
+    Reads events from inotify. This function is non-blocking. +
+    On success returns the number of bytes read, otherwise a negative value
+    is returned and 'errno' is set to indicate the error.

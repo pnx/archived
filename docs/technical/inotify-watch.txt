@@ -1,0 +1,74 @@
+Inotify watch
+=============
+
+Datastructure to keep track of watch descriptors and their relationship (tree) on the filesystem. +
+This exists because if symlinks are watched. inotify does not report on subdirectories (files/directories arent actualy removed) so this information needs to be stored.
+
+Data Structures
+---------------
+
+* `struct watch`
+
+`tree`::
+    The N-ary tree data
+
+`wd`::
+    Watchdescriptor
+
+`path`::
+    The path.
+
+Functions
+---------
+
+`inotify_watch_new()`::
+
+    Allocates a new `watch` structure.
++
+NOTE: content of 'path' is *not* copied or modified.
+
+`inotify_watch_destroy()`::
+
+    Recursivly deallocates an tree of watches.
+
+`inotify_watch_add()`::
+
+    Add the 'watch' to exist as a child to 'parent'. +
+    The function will move children from 'parent' down to
+    'watch' if their '->path' member are (textualy) a parent of 'watch'. +
+    +
+    Consider the following tree:
++
+----
+(/)
+ \
+  (/mnt/) --- (/var/a/) --- (/var/b)
+   \
+    (/mnt/c/)
+     \
+      (/mnt/c/a/)
+----
++
+Adding '/var/' as child to '/' will result in '/var/a' and '/var/b' being moved to '/var/'.
++
+----
+(/)
+ \
+  (/mnt/) --- (/var/)
+   \           \
+    (/mnt/c/)   (/var/a/) --- (/var/b)
+     \
+      (/mnt/c/a/)
+
+----
+
+`inotify_watch_rm()`::
+
+    Remove 'watch' from the tree.
++
+NOTE: *only* 'watch' itself is removed, it's children are still in the tree.
+
+`inotify_watch_find_child()`::
+
+    Finds the child by comparing 'path' against childs ->path member. +
+    Returns a pointer to the matched child, `NULL` if no child could be found.

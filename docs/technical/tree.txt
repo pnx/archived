@@ -1,0 +1,70 @@
+tree - N-ary tree
+=================
+
+Genaric N-ary tree, it is designed to be wrapped in more high level and specialized datastructure.
+
+Data structures
+---------------
+
+* `tree`
++
+--
+Represents a tree node.
+
+`next`::
+    Pointer to the next node.
+
+`parent`::
+    Pointer to the parent node.
+
+`child`::
+    Pointer to the first child.
+
+NOTE: Only members related to the tree are defined, no pointer to the associated data. +
+      That is because it is designed to be flexible and expected to be built upon (included in another structure).
+--
+
+Functions
+---------
+
+`tree_new()`::
+
+    allocates memory of a `tree` structure.
+
+`tree_link()`::
+
+    Links the root of 'tree' to be a child of 'parent'. +
+    Those linking the two tree's togheter.
+
+`tree_unlink()`::
+
+    Removes the node 'tree' from the entire tree. +
+    The children of 'tree' is relinked to exist under 'tree'->parent.
+
+`tree_move()`::
+
+    Moves the subtree 'src' to exist as a child to 'dst'.
+
+`tree_detach()`::
+
+    Detaches the subtree pointed by 'tree'. and creates two tree's.
+
+`tree_traverse()`::
+
+    Traverses the tree applying 'fn' on every node.
+
+`tree_parent_count()`::
+
+    Returns the number of parent 'tree' has.
+
+`tree_is_root()`::
+
+    Returns nonzero if node is root (has no parent and no next), zero otherwise.
++
+NOTE: this may be implemented as a macro.
+
+`tree_is_leaf()`::
+
+    Returns nonzero if node is leaf (has no children), zero othersize.
++
+NOTE: this may be implemented as a macro.

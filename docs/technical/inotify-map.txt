@@ -1,0 +1,40 @@
+Inotify map
+===========
+
+This interface is designed to function as a map for inotify watch descriptors and their paths
+according to following relationships
+
+* One watch descriptor can be associated with multiple paths
+* One path can only have one watch descriptor.
+
+Functions
+---------
+
+`inotify_map()`::
+
+    Map 'wd' to 'path'.
+
+`inotify_unmap_wd()`::
+
+    Removes 'wd'.
+
+`inotify_unmap_path()`::
+
+    Removes 'path'.
+
+`inotify_unmap_all()`::
+
+    Removes everything.
+
+`inotify_map_get_wd()`::
+
+    Returns the watch descriptor that is associated with 'path'. +
+    A negative value is returned if 'path' does not exist.
+
+`inotify_map_get_path()`::
+
+    Returns a `struct list` of `struct watch` the represents all watches that is associated with 'wd'.
+
+`inotify_map_isempty()`::
+
+    Returns nonzero if map is not empty, zero otherwise.

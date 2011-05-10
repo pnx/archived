@@ -8,7 +8,6 @@
  *   (at your option) any later version.
  */
 
-#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include "util.h"
@@ -84,8 +83,10 @@ void* xmemdup(const void *src, size_t size) {
     return dest;
 }
 
+#ifdef __DEBUG__
 void xfree(void *ptr) {
 
     CHECK_INPUT(ptr, "xfree");
     free(ptr);
 }
+#endif /* __DEBUG__ */

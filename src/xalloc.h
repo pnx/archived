@@ -11,7 +11,7 @@
 #ifndef __XALLOC_H
 #define __XALLOC_H
 
-#include <stddef.h>
+#include <stdlib.h>
 
 void* xmalloc(size_t);
 
@@ -23,6 +23,10 @@ char* xstrdup(const char *);
 
 void* xmemdup(const void *, size_t);
 
+#ifdef __DEBUG__
 void xfree(void *);
+#else
+#define xfree free
+#endif /* __DEBUG__ */
 
 #endif /* __XALLOC_H */

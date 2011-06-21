@@ -1,6 +1,7 @@
 *.o
 archived
 Makefile.local.mk
+VERSION
 test/test_*
 nbproject
 config.ini

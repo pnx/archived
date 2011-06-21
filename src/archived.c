@@ -27,6 +27,9 @@
 #include "util.h"
 
 static const char *archived_usage_str =
+#ifdef ARCHIVED_VERSION
+    "Archived " ARCHIVED_VERSION "\n"
+#endif
     "Usage: archived [-c <config>] <root>\n"
     "       config - Path to the configuration file (default ./config.ini)\n"
     "       root   - Path to indexroot. All subdirectories will be indexed.\n";

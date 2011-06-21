@@ -2,6 +2,7 @@
 #
 # Archived Makefile
 #
+all::
 
 CC       = gcc
 CFLAGS	 = -O2 -Wall -Ilib
@@ -27,10 +28,14 @@ else
 	obj += $(obj-mysql)
 endif
 
+VERSION :
+	@$(SHELL) ./VERSION-GEN > VERSION
+-include VERSION
+
 .SUFFIXES: .c .o
 .PHONY : clean distclean
 
-all : $(PROGRAM)
+all:: $(PROGRAM)
 
 $(PROGRAM) : src/archived.o $(obj)
 	$(QUIET_LD)$(LD) $(sort $(^)) -o $@ $(LDFLAGS)
@@ -41,10 +46,13 @@ clean :
 	done
 	@make -C test clean
 	@make -C docs clean
+	$(RM) VERSION
 
 distclean : clean
 	$(RM) $(PROGRAM)
 	$(RM) Makefile.local.mk
+
+src/archived.o : CFLAGS += -DARCHIVED_VERSION='"$(ARCHIVED_VERSION)"'
 
 %.o : %.c
 	$(QUIET_CC)$(CC) $(CFLAGS) -c $< -o $@

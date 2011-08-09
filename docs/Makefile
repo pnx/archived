@@ -11,7 +11,7 @@ endif
 
 .PHONY : clean
 
-all : html
+all : html technical
 
 html : index.html
 

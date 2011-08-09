@@ -33,12 +33,15 @@ VERSION :
 -include VERSION
 
 .SUFFIXES: .c .o
-.PHONY : clean distclean
+.PHONY : docs clean distclean
 
 all:: $(PROGRAM)
 
 $(PROGRAM) : src/archived.o $(obj)
 	$(QUIET_LD)$(LD) $(sort $(^)) -o $@ $(LDFLAGS)
+
+docs :
+	$(MAKE) -C docs all
 
 clean :
 	@for obj in $(shell find . -name "*.o" -type f -printf "%P\n"); do \

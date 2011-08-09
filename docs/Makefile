@@ -10,8 +10,11 @@ ifndef VERBOSE
 endif
 
 .PHONY : clean
+
 all : html
+
 html : index.html
+
 technical : technical/index.html
 
 %.html : %.txt

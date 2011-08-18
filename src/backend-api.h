@@ -1,4 +1,4 @@
-/* database.h - database driver API
+/* backend-api.h - backend driver API
  *
  *   Copyright (C) 2010  Fredric Nilsson <fredric@fiktivkod.org>
  *
@@ -8,17 +8,17 @@
  *   (at your option) any later version.
  */
 
-#ifndef __DATABASE_H
-#define __DATABASE_H
+#ifndef __BACKEND_API_H
+#define __BACKEND_API_H
 
 #include <ini/dictionary.h>
 
-int database_init(dictionary *conf);
+int backend_init(dictionary *conf);
 
-int database_insert(const char *path, const char *filename, const int isdir);
+int backend_insert(const char *path, const char *filename, const int isdir);
 
-int database_delete(const char *path, const char *filename);
+int backend_delete(const char *path, const char *filename);
 
-int database_close();
+int backend_exit();
 
-#endif /* __DATABASE_H */
+#endif /* __BACKEND_API_H */

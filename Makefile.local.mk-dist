@@ -8,8 +8,8 @@
 # database adapter, mysql is default
 # Note: mysql is recomended, the mongo driver is not stable and you have to figure out
 # how to install the libray and header files by yourself.
-# database = mysql
-# database = mongo
+# backend_driver = mysql
+# backend_driver = mongo
 
 # Uncomment this if you don't have memrchr on your system. (GNU extension as of >=glibc 2.1.91)
 # NO_MEMRCHR = 1

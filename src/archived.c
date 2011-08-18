@@ -21,7 +21,7 @@
 #include <ini/iniparser.h>
 
 #include "notify.h"
-#include "database.h"
+#include "backend-api.h"
 #include "log.h"
 #include "path.h"
 #include "strbuf.h"
@@ -60,7 +60,7 @@ static void clean_exit(int excode) {
 
     notify_exit();
 
-    database_close();
+    backend_exit();
 
     iniparser_freedict(config);
 
@@ -106,9 +106,9 @@ static void main_loop() {
             event->dir ? 'D' : 'F', event->path, event->filename);
 
         if (event->type == NOTIFY_CREATE)
-            database_insert(event->path, event->filename, event->dir);
+            backend_insert(event->path, event->filename, event->dir);
         else if (event->type == NOTIFY_DELETE)
-            database_delete(event->path, event->filename);
+            backend_delete(event->path, event->filename);
 
         notify_event_del(event);
     }
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
         init_log(level, path);
     }
 
-    ret = database_init(config);
+    ret = backend_init(config);
     if (ret == -1)
         return EXIT_FAILURE;
 

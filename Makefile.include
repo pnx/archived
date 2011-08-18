@@ -39,5 +39,7 @@ obj-notify-inotify = src/notify-inotify.o $(obj-inotify) $(obj-xalloc) $(obj-fsc
 
 obj-notify = src/event.o $(obj-notify-inotify)
 obj-ini = lib/ini/iniparser.o lib/ini/dictionary.o
-obj-mongo = src/database/mongo.o $(obj-path) $(obj-ini)
-obj-mysql = src/database/mysql.o $(obj-ini) $(obj-xalloc)
+
+# Backends
+obj-backend-mongo = src/backend/mongo.o $(obj-ini) $(obj-path)
+obj-backend-mysql = src/backend/mysql.o $(obj-ini) $(obj-xalloc)

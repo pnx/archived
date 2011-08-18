@@ -21,7 +21,7 @@
 #include <mongo/mongo.h>
 #include <ini/iniparser.h>
 #include "../path.h"
-#include "../database.h"
+#include "../backend-api.h"
 
 static struct {
     mongo_connection conn;
@@ -52,7 +52,7 @@ static void coll_clear() {
     bson_destroy(&cond);
 }
 
-int database_init(dictionary *conf) {
+int backend_init(dictionary *conf) {
 
     char *confdb = iniparser_getstring(conf, "mongo:database", NULL);
     char *confcoll = iniparser_getstring(conf, "mongo:collection", NULL);
@@ -120,7 +120,7 @@ int database_init(dictionary *conf) {
     return 0;
 }
 
-int database_insert(const char *path, const char *filename, const int isdir) {
+int backend_insert(const char *path, const char *filename, const int isdir) {
 
     bson b;
     bson_buffer buf;
@@ -140,7 +140,7 @@ int database_insert(const char *path, const char *filename, const int isdir) {
     return 0;
 }
 
-int database_delete(const char *path, const char *filename) {
+int backend_delete(const char *path, const char *filename) {
 
     bson cond;
     bson_buffer buf;
@@ -169,7 +169,7 @@ int database_delete(const char *path, const char *filename) {
     return 0;
 }
 
-int database_close() {
+int backend_exit() {
 
     mongo_destroy(&db.conn);
 

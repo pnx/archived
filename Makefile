@@ -19,13 +19,13 @@ endif
 obj := $(obj-ini) $(obj-log) $(obj-notify) $(obj-path) \
 	   $(obj-strbuf) $($obj-xalloc) $(obj-compat)
 
-ifeq ($(database), mongo)
+ifeq ($(backend_driver), mongo)
 	LDFLAGS += -lmongoc -lbson
-	obj += $(obj-mongo)
+	obj += $(obj-backend-mongo)
 else
 	CFLAGS += $(shell mysql_config --cflags)
 	LDFLAGS += $(shell mysql_config --libs)
-	obj += $(obj-mysql)
+	obj += $(obj-backend-mysql)
 endif
 
 VERSION :

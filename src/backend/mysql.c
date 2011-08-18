@@ -9,7 +9,7 @@
  */
 #include <mysql/mysql.h>
 #include <ini/iniparser.h>
-#include "../database.h"
+#include "../backend-api.h"
 #include "../xalloc.h"
 
 static struct {
@@ -124,7 +124,7 @@ static int database_setup() {
 /*
  * Initialize database connection and connect to database
  */
-int database_init(dictionary *conf) {
+int backend_init(dictionary *conf) {
 
     if (load_dbconf(conf) < 0)
         return -1;
@@ -148,7 +148,7 @@ int database_init(dictionary *conf) {
     return database_setup();
 }
 
-int database_insert(const char *path, const char *filename, const int isdir) {
+int backend_insert(const char *path, const char *filename, const int isdir) {
 
     int ret;
     char stmt_insert[] = "INSERT INTO `%s` (`Path`, `Base`, `Type`, `Status`, `Date`) VALUES('%s','%s','%i','0', NOW())";
@@ -181,7 +181,7 @@ int database_insert(const char *path, const char *filename, const int isdir) {
     return 0;
 }
 
-int database_delete(const char *path, const char *filename) {
+int backend_delete(const char *path, const char *filename) {
 
     int ret;
     char stmt_delete[] = "DELETE FROM `%s` WHERE `Path` LIKE '%s%s%%' OR (`Path` = '%s' AND `Base` = '%s')";
@@ -209,7 +209,7 @@ int database_delete(const char *path, const char *filename) {
     return 0;
 }
 
-int database_close() {
+int backend_exit() {
 
     mysql_close(db.connection);
 

@@ -57,12 +57,32 @@ int inotify_ignore(const char *path) {
     return 0;
 }
 
+static const char* strmask(uint32_t mask) {
+
+    if (mask & IN_CREATE)
+        return "IN_CREATE";
+    if (mask & IN_DELETE)
+        return "IN_DELETE";
+    if (mask & IN_DELETE_SELF)
+        return "IN_DELETE_SELF";
+    if (mask & IN_MOVED_TO)
+        return "IN_MOVED_TO";
+    if (mask & IN_MOVED_FROM)
+        return "IN_MOVED_FROM";
+    if (mask & IN_IGNORED)
+        return "IN_IGNORED";
+    if (mask & IN_UNMOUNT)
+        return "IN_UNMOUNT";
+    return "-";
+}
+
 static void proc_event(struct inotify_event *iev) {
 
     int i;
     struct list *watch_list;
 
-    logmsg(LOG_DEBUG, "RAW EVENT: %i, %x, %s", iev->wd, iev->mask, iev->name);
+    logmsg(LOG_DEBUG, "RAW EVENT: %i, %x (%s), %s",
+        iev->wd, iev->mask, strmask(iev->mask), iev->name);
 
     if (iev->mask & IN_IGNORED) {
         inotify_unmap_wd(iev->wd);

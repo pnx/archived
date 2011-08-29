@@ -102,8 +102,13 @@ static void proc_event(struct inotify_event *iev) {
         struct watch *watch = watch_list->items[i];
         notify_event *event = notify_event_new();
 
-        notify_event_set_path(event, watch->path);
-        notify_event_set_filename(event, iev->name);
+        if (iev->name[0]) {
+            notify_event_set_path(event, watch->path);
+            notify_event_set_filename(event, iev->name);
+        } else {
+            notify_event_set_path(event, dirname_s(watch->path, 1));
+            notify_event_set_filename(event, basename_s(watch->path));
+        }
 
         /*
          * Because of limitation on the information we get from inotify
@@ -139,6 +144,9 @@ static void proc_event(struct inotify_event *iev) {
                     event->dir = 0;
                 }
             }
+            event->type = NOTIFY_DELETE;
+        } else if (iev->mask & IN_UNMOUNT) {
+            event->dir = 1;
             event->type = NOTIFY_DELETE;
         } else {
             event->type = NOTIFY_UNKNOWN;

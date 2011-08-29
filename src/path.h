@@ -24,6 +24,8 @@ int path_isparent(const char *path, const char *parent);
 
 const char* dirname_s(const char *path, int slash);
 
+const char* basename_s(const char *path);
+
 const char* mkpath(const char *fmt, ...);
 
 char* path_normalize(const char *base, const char *name, unsigned dir);

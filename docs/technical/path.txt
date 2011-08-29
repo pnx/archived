@@ -38,6 +38,14 @@ The function performs this type of checks/manipulation:
 +
 Returns `NULL` if 'base' is not an absolute path or 'name' contains a delimiter.
 
+`basename_s`::
+
+    Safe basename implementation. works like POSIX basename with some modifications: +
++
+--
+    * The function will never modify 'path' instead the function will *always* return a static buffer that will be overwritten by subsequent calls.
+--
+
 `dirname_s`::
 
     Safe dirname implementation. works like POSIX dirname with some modifications: +

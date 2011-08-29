@@ -107,6 +107,32 @@ const char* dirname_s(const char *path, int slash) {
     return sb.buf;
 }
 
+const char* basename_s(const char *path) {
+
+    static strbuf_t sb = STRBUF_INIT;
+
+    strbuf_setlen(&sb, 0);
+    strbuf_append_str(&sb, path);
+    strbuf_squeeze(&sb, '/');
+
+    if (!sb.len) {
+        strbuf_append_ch(&sb, '.');
+    } else if (sb.len > 1) {
+        char *ptr;
+
+        if (sb.buf[sb.len-1] == '/')
+            strbuf_reduce(&sb, 1);
+
+        ptr = strrchr(sb.buf, '/');
+        if (ptr++) {
+            size_t len = sb.len - (sb.buf - ptr);
+            memcpy(sb.buf, ptr, len);
+            strbuf_setlen(&sb, len);
+        }
+    }
+    return sb.buf;
+}
+
 const char *mkpath(const char *fmt, ...) {
 
     static strbuf_t sb = STRBUF_INIT;

@@ -90,7 +90,7 @@ void test_basename() {
     };
 
     for(i=0; i < 11; i++)
-        assert_string(basename(data[i][0]), data[i][1]);
+        assert_string(basename_s(data[i][0]), data[i][1]);
 }
 
 void test_dirname() {

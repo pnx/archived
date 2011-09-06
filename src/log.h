@@ -12,6 +12,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <errno.h>
 
 #define LOG_INFO  (1<<0)
 #define LOG_WARN  (1<<1)

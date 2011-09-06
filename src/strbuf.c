@@ -8,9 +8,11 @@
  *   (at your option) any later version.
  */
 
+#include <unistd.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <errno.h>
 #include "compat/string.h"
 #include "util.h"
 #include "xalloc.h"
@@ -267,4 +269,26 @@ strbuf_t** strbuf_explode(const strbuf_t *s, char sep) {
         p = ++d;
     }
     return list;
+}
+
+int strbuf_readlink(strbuf_t *s, const char *path) {
+
+    int r, len = s->len;
+
+    if (len < CHNK_SIZE)
+        len = CHNK_SIZE;
+
+    while(len < 8192) {
+        strbuf_expand(s, len);
+        r = readlink(path, s->buf, len);
+        if (r < 0) {
+            if (errno != ERANGE)
+                break;
+        } else if (r < len) {
+            strbuf_setlen(s, r);
+            return 0;
+        }
+        len *= 2;
+    }
+    return -1;
 }

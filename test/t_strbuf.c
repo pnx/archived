@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../src/strbuf.h"
+#include "unit.h"
 
 typedef unsigned int uint;
 
@@ -225,6 +226,19 @@ void test_free_empty() {
     strbuf_free(&b);
 }
 
+void test_readlink() {
+
+    strbuf_t b = STRBUF_INIT;
+
+    assert(symlink("/", "./link") == 0);
+
+    strbuf_readlink(&b, "./link");
+
+    unlink("./link");
+
+    assert_string(b.buf, "/");
+}
+
 int main() {
 
     test_appendf();
@@ -239,6 +253,7 @@ int main() {
     test_chop();
     test_explode();
     test_free_empty();
+    test_readlink();
 
     return 0;
 }

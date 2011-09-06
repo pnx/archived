@@ -114,6 +114,11 @@ TIP: use `strbuf_free_list()` to free the entire list.
 +
 NOTE: 'delimiter' is not included in the list.
 
+`strbuf_readlink()`::
+
+    Reads the contents of an symbolic link into the string buffer.
+    On success zero is returned, otherwise non zero is returned and 'errno' is set to indicate the error.
+
 `strbuf_release()`::
 
     This function should be used to detach the ->buf member from the `strbuf_t` structure. +

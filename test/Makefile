@@ -13,7 +13,7 @@ TESTS = $(patsubst t_%.c,%,$(wildcard t_*.c))
 .PHONY : clean
 all : $(TESTS)
 
-strbuf : $(addprefix $(ROOT),$(obj-strbuf))
+strbuf : unit.c $(addprefix $(ROOT),$(obj-strbuf))
 rbtree : unit.c $(addprefix $(ROOT),$(obj-rbtree))
 queue : $(ROOT)src/queue.o $(addprefix $(ROOT),$(obj-xalloc))
 path : unit.c $(ROOT)src/path.o $(addprefix $(ROOT),$(obj-strbuf))

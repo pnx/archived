@@ -70,4 +70,6 @@ void strbuf_squeeze(strbuf_t *s, char ch);
 
 strbuf_t** strbuf_explode(const strbuf_t *s, char sep);
 
+int strbuf_readlink(strbuf_t *s, const char *path);
+
 #endif /* __STRBUF_H */

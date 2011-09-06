@@ -119,6 +119,14 @@ NOTE: 'delimiter' is not included in the list.
     Reads the contents of an symbolic link into the string buffer.
     On success zero is returned, otherwise non zero is returned and 'errno' is set to indicate the error.
 
+`strbuf_getcwd()`::
+
+Fetches the current working directory path and stores it in ->buf. +
+On success zero is returned, otherwise non zero is returned and 'errno' is set to indicate the error.
++
+NOTE: On error, do not assume that the previous content of ->buf is unchanged. +
+      If so, you should consider the whole buffer to be invalid.
+
 `strbuf_release()`::
 
     This function should be used to detach the ->buf member from the `strbuf_t` structure. +

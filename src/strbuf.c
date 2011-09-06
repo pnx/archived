@@ -237,3 +237,25 @@ int strbuf_readlink(strbuf_t *s, const char *path) {
     }
     return -1;
 }
+
+int strbuf_getcwd(strbuf_t *s) {
+
+    int len = s->len;
+
+    if (len < CHNK_SIZE)
+        len = CHNK_SIZE;
+
+    while(len < 8192) {
+        strbuf_expand(s, len);
+        if (!getcwd(s->buf, len)) {
+            if (errno != ERANGE)
+                break;
+        } else {
+            strbuf_setlen(s, strlen(s->buf));
+            return 0;
+        }
+        len *= 2;
+    }
+    strbuf_setlen(s, 0);
+    return -1;
+}

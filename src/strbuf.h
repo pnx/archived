@@ -112,4 +112,6 @@ strbuf_t** strbuf_explode(const strbuf_t *s, char sep);
 
 int strbuf_readlink(strbuf_t *s, const char *path);
 
+int strbuf_getcwd(strbuf_t *s);
+
 #endif /* __STRBUF_H */

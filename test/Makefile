@@ -10,6 +10,10 @@ include ../Makefile.include
 ROOT = ../
 TESTS = $(patsubst t_%.c,%,$(wildcard t_*.c))
 
+# workaround to force make not to remove "intermediate" files
+# (that apperantly make decided *.o files was :)
+.SECONDARY:
+
 .PHONY : clean
 all : $(TESTS)
 
@@ -28,8 +32,9 @@ str-list : unit.c $(addprefix $(ROOT),$(obj-str-list))
 
 clean :
 	$(RM) $(patsubst t_%.c,test_%,$(wildcard t_*.c))
+	$(RM) *.o
 
-% : t_%.c
+% : t_%.o
 	$(QUIET_LD)$(LD) $(LDFLAGS) $(sort $(^)) -o test_$@
 
 %.o : %.c

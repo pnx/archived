@@ -23,6 +23,16 @@ Functions
     Formats a "functional correct" path (that works with `open()`, `stat()` etc). +
     Returns a staticly allocated string.
 
+`real_path()`::
+
+Expands symbolic links and resolves references to '/./' and '/../' in 'path' to generate
+an absolute path.
++
+NOTE: While the returned path is absolute, it may still be a symbolic link
+      because the function has an upper limit on how many links can be resolved. +
++
+Returns an static string or `NULL` if an error occure.
+
 `path_normalize`::
 
 Returns a string that contains the normalized full path specified by 'base', 'name' and 'dir'. +

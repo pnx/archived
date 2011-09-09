@@ -12,14 +12,16 @@
  *   so we use funky heap memory based algorithms instead :)
  */
 
+#include <unistd.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #include "strbuf.h"
 #include "path.h"
+#include "log.h"
 
 static char path_null = '\0';
 
@@ -80,6 +82,82 @@ int path_isparent(const char *path, const char *parent) {
             break;
     }
     return 0;
+}
+
+const char* real_path(const char *path) {
+
+    struct stat st;
+    unsigned numresolve = 5;
+
+    static strbuf_t cwd = STRBUF_INIT, buffers[2] = { STRBUF_INIT };
+    strbuf_t *resolve = buffers, *tmpbuf = buffers + 1, file = STRBUF_INIT;
+
+    strbuf_setlen(resolve, 0);
+    strbuf_append_str(resolve, path);
+
+    while(numresolve--) {
+
+        char *last = NULL;
+
+        if (!is_dir(resolve->buf)) {
+            strbuf_setlen(&file, 0);
+            last = strrchr(resolve->buf, '/');
+            if (last) {
+                strbuf_append_str(&file, last + 1);
+                strbuf_setlen(resolve, last - resolve->buf);
+            } else {
+                last = resolve->buf;
+                strbuf_append_str(&file, last);
+                strbuf_setlen(resolve, 0);
+            }
+        }
+
+        if (resolve->len) {
+            if (!cwd.len && strbuf_getcwd(&cwd) < 0) {
+                logerrno(LOG_CRIT, "getcwd", errno);
+                goto err;
+            }
+
+            if (chdir(resolve->buf)) {
+                logerrno(LOG_WARN, "chdir", errno);
+                goto err;
+            }
+        }
+        if (strbuf_getcwd(resolve) < 0) {
+            logerrno(LOG_CRIT, "getcwd", errno);
+            goto err;
+        }
+
+        if (last) {
+            strbuf_term(resolve, '/');
+            strbuf_append(resolve, file.buf, file.len);
+            strbuf_setlen(&file, 0);
+        }
+
+        if (!lstat(resolve->buf, &st) && S_ISLNK(st.st_mode)) {
+            strbuf_t *tmpnext;
+            int len = strbuf_readlink(resolve, tmpbuf->buf);
+            if (len < 0) {
+                logerrno(LOG_CRIT, "readlink", errno);
+                goto out;
+            }
+            tmpnext = resolve;
+            resolve = tmpbuf;
+            tmpbuf = tmpnext;
+        } else {
+            break;
+        }
+    }
+
+out:
+    if (cwd.len && chdir(cwd.buf))
+        logerrno(LOG_CRIT, "chdir", errno);
+
+    strbuf_free(&file);
+    return resolve->buf;
+err:
+    strbuf_free(&file);
+    return NULL;
 }
 
 const char* dirname_s(const char *path, int slash) {

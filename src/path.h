@@ -22,6 +22,8 @@ int is_dir(const char *path);
 
 int path_isparent(const char *path, const char *parent);
 
+const char* real_path(const char *path);
+
 const char* dirname_s(const char *path, int slash);
 
 const char* basename_s(const char *path);

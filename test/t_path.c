@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "unit.h"
+#include "../src/log.h"
 #include "../src/path.h"
 
 void test_normalize() {
@@ -130,7 +131,28 @@ void test_path_isparent() {
     assert(path_isparent("/dir1/dir2/", "/var/") == 0);
 }
 
+void test_real_path() {
+
+    const char *p2, *p1;
+
+    p1 = real_path("../test/Makefile");
+    assert(p1);
+    printf("%s\n", p1);
+
+    p1 = real_path("t_path.c");
+    assert(p1);
+    p1 = strdup(p1);
+
+    p2 = real_path("./t_path.c");
+
+    assert_string(p1, p2);
+
+    free(p1);
+}
+
 int main(int argc, char *argv[]) {
+
+    init_log(LOG_ALL, NULL);
 
     test_isabspath();
     test_isfile();
@@ -140,6 +162,7 @@ int main(int argc, char *argv[]) {
     test_basename();
     test_dirname();
     test_path_isparent();
+    test_real_path();
 
     return 0;
 }

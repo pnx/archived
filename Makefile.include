@@ -19,14 +19,14 @@ ifdef NO_MEMRCHR
 	obj-compat = src/compat/memrchr.o
 endif
 obj-xalloc = src/xalloc.o src/die.o
+obj-strbuf = src/strbuf.o $(obj-xalloc) src/die.o
+obj-log = src/log.o $(obj-strbuf) $(obj-xalloc)
 obj-list = src/list.o $(obj-xalloc)
 obj-str-list = src/str-list.o $(obj-xalloc)
-obj-strbuf = src/strbuf.o $(obj-xalloc) src/die.o
-obj-path = src/path.o $(obj-strbuf)
+obj-path = src/path.o $(obj-strbuf) $(obj-log) $(obj-compat)
 obj-rbtree = src/rbtree.o $(obj-xalloc)
 obj-tree = src/tree.o $(obj-xalloc)
 obj-fscrawl = src/fscrawl.o $(obj-strbuf) $(obj-path) $(obj-log)
-obj-log = src/log.o $(obj-strbuf) $(obj-xalloc)
 
 # inotify
 obj-inotify-backend = src/inotify-backend.o $(obj-log)

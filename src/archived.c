@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
     if (ret == -1)
         return EXIT_FAILURE;
 
-    ret = notify_add_watch(rootdir);
+    ret = notify_add_watch(real_path(rootdir));
     if (ret == -1) {
         fprintf(stderr, "Invalid path: %s\n", rootdir);
         return EXIT_FAILURE;

@@ -111,7 +111,7 @@ static void proc_event(struct inotify_event *iev) {
         }
 
         /*
-         * Because of limitation on the information we get from inotify
+         * Because of limitation in the information we get from inotify
          * We must do something else to find out what type a "file/link" should be.
          *
          *   if CREATE or MOVED_TO:

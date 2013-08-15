@@ -1,4 +1,4 @@
-/* tree.c - N-tree implementation
+/* tree.h - N-tree implementation
  *
  *   Copyright (C) 2011   Henrik Hautakoski <henrik@fiktivkod.org>
  *

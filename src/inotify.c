@@ -57,23 +57,47 @@ int inotify_ignore(const char *path) {
     return 0;
 }
 
+static size_t memadd(void *dest, void *src, size_t msize, size_t size) {
+
+    if (msize >= size)
+        msize = size;
+
+    memcpy(dest, src, msize);
+    return msize;
+}
+
 static const char* strmask(uint32_t mask) {
 
+    static char buf[1024];
+    unsigned p = 0;
+
     if (mask & IN_CREATE)
-        return "IN_CREATE";
+        p = memadd(buf, ",CREATE", 7, sizeof(buf)-1);
     if (mask & IN_DELETE)
-        return "IN_DELETE";
+        p += memadd(buf + p, ",DELETE", 7, sizeof(buf)-1 - p);
+    if (mask & IN_ISDIR)
+        p += memadd(buf + p, ",ISDIR", 6, sizeof(buf)-1 - p);
     if (mask & IN_DELETE_SELF)
-        return "IN_DELETE_SELF";
+        p += memadd(buf + p, ",DELETE_SELF", 12, sizeof(buf)-1 - p);
     if (mask & IN_MOVED_TO)
-        return "IN_MOVED_TO";
+        p += memadd(buf + p, ",MOVED_TO", 9, sizeof(buf)-1 - p);
     if (mask & IN_MOVED_FROM)
-        return "IN_MOVED_FROM";
+        p += memadd(buf + p, ",MOVED_FROM", 11, sizeof(buf)-1 - p);
     if (mask & IN_IGNORED)
-        return "IN_IGNORED";
+        p += memadd(buf + p, ",IGNORED", 8, sizeof(buf)-1 - p);
     if (mask & IN_UNMOUNT)
-        return "IN_UNMOUNT";
-    return "-";
+        p += memadd(buf + p, ",UNMOUNT", 8, sizeof(buf)-1 - p);
+
+#ifdef __DEBUG__
+    if (p >= sizeof(buf)-1)
+        die("strmask: buffer overflow\n");
+#endif /* __DEBUG__ */
+
+    if (!p)
+        p = 1;
+
+    buf[p] = '\0';
+    return buf + 1;
 }
 
 static void proc_event(struct inotify_event *iev) {

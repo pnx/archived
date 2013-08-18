@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <string.h>
 #include "log.h"
 #include "path.h"
 #include "queue.h"

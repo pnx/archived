@@ -14,7 +14,7 @@
 
 size_t memcpy_sb(void *dest, size_t dsize, const void *src, size_t ssize) {
 
-    if (dsize >= ssize)
+    if (dsize > ssize)
         dsize = ssize;
 
     /* Let memcpy do the work. */

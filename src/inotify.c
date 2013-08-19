@@ -1,6 +1,6 @@
 
 #include <stdlib.h>
-#include <string.h>
+#include "compat/string.h"
 #include "log.h"
 #include "path.h"
 #include "queue.h"
@@ -58,36 +58,27 @@ int inotify_ignore(const char *path) {
     return 0;
 }
 
-static size_t memadd(void *dest, void *src, size_t msize, size_t size) {
-
-    if (msize >= size)
-        msize = size;
-
-    memcpy(dest, src, msize);
-    return msize;
-}
-
 static const char* strmask(uint32_t mask) {
 
     static char buf[1024];
     unsigned p = 0;
 
     if (mask & IN_CREATE)
-        p = memadd(buf, ",CREATE", 7, sizeof(buf)-1);
+        p = memcpy_sb(buf, sizeof(buf)-1, ",CREATE", 7);
     if (mask & IN_DELETE)
-        p += memadd(buf + p, ",DELETE", 7, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",DELETE", 7);
     if (mask & IN_ISDIR)
-        p += memadd(buf + p, ",ISDIR", 6, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",ISDIR", 6);
     if (mask & IN_DELETE_SELF)
-        p += memadd(buf + p, ",DELETE_SELF", 12, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",DELETE_SELF", 12);
     if (mask & IN_MOVED_TO)
-        p += memadd(buf + p, ",MOVED_TO", 9, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",MOVED_TO", 9);
     if (mask & IN_MOVED_FROM)
-        p += memadd(buf + p, ",MOVED_FROM", 11, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",MOVED_FROM", 11);
     if (mask & IN_IGNORED)
-        p += memadd(buf + p, ",IGNORED", 8, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",IGNORED", 8);
     if (mask & IN_UNMOUNT)
-        p += memadd(buf + p, ",UNMOUNT", 8, sizeof(buf)-1 - p);
+        p += memcpy_sb(buf + p, sizeof(buf)-1 - p, ",UNMOUNT", 8);
 
 #ifdef __DEBUG__
     if (p >= sizeof(buf)-1)

@@ -33,7 +33,8 @@ obj-fscrawl = src/fscrawl.o $(obj-strbuf) $(obj-path) $(obj-log)
 obj-inotify-backend = src/inotify-backend.o $(obj-log)
 obj-inotify-watch = src/inotify-watch.o $(obj-tree)
 obj-inotify-map = src/inotify-map.o $(obj-inotify-watch) $(obj-path) $(obj-rbtree) $(obj-list)
-obj-inotify = src/inotify.o src/queue.o $(obj-path) $(obj-inotify-backend) $(obj-inotify-map)
+obj-inotify = src/inotify.o src/queue.o $(obj-path) $(obj-inotify-backend) \
+            $(obj-inotify-map) $(obj-compat)
 obj-notify-inotify = src/notify-inotify.o $(obj-inotify) $(obj-xalloc) $(obj-fscrawl)
 
 obj-notify = src/event.o $(obj-notify-inotify)

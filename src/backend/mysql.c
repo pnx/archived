@@ -9,7 +9,7 @@
  */
 #include <mysql/mysql.h>
 #include <ini/iniparser.h>
-#include "../backend-api.h"
+#include "driver.h"
 #include "../xalloc.h"
 
 static struct {

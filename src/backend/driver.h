@@ -1,4 +1,4 @@
-/* backend-api.h - backend driver API
+/* driver.h - backend driver API
  *
  *   Copyright (C) 2010  Fredric Nilsson <fredric@fiktivkod.org>
  *
@@ -8,8 +8,8 @@
  *   (at your option) any later version.
  */
 
-#ifndef __BACKEND_API_H
-#define __BACKEND_API_H
+#ifndef __BACKEND_DRIVER_H
+#define __BACKEND_DRIVER_H
 
 #include <ini/dictionary.h>
 
@@ -21,4 +21,4 @@ int backend_delete(const char *path, const char *filename);
 
 int backend_exit();
 
-#endif /* __BACKEND_API_H */
+#endif /* __BACKEND_DRIVER_H */

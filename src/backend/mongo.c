@@ -20,8 +20,8 @@
 #include <time.h>
 #include <mongo/mongo.h>
 #include <ini/iniparser.h>
+#include "driver.h"
 #include "../path.h"
-#include "../backend-api.h"
 
 static struct {
     mongo_connection conn;

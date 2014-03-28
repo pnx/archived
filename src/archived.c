@@ -21,7 +21,7 @@
 #include <ini/iniparser.h>
 
 #include "notify.h"
-#include "backend-api.h"
+#include "backend/driver.h"
 #include "log.h"
 #include "path.h"
 #include "strbuf.h"

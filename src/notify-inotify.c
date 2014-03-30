@@ -29,7 +29,7 @@
 
 static int init;
 
-static queue_t init_ev_q;
+static queue_t ev_queue;
 
 static int addwatch(const char *path, const char *name) {
 
@@ -66,7 +66,7 @@ static int addwatch(const char *path, const char *name) {
                 xfree(fullpath);
         }
 
-        queue_enqueue(init_ev_q, ev);
+        queue_enqueue(ev_queue, ev);
     }
     fsc_close(f);
 
@@ -96,7 +96,7 @@ int notify_init() {
     if (!init) {
         if (inotify_init() < 0)
             return -1;
-        init_ev_q = queue_init();
+        ev_queue = queue_init();
         init = 1;
     }
     return 0;
@@ -105,11 +105,11 @@ int notify_init() {
 void notify_exit() {
 
     if (init) {
-        notify_event *e;
-        while((e = queue_dequeue(init_ev_q)))
-            notify_event_del(e);
-             queue_destroy(init_ev_q);
-        init_ev_q = NULL;
+        notify_event *ev;
+        while((ev = queue_dequeue(ev_queue)))
+            notify_event_del(ev);
+        queue_destroy(ev_queue);
+        ev_queue = NULL;
 
         inotify_exit();
 
@@ -141,8 +141,8 @@ notify_event* notify_read() {
     if (!init)
         die("inotify is not instantiated.");
 
-    if (!queue_isempty(init_ev_q))
-        return queue_dequeue(init_ev_q);
+    if (!queue_isempty(ev_queue))
+        return queue_dequeue(ev_queue);
 
     ev = inotify_read();
 

@@ -85,6 +85,7 @@ static void sighandl(int sig) {
     case SIGUSR2 :
         printf("notify stat:\n");
         notify_stat();
+        fflush(stdout);
     }
 }
 

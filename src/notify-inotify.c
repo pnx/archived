@@ -156,4 +156,6 @@ void notify_stat() {
 
     if (!init)
         die("inotify is not instantiated.");
+
+    printf("stats is not available for inotify yet.\n");
 }

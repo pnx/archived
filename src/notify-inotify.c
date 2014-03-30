@@ -1,4 +1,4 @@
-/* inotify.c - inotify implementation
+/* notify-inotify.c - inotify implementation
  *
  *   Copyright (C) 2010-2011   Henrik Hautakoski <henrik@fiktivkod.org>
  *   Copyright (C) 2010        Fredric Nilsson <fredric@fiktivkod.org>

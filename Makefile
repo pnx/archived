@@ -4,9 +4,9 @@
 #
 all::
 
-CC       = gcc
-CFLAGS	 = -O2 -Wall -Ilib
-LD		 = $(CC)
+CC     = gcc
+CFLAGS = -O2 -Wall -Ilib
+LD     = $(CC)
 PROGRAM  := archived
 
 -include Makefile.local.mk
@@ -17,7 +17,7 @@ ifdef DEBUG
 endif
 
 obj := $(obj-ini) $(obj-log) $(obj-notify) $(obj-path) \
-	   $(obj-strbuf) $($obj-xalloc) $(obj-compat)
+	$(obj-strbuf) $($obj-xalloc) $(obj-compat)
 
 CFLAGS  += $(shell mysql_config --cflags)
 LDFLAGS += $(shell mysql_config --libs)
